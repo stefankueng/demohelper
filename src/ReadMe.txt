@@ -1,0 +1,1 @@
+ShowHelper: a small application for presentations
