@@ -6,8 +6,8 @@
 #include <commctrl.h>
 #include <vector>
 
-#define LINEARRAYSIZE 1000
-#define MAX_NUMBEROFLINES 100
+#define LINEARRAYSIZE 4000
+#define MAX_NUMBEROFLINES 50
 #define DRAW_HOTKEY 100
 #define ZOOM_HOTKEY 101
 
@@ -38,8 +38,14 @@ public:
 		m_colors[7] = RGB(150, 150, 150);
 		m_colors[8] = RGB(255, 255, 255);
 		m_colors[9] = RGB(0, 255, 255);
+		m_points = new POINT[MAX_NUMBEROFLINES*LINEARRAYSIZE];
+		m_linetypes = new BYTE[MAX_NUMBEROFLINES*LINEARRAYSIZE];
 	};
-	~CTrayWindow(void);
+	~CTrayWindow(void)
+	{
+		delete [] m_points;
+		delete [] m_linetypes;
+	};
 
 	bool				RegisterAndCreateWindow();
 
@@ -78,8 +84,8 @@ protected:
 
 	int					m_totallines;
 	int					m_lineindex[MAX_NUMBEROFLINES];
-	POINT				m_points[MAX_NUMBEROFLINES][LINEARRAYSIZE];
-	BYTE				m_linetypes[MAX_NUMBEROFLINES][LINEARRAYSIZE];
+	POINT *				m_points;
+	BYTE *				m_linetypes;
 	POINT				m_lineStartPoint[MAX_NUMBEROFLINES];
 	POINT				m_lineEndPoint[MAX_NUMBEROFLINES];
 	int					m_penwidth[MAX_NUMBEROFLINES];
