@@ -25,6 +25,7 @@ public:
 		, m_totallines(-1)
 		, m_colorindex(0)
 		, m_currentpenwidth(3)
+		, m_hCursor(NULL)
 	{
 		SetWindowTitle((LPCTSTR)ResString(hResource, IDS_APP_TITLE));
 		m_colors[0] = RGB(255, 0, 0);
@@ -56,12 +57,14 @@ protected:
 	bool				DrawArrow(HDC hdc, int index);
 	bool				ArrowTo(HDC hdc, LONG x, LONG y);
 	bool				DrawZoom(HDC hdc, POINT pt);
+	HCURSOR				CreateDrawCursor(COLORREF color, int penwidth);
 
 	static BOOL CALLBACK OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
 	static WORD			HotKeyControl2HotKey(WORD hk);
 	static WORD			HotKey2HotKeyControl(WORD hk);
 
 	void				RegisterHotKeys();
+	bool				UpdateCursor();
 	DWORD				GetDllVersion(LPCTSTR lpszDllName);
 protected:
 	NOTIFYICONDATA		niData; 
@@ -87,4 +90,7 @@ protected:
 	POINT				m_lineStartShiftPoint;
 
 	COLORREF			m_colors[10];
+
+	HCURSOR				m_hCursor;
+	HCURSOR				m_hPreviousCursor;
 };

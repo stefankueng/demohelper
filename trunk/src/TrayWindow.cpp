@@ -58,7 +58,7 @@ bool CTrayWindow::RegisterAndCreateWindow()
 	wcx.cbClsExtra = 0;
 	wcx.cbWndExtra = 0;
 	wcx.hInstance = hResource;
-	wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wcx.hCursor = NULL;//LoadCursor(NULL, IDC_ARROW);
 	wcx.lpszClassName = ResString(hResource, IDS_APP_TITLE);
 	wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_SHOWHELPER));
 	wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
@@ -375,6 +375,7 @@ LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 						RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
 					}
 				}
+				UpdateCursor();
 				break;
 			case VK_DOWN:
 				if (m_bZooming)
@@ -394,6 +395,7 @@ LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 						RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
 					}
 				}
+				UpdateCursor();
 				break;
 			case VK_RIGHT:
 				// cycle through colors
@@ -405,6 +407,7 @@ LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 						RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
 					}
 				}
+				UpdateCursor();
 				break;
 			case VK_LEFT:
 				// cycle through colors
@@ -416,6 +419,7 @@ LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 						RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
 					}
 				}
+				UpdateCursor();
 				break;
 			case 'E':
 				m_bDrawing = false;
@@ -498,6 +502,10 @@ bool CTrayWindow::StartPresentationMode()
 
 	SetWindowPos(*this, HWND_TOP/*MOST*/, 0, 0, nScreenWidth, nScreenHeight, SWP_SHOWWINDOW);
 	SetForegroundWindow(*this);
+	if (m_hCursor)
+		DestroyCursor(m_hCursor);
+	m_hCursor = CreateDrawCursor(m_colors[m_colorindex], m_currentpenwidth);
+	m_hPreviousCursor = SetCursor(m_hCursor);
 	return true;
 }
 
@@ -512,6 +520,12 @@ bool CTrayWindow::EndPresentationMode()
 	m_lineStartPoint[0].y = -1;
 	m_totallines = -1;
 	m_bDrawing = false;
+	SetCursor(m_hPreviousCursor);
+	if (m_hCursor)
+	{
+		DestroyCursor(m_hCursor);
+		m_hCursor = NULL;
+	}
 	return true;
 }
 
@@ -617,4 +631,96 @@ bool CTrayWindow::DrawZoom(HDC hdc, POINT pt)
 	if (y + zoomwindowy > cy)
 		y = cy-zoomwindowy;
 	return !!StretchBlt(hdc,0,0,cx,cy,hDesktopCompatibleDC,x,y,zoomwindowx,zoomwindowy,SRCCOPY);
+}
+
+HCURSOR CTrayWindow::CreateDrawCursor(COLORREF color, int penwidth)
+{
+	// Get the system display DC
+	HDC hDC = ::GetDC(*this);
+
+	// Create helper DC
+	HDC hMainDC = ::CreateCompatibleDC(hDC);
+	HDC hAndMaskDC = ::CreateCompatibleDC(hDC);
+	HDC hXorMaskDC = ::CreateCompatibleDC(hDC);
+
+	// Create the mask bitmaps
+	HBITMAP hSourceBitmap = ::CreateCompatibleBitmap(hDC, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR)); // original
+	HBITMAP hAndMaskBitmap = ::CreateBitmap(GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR), 1, 1, NULL); // monochrome
+	HBITMAP hXorMaskBitmap  = ::CreateCompatibleBitmap(hDC, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR)); // color
+
+	// Release the system display DC
+	::ReleaseDC(*this, hDC);
+
+	// Select the bitmaps to helper DC
+	HBITMAP hOldMainBitmap = (HBITMAP)::SelectObject(hMainDC, hSourceBitmap);
+	HBITMAP hOldAndMaskBitmap  = (HBITMAP)::SelectObject(hAndMaskDC, hAndMaskBitmap);
+	HBITMAP hOldXorMaskBitmap  = (HBITMAP)::SelectObject(hXorMaskDC, hXorMaskBitmap);
+
+	// fill our bitmap with the 'transparent' color RGB(1,1,1)
+	RECT rc;
+	rc.left = 0;
+	rc.top = 0;
+	rc.right = GetSystemMetrics(SM_CXCURSOR);
+	rc.bottom = GetSystemMetrics(SM_CYCURSOR);
+	SetBkColor(hMainDC, RGB(1,1,1));
+	::ExtTextOut(hMainDC, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL);
+	// set up the pen and brush to draw
+	HPEN hPen = CreatePen(PS_SOLID, 1, color);
+	HPEN hOldPen = NULL;
+	HBRUSH hOldBrush = NULL;
+	hOldPen = (HPEN)SelectObject(hMainDC, hPen);
+	HBRUSH hBrush = CreateSolidBrush(color);
+	hOldBrush = (HBRUSH)SelectObject(hMainDC, hBrush);
+
+	// draw the brush circle
+	Ellipse(hMainDC, (GetSystemMetrics(SM_CXCURSOR)-penwidth)/2, (GetSystemMetrics(SM_CYCURSOR)-penwidth)/2, (GetSystemMetrics(SM_CXCURSOR)-penwidth)/2+penwidth, (GetSystemMetrics(SM_CYCURSOR)-penwidth)/2+penwidth);
+
+	SelectObject(hMainDC, hOldBrush);
+	SelectObject(hMainDC, hOldPen);
+	DeleteObject(hBrush);
+	DeleteObject(hPen);
+
+	// Assign the monochrome AND mask bitmap pixels so that a pixels of the source bitmap
+	//    with 'clrTransparent' will be white pixels of the monochrome bitmap
+	::SetBkColor(hMainDC, RGB(1,1,1));
+	::BitBlt(hAndMaskDC, 0, 0, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR), hMainDC, 0, 0, SRCCOPY);
+
+	// Assign the color XOR mask bitmap pixels so that a pixels of the source bitmap
+	//    with 'clrTransparent' will be black and rest the pixels same as corresponding
+	//    pixels of the source bitmap
+	::SetBkColor(hXorMaskDC, RGB(0, 0, 0));
+	::SetTextColor(hXorMaskDC, RGB(255, 255, 255));
+	::BitBlt(hXorMaskDC, 0, 0, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR), hAndMaskDC, 0, 0, SRCCOPY);
+	::BitBlt(hXorMaskDC, 0, 0, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR), hMainDC, 0,0, SRCAND);
+
+	// Deselect bitmaps from the helper DC
+	::SelectObject(hMainDC, hOldMainBitmap);
+	::SelectObject(hAndMaskDC, hOldAndMaskBitmap);
+	::SelectObject(hXorMaskDC, hOldXorMaskBitmap);
+
+	// Delete the helper DC
+	::DeleteDC(hXorMaskDC);
+	::DeleteDC(hAndMaskDC);
+	::DeleteDC(hMainDC);
+
+	ICONINFO iconinfo = {0};
+	iconinfo.fIcon			= FALSE;
+	iconinfo.xHotspot       = GetSystemMetrics(SM_CXCURSOR)/2;
+	iconinfo.yHotspot       = GetSystemMetrics(SM_CYCURSOR)/2;
+	iconinfo.hbmMask        = hAndMaskBitmap;
+	iconinfo.hbmColor       = hXorMaskBitmap;
+
+	return ::CreateIconIndirect(&iconinfo);
+}
+
+bool CTrayWindow::UpdateCursor()
+{
+	DestroyCursor(m_hCursor);
+	m_hCursor = CreateDrawCursor(m_colors[m_colorindex], m_currentpenwidth);
+	if (m_hCursor)
+	{
+		SetCursor(m_hCursor);
+		return true;
+	}
+	return false;
 }
