@@ -339,11 +339,9 @@ LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 			switch (wParam)
 			{
 			case VK_ESCAPE:
-				// first quit zooming mode, then quit presentation mode
-				if (m_bZooming)
-					m_bZooming = false;
-				else
-					EndPresentationMode();
+				m_bZooming = false;
+				EndPresentationMode();
+				UpdateCursor();
 				break;
 			case VK_BACK:
 				m_bDrawing = false;
@@ -439,6 +437,7 @@ LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 						BitBlt(hDesktopCompatibleDC,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN),hdc,0,0,SRCCOPY);
 						DeleteDC(hdc);
 						RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
+						UpdateCursor();
 					}
 				}
 				break;
@@ -505,10 +504,17 @@ bool CTrayWindow::StartPresentationMode()
 
 	SetWindowPos(*this, HWND_TOP/*MOST*/, 0, 0, nScreenWidth, nScreenHeight, SWP_SHOWWINDOW);
 	SetForegroundWindow(*this);
-	if (m_hCursor)
-		DestroyCursor(m_hCursor);
-	m_hCursor = CreateDrawCursor(m_colors[m_colorindex], m_currentpenwidth);
-	m_hPreviousCursor = SetCursor(m_hCursor);
+	if (!m_bZooming)
+	{
+		if (m_hCursor)
+			DestroyCursor(m_hCursor);
+		m_hCursor = CreateDrawCursor(m_colors[m_colorindex], m_currentpenwidth);
+		m_hPreviousCursor = SetCursor(m_hCursor);
+	}
+	else
+	{
+		SetCursor(NULL);
+	}
 	return true;
 }
 
@@ -615,7 +621,7 @@ bool CTrayWindow::EndZoomingMode()
 
 bool CTrayWindow::DrawZoom(HDC hdc, POINT pt)
 {
-	// cursor pos is in screen coordinates - just what we need since our window covers the whole screen
+	// cursor pos is in screen coordinates - just what we need since our window covers the whole screen.
 	// to zoom, we need to stretch the part around the cursor to the full screen
 	// zoomfactor 1 = whole screen
 	// zoomfactor 2 = quarter screen to fullscreen
@@ -623,8 +629,11 @@ bool CTrayWindow::DrawZoom(HDC hdc, POINT pt)
 	int cy = GetSystemMetrics(SM_CYSCREEN);
 	int zoomwindowx = int(float(cx) / m_zoomfactor);
 	int zoomwindowy = int(float(cy) / m_zoomfactor);
-	int x = pt.x - (zoomwindowx / 2);
-	int y = pt.y - (zoomwindowy / 2);
+
+	// adjust the cursor position to the zoom factor
+	int x = pt.x*(cx-zoomwindowx)/cx;
+	int y = pt.y*(cy-zoomwindowy)/cy;
+	
 	if (x < 0)
 		x = 0;
 	if (y < 0)
@@ -718,6 +727,10 @@ HCURSOR CTrayWindow::CreateDrawCursor(COLORREF color, int penwidth)
 
 bool CTrayWindow::UpdateCursor()
 {
+	if (m_bZooming)
+	{
+		SetCursor(NULL);
+	}
 	DestroyCursor(m_hCursor);
 	m_hCursor = CreateDrawCursor(m_colors[m_colorindex], m_currentpenwidth);
 	if (m_hCursor)
