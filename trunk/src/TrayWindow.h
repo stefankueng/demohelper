@@ -18,7 +18,7 @@ public:
 	CTrayWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL) : CWindow(hInst, wcx)
 		, m_bDrawing(false)
 		, m_bZooming(false)
-		, m_zoomfactor(1.2f)
+		, m_zoomfactor(2.0f)
 		, hDesktopCompatibleDC(NULL)
 		, hDesktopCompatibleBitmap(NULL)
 		, hOldBmp(NULL)
