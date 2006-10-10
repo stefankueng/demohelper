@@ -42,6 +42,9 @@ IDC_SHOWHELPER MENU
 BEGIN
     POPUP "TrayContext"
     BEGIN
+        MENUITEM "&Zoom",                       ID_TRAYCONTEXT_ZOOM
+        MENUITEM "&Draw",                       ID_TRAYCONTEXT_DRAW
+        MENUITEM SEPARATOR
         MENUITEM "&Options",                    ID_TRAYCONTEXT_OPTIONS
         MENUITEM SEPARATOR
         MENUITEM "E&xit",                       IDM_EXIT
@@ -129,10 +132,8 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 225
         VERTGUIDE, 14
-        VERTGUIDE, 34
         VERTGUIDE, 40
         VERTGUIDE, 94
-        VERTGUIDE, 103
         VERTGUIDE, 219
         TOPMARGIN, 7
         BOTTOMMARGIN, 202
