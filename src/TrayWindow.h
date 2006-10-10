@@ -61,7 +61,7 @@ protected:
 	bool				StartZoomingMode();
 	bool				EndZoomingMode();
 	bool				DrawArrow(HDC hdc, int index);
-	bool				ArrowTo(HDC hdc, LONG x, LONG y);
+	bool				ArrowTo(HDC hdc, LONG x, LONG y, int width);
 	bool				DrawZoom(HDC hdc, POINT pt);
 	HCURSOR				CreateDrawCursor(COLORREF color, int penwidth);
 
