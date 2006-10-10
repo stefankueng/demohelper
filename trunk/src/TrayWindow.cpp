@@ -482,6 +482,12 @@ LRESULT CTrayWindow::DoCommand(int id)
 			RegisterHotKeys();
 		}
 		break;
+	case ID_TRAYCONTEXT_DRAW:
+		StartPresentationMode();
+		break;
+	case ID_TRAYCONTEXT_ZOOM:
+		StartZoomingMode();
+		break;
 	default:
 		break;
 	};
