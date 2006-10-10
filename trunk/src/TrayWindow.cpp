@@ -560,10 +560,10 @@ bool CTrayWindow::EndPresentationMode()
 bool CTrayWindow::DrawArrow(HDC hdc, int index)
 {
 	MoveToEx(hdc, m_lineStartPoint[index].x, m_lineStartPoint[index].y, NULL);
-	return ArrowTo(hdc, m_lineEndPoint[index].x, m_lineEndPoint[index].y);
+	return ArrowTo(hdc, m_lineEndPoint[index].x, m_lineEndPoint[index].y, m_penwidth[index]*3);
 }
 
-bool CTrayWindow::ArrowTo(HDC hdc, LONG x, LONG y)
+bool CTrayWindow::ArrowTo(HDC hdc, LONG x, LONG y, int width)
 {
 
 	POINT pFrom;
@@ -591,8 +591,8 @@ bool CTrayWindow::ArrowTo(HDC hdc, LONG x, LONG y)
 	vecLeft[1] = vecLine[0];
 
 	fLength = sqrt(vecLine[0]*vecLine[0] + vecLine[1]*vecLine[1])/fLength;
-	th = 10 / (2.0f * fLength);
-	ta = 10 / (2.0f * 0.15f * fLength);
+	th = width / (2.0f * fLength);
+	ta = width / (2.0f * 0.15f * fLength);
 
 	// find the base of the arrow
 	pBase.x = (int) (aptPoly[0].x + -ta * vecLine[0]);
