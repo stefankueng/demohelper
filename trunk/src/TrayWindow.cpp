@@ -8,9 +8,6 @@
 
 #define TRAY_WM_MESSAGE		WM_APP+1
 
-CTrayWindow::~CTrayWindow(void)
-{
-}
 
 #define PACKVERSION(major,minor) MAKELONG(minor,major)
 DWORD CTrayWindow::GetDllVersion(LPCTSTR lpszDllName)
@@ -165,7 +162,7 @@ LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 
 							if (m_lineindex[i])
 							{
-								PolyDraw(memdc, (const POINT*)&m_points[i], (const BYTE*)&m_linetypes[i], m_lineindex[i]);
+								PolyDraw(memdc, (const POINT*)&m_points[i*LINEARRAYSIZE], (const BYTE*)&m_linetypes[i*LINEARRAYSIZE], m_lineindex[i]);
 							}
 							else if ((m_lineStartPoint[i].x>0) && (m_lineStartPoint[i].y>0) && (m_lineEndPoint[i].x>0) && (m_lineEndPoint[i].y>0))
 							{
@@ -213,8 +210,8 @@ LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 				m_lineStartShiftPoint.x = -1;
 				m_lineStartShiftPoint.y = -1;
 				m_lineindex[m_totallines] = 0;
-				m_points[m_totallines][m_lineindex[m_totallines]] = m_lineStartPoint[m_totallines];
-				m_linetypes[m_totallines][m_lineindex[m_totallines]] = PT_MOVETO;
+				m_points[m_totallines*LINEARRAYSIZE + m_lineindex[m_totallines]] = m_lineStartPoint[m_totallines];
+				m_linetypes[m_totallines*LINEARRAYSIZE + m_lineindex[m_totallines]] = PT_MOVETO;
 				m_linecolorindex[m_totallines] = m_colorindex;
 				m_penwidth[m_totallines] = m_currentpenwidth;
 			}
@@ -269,8 +266,8 @@ LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 					{
 						m_lineindex[m_totallines]++;
 						POINT pt = {xPos, yPos};
-						m_points[m_totallines][m_lineindex[m_totallines]] = pt;
-						m_linetypes[m_totallines][m_lineindex[m_totallines]] = PT_LINETO;
+						m_points[m_totallines*LINEARRAYSIZE + m_lineindex[m_totallines]] = pt;
+						m_linetypes[m_totallines*LINEARRAYSIZE + m_lineindex[m_totallines]] = PT_LINETO;
 					}
 					RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
 				}
