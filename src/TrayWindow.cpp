@@ -8,6 +8,8 @@
 
 #define TRAY_WM_MESSAGE		WM_APP+1
 
+#pragma comment(lib, "Msimg32")
+
 
 #define PACKVERSION(major,minor) MAKELONG(minor,major)
 DWORD CTrayWindow::GetDllVersion(LPCTSTR lpszDllName)
@@ -500,6 +502,23 @@ bool CTrayWindow::StartPresentationMode()
 	hDesktopCompatibleBitmap = CreateCompatibleBitmap(hDesktopDC, nScreenWidth, nScreenHeight);
 	hOldBmp = (HBITMAP)SelectObject(hDesktopCompatibleDC,hDesktopCompatibleBitmap); 
 	BitBlt(hDesktopCompatibleDC,0,0,nScreenWidth,nScreenHeight, hDesktopDC,0,0,SRCCOPY|CAPTUREBLT);
+	CRegStdWORD regShowCursor(_T("Software\\ShowHelper\\capturecursor"), TRUE);
+	if (DWORD(regShowCursor))
+	{
+		// capture the cursor
+		CURSORINFO ci;
+		ci.cbSize = sizeof(CURSORINFO);
+		GetCursorInfo(&ci);
+		if (ci.flags & CURSOR_SHOWING)
+		{
+			HICON hIcon = CopyIcon(ci.hCursor);
+			ICONINFO ii;
+			GetIconInfo(hIcon, &ii);
+			DrawIcon(hDesktopCompatibleDC, ci.ptScreenPos.x-ii.xHotspot, ci.ptScreenPos.y-ii.yHotspot, hIcon);
+			DestroyIcon(hIcon);
+		}
+	}
+
 	ReleaseDC(hDesktopWnd,hDesktopDC);
 
 	SetWindowPos(*this, HWND_TOP/*MOST*/, 0, 0, nScreenWidth, nScreenHeight, SWP_SHOWWINDOW);
