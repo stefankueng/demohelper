@@ -14,6 +14,22 @@ BOOL CALLBACK CTrayWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
 			SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_SETHOTKEY, (WPARAM)(DWORD)regZoom, 0);
 			SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_SETHOTKEY, (WPARAM)(DWORD)regDraw, 0);
 			SendMessage(GetDlgItem(hwndDlg, IDC_CURSORCHECK), BM_SETCHECK, DWORD(regCursor) ? BST_CHECKED : BST_UNCHECKED, 0);
+
+			// position the dialog box on the screen
+			HWND hwndOwner; 
+			RECT rc, rcDlg, rcOwner; 
+
+			hwndOwner = GetDesktopWindow(); 
+
+			GetWindowRect(hwndOwner, &rcOwner); 
+			GetWindowRect(hwndDlg, &rcDlg); 
+			CopyRect(&rc, &rcOwner); 
+
+			OffsetRect(&rcDlg, -rcDlg.left, -rcDlg.top); 
+			OffsetRect(&rc, -rc.left, -rc.top); 
+			OffsetRect(&rc, -rcDlg.right, -rcDlg.bottom); 
+
+			SetWindowPos(hwndDlg, HWND_TOP, rcOwner.left + (rc.right / 2), rcOwner.top + (rc.bottom / 2), 0, 0,	SWP_NOSIZE); 
 		}
 		break;
 	case WM_COMMAND: 
