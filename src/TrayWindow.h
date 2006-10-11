@@ -24,19 +24,19 @@ public:
 		, hOldBmp(NULL)
 		, m_totallines(-1)
 		, m_colorindex(0)
-		, m_currentpenwidth(3)
+		, m_currentpenwidth(6)
 		, m_hCursor(NULL)
 	{
 		SetWindowTitle((LPCTSTR)ResString(hResource, IDS_APP_TITLE));
 		m_colors[0] = RGB(255, 0, 0);
-		m_colors[1] = RGB(150, 0, 0);
-		m_colors[2] = RGB(0, 255, 0);
-		m_colors[3] = RGB(0, 150, 0);
-		m_colors[4] = RGB(0, 0, 255);
-		m_colors[5] = RGB(0, 0, 150);
-		m_colors[6] = RGB(0, 0, 0);
-		m_colors[7] = RGB(150, 150, 150);
-		m_colors[8] = RGB(255, 255, 255);
+		m_colors[1] = RGB(255, 255, 0);
+		m_colors[2] = RGB(150, 0, 0);
+		m_colors[3] = RGB(0, 255, 0);
+		m_colors[4] = RGB(0, 150, 0);
+		m_colors[5] = RGB(0, 0, 255);
+		m_colors[6] = RGB(0, 0, 150);
+		m_colors[7] = RGB(0, 0, 0);
+		m_colors[8] = RGB(150, 150, 150);
 		m_colors[9] = RGB(0, 255, 255);
 		m_points = new POINT[MAX_NUMBEROFLINES*LINEARRAYSIZE];
 		m_linetypes = new BYTE[MAX_NUMBEROFLINES*LINEARRAYSIZE];
