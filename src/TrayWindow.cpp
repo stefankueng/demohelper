@@ -399,10 +399,10 @@ LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 				if (m_totallines>=0)
 				{
 					if (m_colorindex<9)
-					{
 						m_colorindex++;
-						RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
-					}
+					else
+						m_colorindex = 0;
+					RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
 				}
 				UpdateCursor();
 				break;
@@ -411,10 +411,10 @@ LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 				if (m_totallines>=0)
 				{
 					if (m_colorindex>0)
-					{
 						m_colorindex--;
-						RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
-					}
+					else
+						m_colorindex = 9;
+					RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
 				}
 				UpdateCursor();
 				break;
