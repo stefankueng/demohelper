@@ -134,6 +134,7 @@ LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 			HDC hdc = BeginPaint(*this, &ps);
 			{
 				CMemDC memdc(hdc);
+				SetROP2(memdc, R2_MASKPEN);
 				if (m_bZooming)
 				{
 					// we're zooming,
