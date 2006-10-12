@@ -175,7 +175,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 							{
 								PolyDraw(memdc, (const POINT*)&m_points[i*LINEARRAYSIZE], (const BYTE*)&m_linetypes[i*LINEARRAYSIZE], m_lineindex[i]);
 							}
-							else if ((m_lineStartPoint[i].x>0) && (m_lineStartPoint[i].y>0) && (m_lineEndPoint[i].x>0) && (m_lineEndPoint[i].y>0))
+							else if ((m_lineStartPoint[i].x>=0) && (m_lineStartPoint[i].y>=0) && (m_lineEndPoint[i].x>=0) && (m_lineEndPoint[i].y>=0))
 							{
 								DrawArrow(memdc, i);
 							}
@@ -275,12 +275,23 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 					}
 					if (m_lineindex[m_totallines] < (LINEARRAYSIZE-2))
 					{
+						RECT invalidRect = {0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN)};
 						m_lineindex[m_totallines]++;
 						POINT pt = {xPos, yPos};
 						m_points[m_totallines*LINEARRAYSIZE + m_lineindex[m_totallines]] = pt;
 						m_linetypes[m_totallines*LINEARRAYSIZE + m_lineindex[m_totallines]] = PT_LINETO;
+						for (int i=0; i<m_lineindex[m_totallines]; ++i)
+						{
+							invalidRect.left = min(m_points[m_totallines*LINEARRAYSIZE + i].x, invalidRect.left);
+							invalidRect.top = min(m_points[m_totallines*LINEARRAYSIZE + i].y, invalidRect.top);
+							invalidRect.right = max(m_points[m_totallines*LINEARRAYSIZE + i].x, invalidRect.right);
+							invalidRect.bottom = max(m_points[m_totallines*LINEARRAYSIZE + i].y, invalidRect.bottom);
+						}
+						InflateRect(&invalidRect, 2*m_currentpenwidth, 2*m_currentpenwidth);
+						invalidRect.left = max(0, invalidRect.left);
+						invalidRect.top = max(0, invalidRect.top);
+						InvalidateRect(*this, &invalidRect, FALSE);
 					}
-					RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
 				}
 				else if (wParam & MK_RBUTTON)
 				{
@@ -298,9 +309,23 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 							xPos = m_lineStartPoint[m_totallines].x;
 						}
 					}
+					RECT invalidRect;
+					invalidRect.left = min(m_lineStartPoint[m_totallines].x, xPos);
+					invalidRect.top = min(m_lineStartPoint[m_totallines].y, yPos);
+					invalidRect.right = max(m_lineStartPoint[m_totallines].x, xPos);
+					invalidRect.bottom = max(m_lineStartPoint[m_totallines].y, yPos);
+
+					invalidRect.left = min(m_lineStartPoint[m_totallines].x, m_lineEndPoint[m_totallines].x);
+					invalidRect.top = min(m_lineStartPoint[m_totallines].y, m_lineEndPoint[m_totallines].y);
+					invalidRect.right = max(m_lineStartPoint[m_totallines].x, m_lineEndPoint[m_totallines].x);
+					invalidRect.bottom = max(m_lineStartPoint[m_totallines].y, m_lineEndPoint[m_totallines].y);
+
+					InflateRect(&invalidRect, 10*m_currentpenwidth, 10*m_currentpenwidth);
+					invalidRect.left = max(0, invalidRect.left);
+					invalidRect.top = max(0, invalidRect.top);
+					InvalidateRect(*this, &invalidRect, FALSE);
 					m_lineEndPoint[m_totallines].x = xPos;
 					m_lineEndPoint[m_totallines].y = yPos;
-					RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
 				}
 			}
 		}
