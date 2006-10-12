@@ -59,17 +59,18 @@ END
 
 IDR_SHOWHELPER ACCELERATORS 
 BEGIN
-    "/",            IDM_ABOUT,              ASCII,  ALT, NOINVERT
-    "?",            IDM_ABOUT,              ASCII,  ALT, NOINVERT
-    VK_BACK,        ID_CMD_UNDOLINE,        VIRTKEY, NOINVERT
-    VK_ESCAPE,      ID_CMD_QUITMODE,        VIRTKEY, NOINVERT
-    VK_UP,          ID_CMD_INCREASE,        VIRTKEY, NOINVERT
+    VK_RETURN,      ID_CMD_ACCEPT,          VIRTKEY, NOINVERT
+    "e",            ID_CMD_CLEARLINES,      ASCII,  NOINVERT
     VK_DOWN,        ID_CMD_DECREASE,        VIRTKEY, NOINVERT
+    VK_UP,          ID_CMD_INCREASE,        VIRTKEY, NOINVERT
     VK_RIGHT,       ID_CMD_NEXTCOLOR,       VIRTKEY, NOINVERT
     VK_LEFT,        ID_CMD_PREVCOLOR,       VIRTKEY, NOINVERT
-    "e",            ID_CMD_CLEARLINES,      ASCII,  NOINVERT
     "m",            ID_CMD_QUICKTOMARKER,   ASCII,  NOINVERT
-    VK_RETURN,      ID_CMD_ACCEPT,          VIRTKEY, NOINVERT
+    VK_ESCAPE,      ID_CMD_QUITMODE,        VIRTKEY, NOINVERT
+    VK_BACK,        ID_CMD_UNDOLINE,        VIRTKEY, NOINVERT
+    "/",            IDM_ABOUT,              ASCII,  ALT, NOINVERT
+    "?",            IDM_ABOUT,              ASCII,  ALT, NOINVERT
+    "t",            ID_CMD_TOGGLEROP,       ASCII,  NOINVERT
 END
 
 
