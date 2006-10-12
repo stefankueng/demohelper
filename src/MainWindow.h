@@ -26,6 +26,7 @@ public:
 		, m_colorindex(0)
 		, m_currentpenwidth(6)
 		, m_hCursor(NULL)
+		, m_currentrop(R2_MASKPEN)
 	{
 		SetWindowTitle((LPCTSTR)ResString(hResource, IDS_APP_TITLE));
 		m_colors[0] = RGB(255, 0, 0);
@@ -86,12 +87,14 @@ protected:
 	int					m_lineindex[MAX_NUMBEROFLINES];
 	POINT *				m_points;
 	BYTE *				m_linetypes;
+	int					m_rop[MAX_NUMBEROFLINES];
 	POINT				m_lineStartPoint[MAX_NUMBEROFLINES];
 	POINT				m_lineEndPoint[MAX_NUMBEROFLINES];
 	int					m_penwidth[MAX_NUMBEROFLINES];
 	int					m_linecolorindex[MAX_NUMBEROFLINES];
 	int					m_colorindex;
 	int					m_currentpenwidth;
+	int					m_currentrop;
 
 	POINT				m_lineStartShiftPoint;
 

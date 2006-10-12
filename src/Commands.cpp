@@ -6,6 +6,12 @@ LRESULT CMainWindow::DoCommand(int id)
 {
 	switch (id) 
 	{
+	case ID_CMD_TOGGLEROP:
+		if (m_currentrop == R2_MASKPEN)
+			m_currentrop = R2_COPYPEN;
+		else
+			m_currentrop = R2_MASKPEN;
+		break;
 	case ID_CMD_QUITMODE:
 		m_bZooming = false;
 		EndPresentationMode();
@@ -94,6 +100,7 @@ LRESULT CMainWindow::DoCommand(int id)
 		// marker mode - quick way to select the biggest brush size and color yellow
 		m_currentpenwidth = GetSystemMetrics(SM_CXCURSOR);
 		m_colorindex = 1;
+		m_currentrop = R2_MASKPEN;
 		UpdateCursor();
 		break;
 	case ID_CMD_ACCEPT:

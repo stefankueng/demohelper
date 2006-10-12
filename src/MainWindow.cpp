@@ -173,10 +173,12 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 
 							if (m_lineindex[i])
 							{
+								SetROP2(memdc, m_rop[i]);
 								PolyDraw(memdc, (const POINT*)&m_points[i*LINEARRAYSIZE], (const BYTE*)&m_linetypes[i*LINEARRAYSIZE], m_lineindex[i]);
 							}
 							else if ((m_lineStartPoint[i].x>=0) && (m_lineStartPoint[i].y>=0) && (m_lineEndPoint[i].x>=0) && (m_lineEndPoint[i].y>=0))
 							{
+								SetROP2(memdc, m_rop[i]);
 								DrawArrow(memdc, i);
 							}
 
@@ -212,6 +214,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 			{
 				m_bDrawing = true;
 				m_totallines++;
+				m_rop[m_totallines] = m_currentrop;
 				int xPos = GET_X_LPARAM(lParam); 
 				int yPos = GET_Y_LPARAM(lParam); 
 				m_lineStartPoint[m_totallines].x = xPos;
