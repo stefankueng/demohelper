@@ -144,6 +144,35 @@ public:
 		SetWindowOrgEx(m_hMemDC, m_rect.left, m_rect.top, NULL);
 	}
 
+	CMemDC(HDC hDC, const RECT& rect)
+	{
+		m_hDC = hDC;
+		m_hOldBitmap = NULL;
+		m_bTempOnly = false;
+
+		m_rect = rect;
+
+		LPtoDP(m_hDC, (LPPOINT)&m_rect, 2);
+
+		//GetClipBox(m_hDC, &m_rect);
+		m_hMemDC = ::CreateCompatibleDC(m_hDC);
+		m_hBitmap = CreateCompatibleBitmap(m_hDC, m_rect.right - m_rect.left, m_rect.bottom - m_rect.top);
+		m_hOldBitmap = (HBITMAP)SelectObject(m_hMemDC, m_hBitmap);
+
+		SetMapMode(m_hMemDC, GetMapMode(hDC));
+
+		SIZE ext;
+		GetWindowExtEx(m_hDC, &ext);
+		SetWindowExtEx(m_hMemDC, ext.cx, ext.cy, NULL);
+
+		GetViewportExtEx(m_hDC, &ext);
+		SetViewportExtEx(m_hMemDC, ext.cx, ext.cy, NULL);
+
+		DPtoLP(m_hDC, (LPPOINT)&m_rect, 2);
+
+		SetWindowOrgEx(m_hMemDC, m_rect.left, m_rect.top, NULL);
+	}
+
 	// Destructor copies the contents of the mem DC to the original DC
 	~CMemDC()
 	{
