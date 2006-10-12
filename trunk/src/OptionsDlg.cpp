@@ -8,8 +8,8 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
 	{
 	case WM_INITDIALOG:
 		{
-			CRegStdWORD regZoom(_T("Software\\ShowHelper\\zoomhotkey"), 0);
-			CRegStdWORD regDraw(_T("Software\\ShowHelper\\drawhotkey"), 0);
+			CRegStdWORD regZoom(_T("Software\\ShowHelper\\zoomhotkey"), 0x331);
+			CRegStdWORD regDraw(_T("Software\\ShowHelper\\drawhotkey"), 0x332);
 			CRegStdWORD regCursor(_T("Software\\ShowHelper\\capturecursor"), TRUE);
 			SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_SETHOTKEY, (WPARAM)(DWORD)regZoom, 0);
 			SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_SETHOTKEY, (WPARAM)(DWORD)regDraw, 0);
@@ -37,8 +37,8 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
 		{
 		case IDOK: 
 			{
-				CRegStdWORD regZoom(_T("Software\\ShowHelper\\zoomhotkey"), 0);
-				CRegStdWORD regDraw(_T("Software\\ShowHelper\\drawhotkey"), 0);
+				CRegStdWORD regZoom(_T("Software\\ShowHelper\\zoomhotkey"), 0x331);
+				CRegStdWORD regDraw(_T("Software\\ShowHelper\\drawhotkey"), 0x332);
 				CRegStdWORD regCursor(_T("Software\\ShowHelper\\capturecursor"), TRUE);
 				LRESULT res = SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_GETHOTKEY, 0, 0);
 				regDraw = res;

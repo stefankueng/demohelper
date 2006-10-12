@@ -113,8 +113,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 		{
 			WORD key = MAKEWORD(HIWORD(lParam), LOWORD(lParam));
 			key = HotKey2HotKeyControl(key);
-			CRegStdWORD regZoom(_T("Software\\ShowHelper\\zoomhotkey"), 0);
-			CRegStdWORD regDraw(_T("Software\\ShowHelper\\drawhotkey"), 0);
+			CRegStdWORD regZoom(_T("Software\\ShowHelper\\zoomhotkey"), 0x331);
+			CRegStdWORD regDraw(_T("Software\\ShowHelper\\drawhotkey"), 0x332);
 			if (key == (WORD)(DWORD)regZoom)
 			{
 				m_bZooming = true;
@@ -380,7 +380,6 @@ bool CMainWindow::StartPresentationMode()
 	ReleaseDC(hDesktopWnd,hDesktopDC);
 
 	SetWindowPos(*this, HWND_TOP/*MOST*/, 0, 0, nScreenWidth, nScreenHeight, SWP_SHOWWINDOW);
-	SetForegroundWindow(*this);
 	if (!m_bZooming)
 	{
 		if (m_hCursor)
@@ -423,8 +422,8 @@ bool CMainWindow::DrawArrow(HDC hdc, int index)
 
 void CMainWindow::RegisterHotKeys()
 {
-	CRegStdWORD regZoom(_T("Software\\ShowHelper\\zoomhotkey"), 0);
-	CRegStdWORD regDraw(_T("Software\\ShowHelper\\drawhotkey"), 0);
+	CRegStdWORD regZoom(_T("Software\\ShowHelper\\zoomhotkey"), 0x331);
+	CRegStdWORD regDraw(_T("Software\\ShowHelper\\drawhotkey"), 0x332);
 	WORD zoom = (WORD)(DWORD)regZoom;
 	WORD draw = (WORD)(DWORD)regDraw;
 	zoom = HotKeyControl2HotKey(zoom);
