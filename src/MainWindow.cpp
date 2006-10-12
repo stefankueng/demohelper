@@ -59,7 +59,7 @@ bool CMainWindow::RegisterAndCreateWindow()
 	wcx.hCursor = NULL;
 	wcx.lpszClassName = ResString(hResource, IDS_APP_TITLE);
 	wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_SHOWHELPER));
-	wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
+	wcx.hbrBackground = NULL;
 	wcx.lpszMenuName = NULL;
 	wcx.hIconSm	= LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_SHOWHELPER));
 	if (RegisterWindow(&wcx))
@@ -126,6 +126,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 			}
 		}
 		break;
+	case WM_ERASEBKGND:
+		return 1;		// don't erase the background!
 	case WM_PAINT:
 		{
 			PAINTSTRUCT ps;
