@@ -11,11 +11,11 @@
 #define DRAW_HOTKEY 100
 #define ZOOM_HOTKEY 101
 
-class CTrayWindow :
+class CMainWindow :
 	public CWindow
 {
 public:
-	CTrayWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL) : CWindow(hInst, wcx)
+	CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL) : CWindow(hInst, wcx)
 		, m_bDrawing(false)
 		, m_bZooming(false)
 		, m_zoomfactor(2.0f)
@@ -41,7 +41,7 @@ public:
 		m_points = new POINT[MAX_NUMBEROFLINES*LINEARRAYSIZE];
 		m_linetypes = new BYTE[MAX_NUMBEROFLINES*LINEARRAYSIZE];
 	};
-	~CTrayWindow(void)
+	~CMainWindow(void)
 	{
 		delete [] m_points;
 		delete [] m_linetypes;

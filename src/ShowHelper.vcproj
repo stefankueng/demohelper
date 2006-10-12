@@ -195,6 +195,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Commands.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Graphics.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MainWindow.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\OptionsDlg.cpp"
 				>
 			</File>
@@ -226,10 +238,6 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath=".\TrayWindow.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -238,6 +246,10 @@
 			>
 			<File
 				RelativePath=".\BaseWindow.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MainWindow.h"
 				>
 			</File>
 			<File
@@ -258,10 +270,6 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TrayWindow.h"
 				>
 			</File>
 		</Filter>
