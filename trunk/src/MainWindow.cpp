@@ -133,7 +133,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(*this, &ps);
 			{
-				CMemDC memdc(hdc);
+				CMemDC memdc(hdc, ps.rcPaint);
 				SetROP2(memdc, R2_MASKPEN);
 				if (m_bZooming)
 				{
@@ -145,7 +145,15 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 				}
 				else
 				{
-					BitBlt(memdc,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN),hDesktopCompatibleDC,0,0,SRCCOPY);
+					BitBlt(memdc,
+						ps.rcPaint.left,
+						ps.rcPaint.top,
+						ps.rcPaint.right-ps.rcPaint.left,
+						ps.rcPaint.bottom-ps.rcPaint.top,
+						hDesktopCompatibleDC,
+						ps.rcPaint.left,
+						ps.rcPaint.top,
+						SRCCOPY);
 					if (m_totallines >= 0)
 					{
 						for (int i=0; i<=m_totallines; ++i)
