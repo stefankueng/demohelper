@@ -1,8 +1,8 @@
 #include "stdafx.h"
-#include "TrayWindow.h"
+#include "MainWindow.h"
 #include "registry.h"
 
-BOOL CALLBACK CTrayWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM /*lParam*/)
+BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	switch (message) 
 	{
@@ -56,7 +56,7 @@ BOOL CALLBACK CTrayWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
 	return FALSE; 
 }
 
-WORD CTrayWindow::HotKeyControl2HotKey(WORD hk)
+WORD CMainWindow::HotKeyControl2HotKey(WORD hk)
 {
 	UINT flags = 0;
 	if (HIBYTE(hk) & HOTKEYF_ALT)
@@ -70,7 +70,7 @@ WORD CTrayWindow::HotKeyControl2HotKey(WORD hk)
 	return MAKEWORD(LOBYTE(hk), flags);
 }
 
-WORD CTrayWindow::HotKey2HotKeyControl(WORD hk)
+WORD CMainWindow::HotKey2HotKeyControl(WORD hk)
 {
 	UINT flags = 0;
 	if (HIBYTE(hk) & MOD_ALT)

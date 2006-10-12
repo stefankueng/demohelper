@@ -1,7 +1,6 @@
 #include "StdAfx.h"
-#include "TrayWindow.h"
+#include "MainWindow.h"
 #include "registry.h"
-#include "math.h"
 
 #define GET_X_LPARAM(lp) ((int)(short)LOWORD(lp))
 #define GET_Y_LPARAM(lp) ((int)(short)HIWORD(lp))
@@ -12,7 +11,7 @@
 
 
 #define PACKVERSION(major,minor) MAKELONG(minor,major)
-DWORD CTrayWindow::GetDllVersion(LPCTSTR lpszDllName)
+DWORD CMainWindow::GetDllVersion(LPCTSTR lpszDllName)
 {
 	HINSTANCE hinstDll;
 	DWORD dwVersion = 0;
@@ -46,7 +45,7 @@ DWORD CTrayWindow::GetDllVersion(LPCTSTR lpszDllName)
 	return dwVersion;
 }
 
-bool CTrayWindow::RegisterAndCreateWindow()
+bool CMainWindow::RegisterAndCreateWindow()
 {
 	WNDCLASSEX wcx; 
 
@@ -57,7 +56,7 @@ bool CTrayWindow::RegisterAndCreateWindow()
 	wcx.cbClsExtra = 0;
 	wcx.cbWndExtra = 0;
 	wcx.hInstance = hResource;
-	wcx.hCursor = NULL;//LoadCursor(NULL, IDC_ARROW);
+	wcx.hCursor = NULL;
 	wcx.lpszClassName = ResString(hResource, IDS_APP_TITLE);
 	wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_SHOWHELPER));
 	wcx.hbrBackground = (HBRUSH)(COLOR_3DFACE+1);
@@ -67,9 +66,8 @@ bool CTrayWindow::RegisterAndCreateWindow()
 	{
 		if (CreateEx(NULL, WS_POPUP, NULL))
 		{
-			// Our 'main' window is in the system tray where we wait to be
-			// useful.
-			// But first, we have to put ourselves to the system tray
+			// since our main window is hidden most of the time
+			// we have to add an auxiliary window to the system tray
 
 			ZeroMemory(&niData,sizeof(NOTIFYICONDATA));
 
@@ -98,7 +96,7 @@ bool CTrayWindow::RegisterAndCreateWindow()
 }
 
 
-LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -337,116 +335,6 @@ LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 			RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
 		}
 		break;
-	case WM_KEYDOWN:
-		{
-			switch (wParam)
-			{
-			case VK_ESCAPE:
-				m_bZooming = false;
-				EndPresentationMode();
-				UpdateCursor();
-				break;
-			case VK_BACK:
-				m_bDrawing = false;
-				m_lineindex[m_totallines] = 0;
-				m_lineStartPoint[m_totallines].x = -1;
-				m_lineStartPoint[m_totallines].y = -1;
-				if (m_totallines > 0)
-					m_totallines--;
-				RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
-				break;
-			case VK_UP:
-				if (m_bZooming)
-				{
-					m_zoomfactor += 0.2f;
-					if (m_zoomfactor>4.0f)
-						m_zoomfactor = 4.0f;
-					RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
-				}
-				else
-				// increase pen size
-				if (m_totallines>=0)
-				{
-					if (m_currentpenwidth<32)
-					{
-						m_currentpenwidth++;
-						RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
-					}
-				}
-				UpdateCursor();
-				break;
-			case VK_DOWN:
-				if (m_bZooming)
-				{
-					m_zoomfactor -= 0.2f;
-					if (m_zoomfactor < 1.0f)
-						m_zoomfactor = 1.0f;
-					RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
-				}
-				else
-				// decrease pen size
-				if (m_totallines>=0)
-				{
-					if (m_currentpenwidth>1)
-					{
-						m_currentpenwidth--;
-						RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
-					}
-				}
-				UpdateCursor();
-				break;
-			case VK_RIGHT:
-				// cycle through colors
-				if (m_totallines>=0)
-				{
-					if (m_colorindex<9)
-						m_colorindex++;
-					else
-						m_colorindex = 0;
-					RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
-				}
-				UpdateCursor();
-				break;
-			case VK_LEFT:
-				// cycle through colors
-				if (m_totallines>=0)
-				{
-					if (m_colorindex>0)
-						m_colorindex--;
-					else
-						m_colorindex = 9;
-					RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
-				}
-				UpdateCursor();
-				break;
-			case 'E':
-				m_bDrawing = false;
-				m_lineindex[0] = 0;
-				m_lineStartPoint[0].x = -1;
-				m_lineStartPoint[0].y = -1;
-				m_totallines = -1;
-				RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
-				break;
-			case VK_RETURN:
-				{
-					if (m_bZooming)
-					{
-						m_bZooming = false;
-						// now make the zoomed window the 'default'
-						HDC hdc = GetDC(*this);
-						POINT pt;
-						GetCursorPos(&pt);
-						DrawZoom(hdc, pt);
-						BitBlt(hDesktopCompatibleDC,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN),hdc,0,0,SRCCOPY);
-						DeleteDC(hdc);
-						RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
-						UpdateCursor();
-					}
-				}
-				break;
-			}
-		}
-		break;
 	case WM_DESTROY:
 		Shell_NotifyIcon(NIM_DELETE,&niData);
 		bWindowClosed = TRUE;
@@ -462,38 +350,7 @@ LRESULT CALLBACK CTrayWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 	return 0;
 };
 
-LRESULT CTrayWindow::DoCommand(int id)
-{
-	switch (id) 
-	{
-	case IDM_EXIT:
-		Shell_NotifyIcon(NIM_DELETE,&niData);
-		::PostQuitMessage(0);
-		return 0;
-		break;
-	case ID_TRAYCONTEXT_OPTIONS:
-		{
-			// deregister our hotkeys
-			UnregisterHotKey(*this, DRAW_HOTKEY);
-			UnregisterHotKey(*this, ZOOM_HOTKEY);
-			DialogBox(hResource, MAKEINTRESOURCE(IDD_OPTIONS), *this, (DLGPROC)OptionsDlgProc);
-			// now register our hotkeys again
-			RegisterHotKeys();
-		}
-		break;
-	case ID_TRAYCONTEXT_DRAW:
-		StartPresentationMode();
-		break;
-	case ID_TRAYCONTEXT_ZOOM:
-		StartZoomingMode();
-		break;
-	default:
-		break;
-	};
-	return 1;
-}
-
-bool CTrayWindow::StartPresentationMode()
+bool CMainWindow::StartPresentationMode()
 {
 	int nScreenWidth = GetSystemMetrics(SM_CXSCREEN);
 	int nScreenHeight = GetSystemMetrics(SM_CYSCREEN);
@@ -538,7 +395,7 @@ bool CTrayWindow::StartPresentationMode()
 	return true;
 }
 
-bool CTrayWindow::EndPresentationMode()
+bool CMainWindow::EndPresentationMode()
 {
 	SetWindowPos(*this, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_HIDEWINDOW|SWP_NOMOVE|SWP_NOREPOSITION|SWP_NOSIZE);
 	SelectObject(hDesktopCompatibleDC, hOldBmp);
@@ -558,61 +415,13 @@ bool CTrayWindow::EndPresentationMode()
 	return true;
 }
 
-bool CTrayWindow::DrawArrow(HDC hdc, int index)
+bool CMainWindow::DrawArrow(HDC hdc, int index)
 {
 	MoveToEx(hdc, m_lineStartPoint[index].x, m_lineStartPoint[index].y, NULL);
 	return ArrowTo(hdc, m_lineEndPoint[index].x, m_lineEndPoint[index].y, m_penwidth[index]*3);
 }
 
-bool CTrayWindow::ArrowTo(HDC hdc, LONG x, LONG y, int width)
-{
-
-	POINT pFrom;
-	POINT pBase;
-	POINT aptPoly[3];
-	float vecLine[2];
-	float vecLeft[2];
-	float fLength = 1.0f;
-	float th;
-	float ta;
-
-	// get from point
-	MoveToEx(hdc, 0, 0, &pFrom);
-
-	// set to point
-	aptPoly[0].x = x;
-	aptPoly[0].y = y;
-
-	// build the line vector
-	vecLine[0] = (float) aptPoly[0].x - pFrom.x;
-	vecLine[1] = (float) aptPoly[0].y - pFrom.y;
-
-	// build the arrow base vector - normal to the line
-	vecLeft[0] = -vecLine[1];
-	vecLeft[1] = vecLine[0];
-
-	fLength = sqrt(vecLine[0]*vecLine[0] + vecLine[1]*vecLine[1])/fLength;
-	th = width / (2.0f * fLength);
-	ta = width / (2.0f * 0.15f * fLength);
-
-	// find the base of the arrow
-	pBase.x = (int) (aptPoly[0].x + -ta * vecLine[0]);
-	pBase.y = (int) (aptPoly[0].y + -ta * vecLine[1]);
-
-	// build the points on the sides of the arrow
-	aptPoly[1].x = (int) (pBase.x + th * vecLeft[0]);
-	aptPoly[1].y = (int) (pBase.y + th * vecLeft[1]);
-	aptPoly[2].x = (int) (pBase.x + -th * vecLeft[0]);
-	aptPoly[2].y = (int) (pBase.y + -th * vecLeft[1]);
-
-	MoveToEx(hdc, pFrom.x, pFrom.y, NULL);
-
-	LineTo(hdc, aptPoly[0].x, aptPoly[0].y);
-	Polygon(hdc, aptPoly, 3);
-	return true;
-}
-
-void CTrayWindow::RegisterHotKeys()
+void CMainWindow::RegisterHotKeys()
 {
 	CRegStdWORD regZoom(_T("Software\\ShowHelper\\zoomhotkey"), 0);
 	CRegStdWORD regDraw(_T("Software\\ShowHelper\\drawhotkey"), 0);
@@ -625,21 +434,21 @@ void CTrayWindow::RegisterHotKeys()
 	RegisterHotKey(*this, ZOOM_HOTKEY, HIBYTE(zoom), LOBYTE(zoom));
 }
 
-bool CTrayWindow::StartZoomingMode()
+bool CMainWindow::StartZoomingMode()
 {
 	m_bZooming = true;
 	StartPresentationMode();
 	return true;
 }
 
-bool CTrayWindow::EndZoomingMode()
+bool CMainWindow::EndZoomingMode()
 {
 	m_bZooming = false;
 	EndPresentationMode();
 	return true;
 }
 
-bool CTrayWindow::DrawZoom(HDC hdc, POINT pt)
+bool CMainWindow::DrawZoom(HDC hdc, POINT pt)
 {
 	// cursor pos is in screen coordinates - just what we need since our window covers the whole screen.
 	// to zoom, we need to stretch the part around the cursor to the full screen
@@ -665,87 +474,7 @@ bool CTrayWindow::DrawZoom(HDC hdc, POINT pt)
 	return !!StretchBlt(hdc,0,0,cx,cy,hDesktopCompatibleDC,x,y,zoomwindowx,zoomwindowy,SRCCOPY);
 }
 
-HCURSOR CTrayWindow::CreateDrawCursor(COLORREF color, int penwidth)
-{
-	// Get the system display DC
-	HDC hDC = ::GetDC(*this);
-
-	// Create helper DC
-	HDC hMainDC = ::CreateCompatibleDC(hDC);
-	HDC hAndMaskDC = ::CreateCompatibleDC(hDC);
-	HDC hXorMaskDC = ::CreateCompatibleDC(hDC);
-
-	// Create the mask bitmaps
-	HBITMAP hSourceBitmap = ::CreateCompatibleBitmap(hDC, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR)); // original
-	HBITMAP hAndMaskBitmap = ::CreateBitmap(GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR), 1, 1, NULL); // monochrome
-	HBITMAP hXorMaskBitmap  = ::CreateCompatibleBitmap(hDC, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR)); // color
-
-	// Release the system display DC
-	::ReleaseDC(*this, hDC);
-
-	// Select the bitmaps to helper DC
-	HBITMAP hOldMainBitmap = (HBITMAP)::SelectObject(hMainDC, hSourceBitmap);
-	HBITMAP hOldAndMaskBitmap  = (HBITMAP)::SelectObject(hAndMaskDC, hAndMaskBitmap);
-	HBITMAP hOldXorMaskBitmap  = (HBITMAP)::SelectObject(hXorMaskDC, hXorMaskBitmap);
-
-	// fill our bitmap with the 'transparent' color RGB(1,1,1)
-	RECT rc;
-	rc.left = 0;
-	rc.top = 0;
-	rc.right = GetSystemMetrics(SM_CXCURSOR);
-	rc.bottom = GetSystemMetrics(SM_CYCURSOR);
-	SetBkColor(hMainDC, RGB(1,1,1));
-	::ExtTextOut(hMainDC, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL);
-	// set up the pen and brush to draw
-	HPEN hPen = CreatePen(PS_SOLID, 1, color);
-	HPEN hOldPen = NULL;
-	HBRUSH hOldBrush = NULL;
-	hOldPen = (HPEN)SelectObject(hMainDC, hPen);
-	HBRUSH hBrush = CreateSolidBrush(color);
-	hOldBrush = (HBRUSH)SelectObject(hMainDC, hBrush);
-
-	// draw the brush circle
-	Ellipse(hMainDC, (GetSystemMetrics(SM_CXCURSOR)-penwidth)/2, (GetSystemMetrics(SM_CYCURSOR)-penwidth)/2, (GetSystemMetrics(SM_CXCURSOR)-penwidth)/2+penwidth, (GetSystemMetrics(SM_CYCURSOR)-penwidth)/2+penwidth);
-
-	SelectObject(hMainDC, hOldBrush);
-	SelectObject(hMainDC, hOldPen);
-	DeleteObject(hBrush);
-	DeleteObject(hPen);
-
-	// Assign the monochrome AND mask bitmap pixels so that a pixels of the source bitmap
-	//    with 'clrTransparent' will be white pixels of the monochrome bitmap
-	::SetBkColor(hMainDC, RGB(1,1,1));
-	::BitBlt(hAndMaskDC, 0, 0, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR), hMainDC, 0, 0, SRCCOPY);
-
-	// Assign the color XOR mask bitmap pixels so that a pixels of the source bitmap
-	//    with 'clrTransparent' will be black and rest the pixels same as corresponding
-	//    pixels of the source bitmap
-	::SetBkColor(hXorMaskDC, RGB(0, 0, 0));
-	::SetTextColor(hXorMaskDC, RGB(255, 255, 255));
-	::BitBlt(hXorMaskDC, 0, 0, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR), hAndMaskDC, 0, 0, SRCCOPY);
-	::BitBlt(hXorMaskDC, 0, 0, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR), hMainDC, 0,0, SRCAND);
-
-	// Deselect bitmaps from the helper DC
-	::SelectObject(hMainDC, hOldMainBitmap);
-	::SelectObject(hAndMaskDC, hOldAndMaskBitmap);
-	::SelectObject(hXorMaskDC, hOldXorMaskBitmap);
-
-	// Delete the helper DC
-	::DeleteDC(hXorMaskDC);
-	::DeleteDC(hAndMaskDC);
-	::DeleteDC(hMainDC);
-
-	ICONINFO iconinfo = {0};
-	iconinfo.fIcon			= FALSE;
-	iconinfo.xHotspot       = GetSystemMetrics(SM_CXCURSOR)/2;
-	iconinfo.yHotspot       = GetSystemMetrics(SM_CYCURSOR)/2;
-	iconinfo.hbmMask        = hAndMaskBitmap;
-	iconinfo.hbmColor       = hXorMaskBitmap;
-
-	return ::CreateIconIndirect(&iconinfo);
-}
-
-bool CTrayWindow::UpdateCursor()
+bool CMainWindow::UpdateCursor()
 {
 	if (m_bZooming)
 	{

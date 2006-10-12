@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "ShowHelper.h"
-#include "TrayWindow.h"
+#include "MainWindow.h"
 
 #pragma comment(lib, "comctl32")
 
@@ -41,7 +41,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	MSG msg;
 	HACCEL hAccelTable;
 
-	CTrayWindow trayWindow(hResource);
+	CMainWindow trayWindow(hResource);
 
 	if (trayWindow.RegisterAndCreateWindow())
 	{
