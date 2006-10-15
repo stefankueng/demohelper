@@ -199,7 +199,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DemoHelper.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Graphics.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\hyperlink.cpp"
 				>
 			</File>
 			<File
@@ -212,10 +220,6 @@
 			</File>
 			<File
 				RelativePath=".\Registry.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DemoHelper.cpp"
 				>
 			</File>
 			<File
@@ -249,6 +253,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DemoHelper.h"
+				>
+			</File>
+			<File
+				RelativePath=".\hyperlink.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MainWindow.h"
 				>
 			</File>
@@ -262,10 +274,6 @@
 			</File>
 			<File
 				RelativePath=".\Resource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DemoHelper.h"
 				>
 			</File>
 			<File
