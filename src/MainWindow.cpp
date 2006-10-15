@@ -373,17 +373,37 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 	case WM_MOUSEWHEEL:
 		{
 			int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-			if (zDelta < 0)
+			if (m_bZooming)
 			{
-				m_zoomfactor += 0.2f;
-				if (m_zoomfactor>4.0f)
-					m_zoomfactor = 4.0f;
+				if (zDelta < 0)
+				{
+					m_zoomfactor += 0.2f;
+					if (m_zoomfactor>4.0f)
+						m_zoomfactor = 4.0f;
+				}
+				else
+				{
+					m_zoomfactor -= 0.2f;
+					if (m_zoomfactor < 1.0f)
+						m_zoomfactor = 1.0f;
+				}
 			}
 			else
 			{
-				m_zoomfactor -= 0.2f;
-				if (m_zoomfactor < 1.0f)
-					m_zoomfactor = 1.0f;
+				if (wParam & MK_CONTROL)
+				{
+					if (zDelta < 0)
+						DoCommand(ID_CMD_DECREASE);
+					else
+						DoCommand(ID_CMD_INCREASE);
+				}
+				else
+				{
+					if (zDelta < 0)
+						DoCommand(ID_CMD_PREVCOLOR);
+					else
+						DoCommand(ID_CMD_NEXTCOLOR);
+				}
 			}
 			RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
 		}
