@@ -1,0 +1,182 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// German (Switzerland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DES)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN_SWISS
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_DEMOHELPER          ICON                    "DemoHelper.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDC_DEMOHELPER MENU 
+BEGIN
+    POPUP "TrayContext"
+    BEGIN
+        MENUITEM "&Zoom",                       ID_TRAYCONTEXT_ZOOM
+        MENUITEM "&Draw",                       ID_TRAYCONTEXT_DRAW
+        MENUITEM SEPARATOR
+        MENUITEM "&Options",                    ID_TRAYCONTEXT_OPTIONS
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       IDM_EXIT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_DEMOHELPER ACCELERATORS 
+BEGIN
+    VK_RETURN,      ID_CMD_ACCEPT,          VIRTKEY, NOINVERT
+    "e",            ID_CMD_CLEARLINES,      ASCII,  NOINVERT
+    VK_DOWN,        ID_CMD_DECREASE,        VIRTKEY, NOINVERT
+    VK_UP,          ID_CMD_INCREASE,        VIRTKEY, NOINVERT
+    VK_RIGHT,       ID_CMD_NEXTCOLOR,       VIRTKEY, NOINVERT
+    VK_LEFT,        ID_CMD_PREVCOLOR,       VIRTKEY, NOINVERT
+    "m",            ID_CMD_QUICKTOMARKER,   ASCII,  NOINVERT
+    VK_ESCAPE,      ID_CMD_QUITMODE,        VIRTKEY, NOINVERT
+    VK_BACK,        ID_CMD_UNDOLINE,        VIRTKEY, NOINVERT
+    "/",            IDM_ABOUT,              ASCII,  ALT, NOINVERT
+    "?",            IDM_ABOUT,              ASCII,  ALT, NOINVERT
+    "t",            ID_CMD_TOGGLEROP,       ASCII,  NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_OPTIONS DIALOGEX 0, 0, 232, 258
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "DemoHelper Options"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,115,237,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,175,237,50,14
+    ICON            IDI_DEMOHELPER,IDC_MYICON2,7,7,20,20
+    LTEXT           "DemoHelper v1.0",IDC_STATIC,40,7,61,8
+    LTEXT           "Copyright 2006 Stefan Küng",IDC_STATIC,40,20,185,8
+    LTEXT           "Stefan's Tools - tools.tortoisesvn.net",IDC_WEBLINK,40,32,185,8
+    LTEXT           "After enabling the zoom mode, you can zoom in and out using the mouse wheel or the up/down arrow keys. Exit zoom mode with Escape.",IDC_STATIC,14,97,205,26
+    LTEXT           "Zoom Mode:",IDC_STATIC,14,127,54,8
+    LTEXT           "After enabling the drawing mode, increase or decrease the pen size with the up/down arrow keys. Cycle through the available colors with the right/left arrow keys. Erase the last line with the Backspace key.",IDC_STATIC,14,166,205,37
+    LTEXT           "Draw Mode:",IDC_STATIC,14,209,54,8
+    CONTROL         "",IDC_HOTKEY_ZOOMMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,124,125,14
+    CONTROL         "",IDC_HOTKEY_DRAWMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,206,125,14
+    GROUPBOX        "Zoom",IDC_STATIC,7,87,218,62
+    GROUPBOX        "Draw",IDC_STATIC,7,154,218,72
+    GROUPBOX        "Misc",IDC_STATIC,7,43,218,39
+    CONTROL         "Capture the mouse cursor",IDC_CURSORCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,55,99,10
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_OPTIONS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 225
+        VERTGUIDE, 14
+        VERTGUIDE, 40
+        VERTGUIDE, 94
+        VERTGUIDE, 219
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 251
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_APP_TITLE           "DemoHelper"
+    IDS_WEBLINK             "http://tools.tortoisesvn.net"
+    IDC_DEMOHELPER          "DemoHelper"
+END
+
+#endif    // German (Switzerland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
