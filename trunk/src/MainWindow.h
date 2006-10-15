@@ -11,6 +11,12 @@
 #define DRAW_HOTKEY 100
 #define ZOOM_HOTKEY 101
 
+typedef enum LineTypes
+{
+	normal,
+	arrow,
+} LineTypes;
+
 class CMainWindow :
 	public CWindow
 {
@@ -89,8 +95,11 @@ protected:
 	POINT *				m_points;
 	BYTE *				m_linetypes;
 	int					m_rop[MAX_NUMBEROFLINES];
+
 	POINT				m_lineStartPoint[MAX_NUMBEROFLINES];
 	POINT				m_lineEndPoint[MAX_NUMBEROFLINES];
+	LineTypes			m_lineType[MAX_NUMBEROFLINES];
+
 	int					m_penwidth[MAX_NUMBEROFLINES];
 	int					m_linecolorindex[MAX_NUMBEROFLINES];
 	int					m_colorindex;

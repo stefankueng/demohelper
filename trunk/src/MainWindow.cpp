@@ -179,7 +179,13 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 							else if ((m_lineStartPoint[i].x>=0) && (m_lineStartPoint[i].y>=0) && (m_lineEndPoint[i].x>=0) && (m_lineEndPoint[i].y>=0))
 							{
 								SetROP2(memdc, m_rop[i]);
-								DrawArrow(memdc, i);
+								if (m_linetypes[i] == arrow)
+									DrawArrow(memdc, i);
+								else
+								{
+									MoveToEx(memdc, m_lineStartPoint[i].x, m_lineStartPoint[i].y, NULL);
+									LineTo(memdc, m_lineEndPoint[i].x, m_lineEndPoint[i].y);
+								}
 							}
 
 							if (hOldPen)
@@ -311,6 +317,15 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 							// straight line vertically
 							xPos = m_lineStartPoint[m_totallines].x;
 						}
+					}
+					if (wParam & MK_CONTROL)
+					{
+						// control pressed means normal lines, not arrows
+						m_linetypes[m_totallines] = normal;
+					}
+					else
+					{
+						m_linetypes[m_totallines] = arrow;
 					}
 					RECT invalidRect;
 					invalidRect.left = min(m_lineStartPoint[m_totallines].x, xPos);
