@@ -1,6 +1,9 @@
 #include "stdafx.h"
+#include "DemoHelper.h"
 #include "MainWindow.h"
 #include "registry.h"
+
+CHyperLink	CMainWindow::m_link;
 
 BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
@@ -14,6 +17,10 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
 			SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_SETHOTKEY, (WPARAM)(DWORD)regZoom, 0);
 			SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_SETHOTKEY, (WPARAM)(DWORD)regDraw, 0);
 			SendMessage(GetDlgItem(hwndDlg, IDC_CURSORCHECK), BM_SETCHECK, DWORD(regCursor) ? BST_CHECKED : BST_UNCHECKED, 0);
+
+			TCHAR buffer[128] = {0};
+			LoadString(hInst, IDS_WEBLINK, buffer, 128);
+			m_link.ConvertStaticToHyperlink(hwndDlg, IDC_WEBLINK, buffer);
 
 			// position the dialog box on the screen
 			HWND hwndOwner; 

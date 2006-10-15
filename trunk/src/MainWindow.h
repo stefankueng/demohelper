@@ -3,6 +3,7 @@
 #include "Resource.h"
 #include "shellapi.h"
 #include "shlwapi.h"
+#include "hyperlink.h"
 #include <commctrl.h>
 #include <vector>
 
@@ -117,4 +118,6 @@ protected:
 	int					m_oldpenwidth;
 	int					m_oldcolorindex;
 	int					m_oldrop;
+
+	static CHyperLink	m_link;
 };

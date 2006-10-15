@@ -161,6 +161,7 @@ END
 STRINGTABLE 
 BEGIN
     IDS_APP_TITLE           "DemoHelper"
+    IDS_WEBLINK             "http://tools.tortoisesvn.net"
     IDC_DEMOHELPER          "DemoHelper"
 END
 
