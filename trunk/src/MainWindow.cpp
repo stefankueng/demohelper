@@ -58,10 +58,10 @@ bool CMainWindow::RegisterAndCreateWindow()
 	wcx.hInstance = hResource;
 	wcx.hCursor = NULL;
 	wcx.lpszClassName = ResString(hResource, IDS_APP_TITLE);
-	wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_SHOWHELPER));
+	wcx.hIcon = LoadIcon(hResource, MAKEINTRESOURCE(IDI_DEMOHELPER));
 	wcx.hbrBackground = NULL;
 	wcx.lpszMenuName = NULL;
-	wcx.hIconSm	= LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_SHOWHELPER));
+	wcx.hIconSm	= LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_DEMOHELPER));
 	if (RegisterWindow(&wcx))
 	{
 		if (CreateEx(NULL, WS_POPUP, NULL))
@@ -78,10 +78,10 @@ bool CMainWindow::RegisterAndCreateWindow()
 				niData.cbSize = NOTIFYICONDATA_V2_SIZE;
 			else niData.cbSize = NOTIFYICONDATA_V1_SIZE;
 
-			niData.uID = IDI_SHOWHELPER;
+			niData.uID = IDI_DEMOHELPER;
 			niData.uFlags = NIF_ICON|NIF_MESSAGE|NIF_TIP|NIF_INFO;
 
-			niData.hIcon = (HICON)LoadImage(hResource, MAKEINTRESOURCE(IDI_SHOWHELPER),
+			niData.hIcon = (HICON)LoadImage(hResource, MAKEINTRESOURCE(IDI_DEMOHELPER),
 				IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
 			niData.hWnd = *this;
 			niData.uCallbackMessage = TRAY_WM_MESSAGE;
@@ -113,8 +113,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 		{
 			WORD key = MAKEWORD(HIWORD(lParam), LOWORD(lParam));
 			key = HotKey2HotKeyControl(key);
-			CRegStdWORD regZoom(_T("Software\\ShowHelper\\zoomhotkey"), 0x331);
-			CRegStdWORD regDraw(_T("Software\\ShowHelper\\drawhotkey"), 0x332);
+			CRegStdWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
+			CRegStdWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
 			if (key == (WORD)(DWORD)regZoom)
 			{
 				m_bZooming = true;
@@ -345,7 +345,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 				{
 					POINT pt;
 					GetCursorPos(&pt);
-					HMENU hMenu = LoadMenu(hResource, MAKEINTRESOURCE(IDC_SHOWHELPER));
+					HMENU hMenu = LoadMenu(hResource, MAKEINTRESOURCE(IDC_DEMOHELPER));
 					HMENU hPopMenu = GetSubMenu(hMenu, 0);
 					SetForegroundWindow(*this);
 					TrackPopupMenu(hPopMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, 0, *this, NULL); 
@@ -398,7 +398,7 @@ bool CMainWindow::StartPresentationMode()
 	hDesktopCompatibleBitmap = CreateCompatibleBitmap(hDesktopDC, nScreenWidth, nScreenHeight);
 	hOldBmp = (HBITMAP)SelectObject(hDesktopCompatibleDC,hDesktopCompatibleBitmap); 
 	BitBlt(hDesktopCompatibleDC,0,0,nScreenWidth,nScreenHeight, hDesktopDC,0,0,SRCCOPY|CAPTUREBLT);
-	CRegStdWORD regShowCursor(_T("Software\\ShowHelper\\capturecursor"), TRUE);
+	CRegStdWORD regShowCursor(_T("Software\\DemoHelper\\capturecursor"), TRUE);
 	if (DWORD(regShowCursor))
 	{
 		// capture the cursor
@@ -460,8 +460,8 @@ bool CMainWindow::DrawArrow(HDC hdc, int index)
 
 void CMainWindow::RegisterHotKeys()
 {
-	CRegStdWORD regZoom(_T("Software\\ShowHelper\\zoomhotkey"), 0x331);
-	CRegStdWORD regDraw(_T("Software\\ShowHelper\\drawhotkey"), 0x332);
+	CRegStdWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
+	CRegStdWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
 	WORD zoom = (WORD)(DWORD)regZoom;
 	WORD draw = (WORD)(DWORD)regDraw;
 	zoom = HotKeyControl2HotKey(zoom);

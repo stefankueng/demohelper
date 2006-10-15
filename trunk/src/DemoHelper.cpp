@@ -1,8 +1,8 @@
-// ShowHelper.cpp : Defines the entry point for the application.
+// DemoHelper.cpp : Defines the entry point for the application.
 //
 
 #include "stdafx.h"
-#include "ShowHelper.h"
+#include "DemoHelper.h"
 #include "MainWindow.h"
 
 #pragma comment(lib, "comctl32")
@@ -45,7 +45,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	if (trayWindow.RegisterAndCreateWindow())
 	{
-		hAccelTable = LoadAccelerators(hResource, MAKEINTRESOURCE(IDR_SHOWHELPER));
+		hAccelTable = LoadAccelerators(hResource, MAKEINTRESOURCE(IDR_DEMOHELPER));
 		// Main message loop:
 		while (GetMessage(&msg, NULL, 0, 0))
 		{
