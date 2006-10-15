@@ -27,6 +27,7 @@ public:
 		, m_currentpenwidth(6)
 		, m_hCursor(NULL)
 		, m_currentrop(R2_MASKPEN)
+		, m_bMarker(false)
 	{
 		SetWindowTitle((LPCTSTR)ResString(hResource, IDS_APP_TITLE));
 		m_colors[0] = RGB(255, 0, 0);
@@ -102,4 +103,9 @@ protected:
 
 	HCURSOR				m_hCursor;
 	HCURSOR				m_hPreviousCursor;
+
+	bool				m_bMarker;
+	int					m_oldpenwidth;
+	int					m_oldcolorindex;
+	int					m_oldrop;
 };

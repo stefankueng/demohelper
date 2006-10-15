@@ -98,9 +98,25 @@ LRESULT CMainWindow::DoCommand(int id)
 		break;
 	case ID_CMD_QUICKTOMARKER:
 		// marker mode - quick way to select the biggest brush size and color yellow
-		m_currentpenwidth = GetSystemMetrics(SM_CXCURSOR);
-		m_colorindex = 1;
-		m_currentrop = R2_MASKPEN;
+		if (m_bMarker)
+		{
+			m_currentpenwidth = m_oldpenwidth;
+			m_colorindex = m_oldcolorindex;
+			m_currentrop = m_oldrop;
+			m_bMarker = false;
+		}
+		else
+		{
+			m_oldpenwidth = m_currentpenwidth;
+			m_oldcolorindex = m_colorindex;
+			m_oldrop = m_currentrop;
+
+			m_currentpenwidth = GetSystemMetrics(SM_CXCURSOR);
+			m_colorindex = 1;
+			m_currentrop = R2_MASKPEN;
+
+			m_bMarker = true;
+		}
 		UpdateCursor();
 		break;
 	case ID_CMD_ACCEPT:
