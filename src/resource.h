@@ -1,15 +1,15 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by ShowHelper.rc
+// Used by DEMOHELPER.rc
 //
 #define IDC_MYICON2                     3
-#define IDD_SHOWHELPER_DIALOG           102
+#define IDD_DEMOHELPER_DIALOG           102
 #define IDS_APP_TITLE                   103
 #define IDM_ABOUT                       104
 #define IDM_EXIT                        105
-#define IDI_SHOWHELPER                  107
-#define IDC_SHOWHELPER                  109
-#define IDR_SHOWHELPER                  109
+#define IDI_DEMOHELPER                  107
+#define IDC_DEMOHELPER                  109
+#define IDR_DEMOHELPER                  109
 #define IDR_MAINFRAME                   128
 #define IDD_OPTIONS                     129
 #define IDC_WEBLINK                     1002

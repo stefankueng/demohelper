@@ -30,14 +30,14 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN_SWISS
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_SHOWHELPER          ICON                    "ShowHelper.ico"
+IDI_DEMOHELPER          ICON                    "DemoHelper.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDC_SHOWHELPER MENU 
+IDC_DEMOHELPER MENU 
 BEGIN
     POPUP "TrayContext"
     BEGIN
@@ -56,7 +56,7 @@ END
 // Accelerator
 //
 
-IDR_SHOWHELPER ACCELERATORS 
+IDR_DEMOHELPER ACCELERATORS 
 BEGIN
     VK_RETURN,      ID_CMD_ACCEPT,          VIRTKEY, NOINVERT
     "e",            ID_CMD_CLEARLINES,      ASCII,  NOINVERT
@@ -80,13 +80,13 @@ END
 
 IDD_OPTIONS DIALOGEX 0, 0, 232, 258
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "ShowHelper Options"
+CAPTION "DemoHelper Options"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,115,237,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,175,237,50,14
-    ICON            IDI_SHOWHELPER,IDC_MYICON2,7,7,21,20
-    LTEXT           "ShowHelper v1.0",IDC_STATIC,40,7,61,8
+    ICON            IDI_DEMOHELPER,IDC_MYICON2,7,7,21,20
+    LTEXT           "DemoHelper v1.0",IDC_STATIC,40,7,61,8
     LTEXT           "Copyright 2006 Stefan Küng",IDC_STATIC,40,20,185,8
     LTEXT           "Stefan's Tools - stefanstools.tortoisesvn.net",IDC_WEBLINK,40,32,185,8
     LTEXT           "After enabling the zoom mode, you can zoom in and out using the mouse wheel or the up/down arrow keys. Exit zoom mode with Escape.",IDC_STATIC,14,97,205,26
@@ -160,8 +160,8 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_APP_TITLE           "ShowHelper"
-    IDC_SHOWHELPER          "SHOWHELPER"
+    IDS_APP_TITLE           "DemoHelper"
+    IDC_DEMOHELPER          "DemoHelper"
 END
 
 #endif    // German (Switzerland) resources
