@@ -204,6 +204,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 	case WM_RBUTTONDOWN:
 	case WM_LBUTTONDOWN:
 		{
+			if (m_bInlineZoom)
+			{
+				GetCursorPos(&m_ptInlineZoomStartPoint);
+				GetCursorPos(&m_ptInlineZoomEndPoint);
+			}
 			if (m_bZooming)
 			{
 				m_bZooming = false;
@@ -239,13 +244,43 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 		break;
 	case WM_RBUTTONUP:
 	case WM_LBUTTONUP:
-		m_bDrawing = false;
-		m_lineStartShiftPoint.x = -1;
-		m_lineStartShiftPoint.y = -1;
+		if (m_bInlineZoom)
+		{
+			m_bInlineZoom = false;
+			StretchBlt(hDesktopCompatibleDC,
+				0,0,
+				GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN),
+				hDesktopCompatibleDC,
+				m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y,
+				abs(m_ptInlineZoomStartPoint.x - m_ptInlineZoomEndPoint.x), abs(m_ptInlineZoomStartPoint.y - m_ptInlineZoomEndPoint.y),
+				SRCCOPY);
+			UpdateCursor();
+			RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
+		}
+		else
+		{
+			m_bDrawing = false;
+			m_lineStartShiftPoint.x = -1;
+			m_lineStartShiftPoint.y = -1;
+		}
 		break;
 	case WM_MOUSEMOVE:
 		{
-			if (m_bZooming)
+			if (m_bInlineZoom)
+			{
+				if ((m_ptInlineZoomStartPoint.x >=0)&&(m_ptInlineZoomStartPoint.y >= 0)&&
+					(m_ptInlineZoomEndPoint.x >= 0)&&(m_ptInlineZoomEndPoint.y >= 0))
+				{
+					HDC hDC = GetDC(*this);
+					SetROP2(hDC, R2_NOT);
+					SelectObject(hDC, GetStockObject(NULL_BRUSH));
+					Rectangle(hDC, m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y, m_ptInlineZoomEndPoint.x, m_ptInlineZoomEndPoint.y);
+					GetCursorPos(&m_ptInlineZoomEndPoint);
+					Rectangle(hDC, m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y, m_ptInlineZoomEndPoint.x, m_ptInlineZoomEndPoint.y);
+					ReleaseDC(*this, hDC);
+				}
+			}
+			else if (m_bZooming)
 			{
 				RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
 			}
@@ -596,4 +631,16 @@ bool CMainWindow::UpdateCursor()
 		return true;
 	}
 	return false;
+}
+
+bool CMainWindow::StartInlineZoom()
+{
+	m_bInlineZoom = true;
+	HCURSOR hCur = LoadCursor(NULL, MAKEINTRESOURCE(IDC_CROSS));
+	SetCursor(hCur);
+	m_ptInlineZoomStartPoint.x = -1;
+	m_ptInlineZoomStartPoint.y = -1;
+	m_ptInlineZoomEndPoint.x = -1;
+	m_ptInlineZoomEndPoint.y = -1;
+	return true;
 }

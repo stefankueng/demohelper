@@ -155,6 +155,9 @@ LRESULT CMainWindow::DoCommand(int id)
 	case ID_TRAYCONTEXT_ZOOM:
 		SetTimer(*this, TIMER_ID_ZOOM, 300, NULL);
 		break;
+	case ID_CMD_INLINEZOOM:
+		StartInlineZoom();
+		break;
 	default:
 		break;
 	};
