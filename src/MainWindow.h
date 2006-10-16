@@ -71,6 +71,7 @@ protected:
 
 	bool				StartPresentationMode();
 	bool				EndPresentationMode();
+	bool				StartInlineZoom();
 	bool				StartZoomingMode();
 	bool				EndZoomingMode();
 	bool				DrawArrow(HDC hdc, int index);
@@ -122,6 +123,10 @@ protected:
 	int					m_oldpenwidth;
 	int					m_oldcolorindex;
 	int					m_oldrop;
+
+	bool				m_bInlineZoom;
+	POINT				m_ptInlineZoomStartPoint;
+	POINT				m_ptInlineZoomEndPoint;
 
 	static CHyperLink	m_link;
 };

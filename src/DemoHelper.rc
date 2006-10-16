@@ -66,10 +66,11 @@ BEGIN
     VK_LEFT,        ID_CMD_PREVCOLOR,       VIRTKEY, NOINVERT
     "m",            ID_CMD_QUICKTOMARKER,   ASCII,  NOINVERT
     VK_ESCAPE,      ID_CMD_QUITMODE,        VIRTKEY, NOINVERT
+    "t",            ID_CMD_TOGGLEROP,       ASCII,  NOINVERT
     VK_BACK,        ID_CMD_UNDOLINE,        VIRTKEY, NOINVERT
     "/",            IDM_ABOUT,              ASCII,  ALT, NOINVERT
     "?",            IDM_ABOUT,              ASCII,  ALT, NOINVERT
-    "t",            ID_CMD_TOGGLEROP,       ASCII,  NOINVERT
+    "z",            ID_CMD_INLINEZOOM,      ASCII,  NOINVERT
 END
 
 
