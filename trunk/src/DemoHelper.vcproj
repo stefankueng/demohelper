@@ -207,6 +207,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HelpDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\hyperlink.cpp"
 				>
 			</File>

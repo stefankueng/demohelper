@@ -13,6 +13,7 @@
 #define IDR_DEMOHELPER                  109
 #define IDR_MAINFRAME                   128
 #define IDD_OPTIONS                     129
+#define IDD_HELPDIALOG                  130
 #define IDC_WEBLINK                     1002
 #define IDC_HOTKEY_ZOOMMODE             1003
 #define IDC_HOTKEY2                     1004
@@ -41,8 +42,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        130
-#define _APS_NEXT_COMMAND_VALUE         32789
+#define _APS_NEXT_RESOURCE_VALUE        131
+#define _APS_NEXT_COMMAND_VALUE         32790
 #define _APS_NEXT_CONTROL_VALUE         1006
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

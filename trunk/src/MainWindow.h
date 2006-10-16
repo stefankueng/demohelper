@@ -82,6 +82,7 @@ protected:
 	static BOOL CALLBACK OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
 	static WORD			HotKeyControl2HotKey(WORD hk);
 	static WORD			HotKey2HotKeyControl(WORD hk);
+	static BOOL CALLBACK HelpDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 	void				RegisterHotKeys();
 	bool				UpdateCursor();

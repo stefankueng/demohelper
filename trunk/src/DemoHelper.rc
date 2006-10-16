@@ -15,11 +15,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// German (Switzerland) resources
+// Neutral resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DES)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
 #ifdef _WIN32
-LANGUAGE LANG_GERMAN, SUBLANG_GERMAN_SWISS
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 #pragma code_page(1252)
 #endif //_WIN32
 
@@ -31,6 +31,18 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN_SWISS
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_DEMOHELPER          ICON                    "DemoHelper.ico"
+#endif    // Neutral resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -71,6 +83,7 @@ BEGIN
     "/",            IDM_ABOUT,              ASCII,  ALT, NOINVERT
     "?",            IDM_ABOUT,              ASCII,  ALT, NOINVERT
     "z",            ID_CMD_INLINEZOOM,      ASCII,  NOINVERT
+    VK_F1,          IDHELP,                 VIRTKEY, NOINVERT
 END
 
 
@@ -102,6 +115,105 @@ BEGIN
     CONTROL         "Capture the mouse cursor",IDC_CURSORCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,55,99,10
 END
 
+IDD_HELPDIALOG DIALOGEX 0, 0, 208, 334
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "DemoHelper Help"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,151,313,50,14
+    GROUPBOX        "Zooming Mode",IDC_STATIC,7,7,194,78
+    LTEXT           "Up",IDC_STATIC,16,22,50,8
+    LTEXT           "Down",IDC_STATIC,16,36,50,8
+    LTEXT           "Enter",IDC_STATIC,16,51,50,8
+    LTEXT           "Escape",IDC_STATIC,16,67,50,8
+    LTEXT           "Up/Down",IDC_STATIC,16,100,50,8
+    LTEXT           "zoom in",IDC_STATIC,66,23,128,14
+    LTEXT           "zoom out",IDC_STATIC,66,36,128,8
+    LTEXT           "activates drawing of the zoomed area",IDC_STATIC,66,51,128,8
+    LTEXT           "cancels zooming mode",IDC_STATIC,66,67,128,8
+    GROUPBOX        "Drawing Mode",IDC_STATIC,7,89,187,217
+    LTEXT           "increases/decreases the size of the drawing brush",IDC_STATIC,66,99,128,18
+    LTEXT           "Right/Left",IDC_STATIC,16,118,50,8
+    LTEXT           "Control",IDC_STATIC,16,136,50,8
+    LTEXT           "Shift",IDC_STATIC,16,154,50,8
+    LTEXT           "right mouse-drag",IDC_STATIC,16,172,50,17
+    LTEXT           "cycles through the available brush colors",IDC_STATIC,66,118,128,8
+    LTEXT           "drawing straight lines",IDC_STATIC,66,136,128,8
+    LTEXT           "forces horizontal/vertical drawing",IDC_STATIC,66,154,128,8
+    LTEXT           "draws arrow lines",IDC_STATIC,66,173,128,8
+    LTEXT           "escape",IDC_STATIC,16,199,50,8
+    LTEXT           "quits drawing mode",IDC_STATIC,66,198,128,8
+    LTEXT           "backspace",IDC_STATIC,16,217,50,8
+    LTEXT           "escape",IDC_STATIC,16,271,50,8
+    LTEXT           "escape",IDC_STATIC,16,253,50,8
+    LTEXT           "E",IDC_STATIC,16,235,50,8
+    LTEXT           "removes the last line drawn",IDC_STATIC,66,217,128,8
+    LTEXT           "removes all drawn lines",IDC_STATIC,66,235,128,8
+    LTEXT           "toggles the marker on/off",IDC_STATIC,66,254,128,8
+    LTEXT           "escape",IDC_STATIC,16,289,50,8
+    LTEXT           "toggles between solid and merged drawing",IDC_STATIC,66,272,128,8
+    LTEXT           "select a rectangle to zoom in",IDC_STATIC,66,289,128,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_OPTIONS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 225
+        VERTGUIDE, 14
+        VERTGUIDE, 40
+        VERTGUIDE, 94
+        VERTGUIDE, 219
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 251
+    END
+
+    IDD_HELPDIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 201
+        VERTGUIDE, 16
+        VERTGUIDE, 66
+        VERTGUIDE, 194
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 327
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_APP_TITLE           "DemoHelper"
+    IDS_WEBLINK             "http://tools.tortoisesvn.net"
+    IDC_DEMOHELPER          "DemoHelper"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// German (Switzerland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DES)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN_SWISS
+#pragma code_page(1252)
+#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -129,42 +241,6 @@ BEGIN
 END
 
 #endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
-BEGIN
-    IDD_OPTIONS, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 225
-        VERTGUIDE, 14
-        VERTGUIDE, 40
-        VERTGUIDE, 94
-        VERTGUIDE, 219
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 251
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE 
-BEGIN
-    IDS_APP_TITLE           "DemoHelper"
-    IDS_WEBLINK             "http://tools.tortoisesvn.net"
-    IDC_DEMOHELPER          "DemoHelper"
-END
 
 #endif    // German (Switzerland) resources
 /////////////////////////////////////////////////////////////////////////////

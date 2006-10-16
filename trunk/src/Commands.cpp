@@ -158,6 +158,9 @@ LRESULT CMainWindow::DoCommand(int id)
 	case ID_CMD_INLINEZOOM:
 		StartInlineZoom();
 		break;
+	case IDHELP:
+		DialogBox(hResource, MAKEINTRESOURCE(IDD_HELPDIALOG), *this, (DLGPROC)HelpDlgProc);
+		break;
 	default:
 		break;
 	};
