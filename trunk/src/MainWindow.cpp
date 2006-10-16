@@ -282,24 +282,48 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 						m_lineStartShiftPoint.x = -1;
 						m_lineStartShiftPoint.y = -1;
 					}
-					if (m_lineindex[m_totallines] < (LINEARRAYSIZE-2))
+					if (wParam & MK_CONTROL)
 					{
-						RECT invalidRect = {0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN)};
-						m_lineindex[m_totallines]++;
-						POINT pt = {xPos, yPos};
-						m_points[m_totallines*LINEARRAYSIZE + m_lineindex[m_totallines]] = pt;
-						m_linetypes[m_totallines*LINEARRAYSIZE + m_lineindex[m_totallines]] = PT_LINETO;
-						for (int i=0; i<m_lineindex[m_totallines]; ++i)
-						{
-							invalidRect.left = min(m_points[m_totallines*LINEARRAYSIZE + i].x, invalidRect.left);
-							invalidRect.top = min(m_points[m_totallines*LINEARRAYSIZE + i].y, invalidRect.top);
-							invalidRect.right = max(m_points[m_totallines*LINEARRAYSIZE + i].x, invalidRect.right);
-							invalidRect.bottom = max(m_points[m_totallines*LINEARRAYSIZE + i].y, invalidRect.bottom);
-						}
-						InflateRect(&invalidRect, 2*m_currentpenwidth, 2*m_currentpenwidth);
+						m_lineType[m_totallines] = normal;
+						RECT invalidRect;
+						invalidRect.left = min(m_lineStartPoint[m_totallines].x, xPos);
+						invalidRect.top = min(m_lineStartPoint[m_totallines].y, yPos);
+						invalidRect.right = max(m_lineStartPoint[m_totallines].x, xPos);
+						invalidRect.bottom = max(m_lineStartPoint[m_totallines].y, yPos);
+
+						invalidRect.left = min(m_lineStartPoint[m_totallines].x, m_lineEndPoint[m_totallines].x);
+						invalidRect.top = min(m_lineStartPoint[m_totallines].y, m_lineEndPoint[m_totallines].y);
+						invalidRect.right = max(m_lineStartPoint[m_totallines].x, m_lineEndPoint[m_totallines].x);
+						invalidRect.bottom = max(m_lineStartPoint[m_totallines].y, m_lineEndPoint[m_totallines].y);
+
+						InflateRect(&invalidRect, 10*m_currentpenwidth, 10*m_currentpenwidth);
 						invalidRect.left = max(0, invalidRect.left);
 						invalidRect.top = max(0, invalidRect.top);
 						InvalidateRect(*this, &invalidRect, FALSE);
+						m_lineEndPoint[m_totallines].x = xPos;
+						m_lineEndPoint[m_totallines].y = yPos;
+					}
+					else
+					{
+						if (m_lineindex[m_totallines] < (LINEARRAYSIZE-2))
+						{
+							RECT invalidRect = {0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN)};
+							m_lineindex[m_totallines]++;
+							POINT pt = {xPos, yPos};
+							m_points[m_totallines*LINEARRAYSIZE + m_lineindex[m_totallines]] = pt;
+							m_linetypes[m_totallines*LINEARRAYSIZE + m_lineindex[m_totallines]] = PT_LINETO;
+							for (int i=0; i<m_lineindex[m_totallines]; ++i)
+							{
+								invalidRect.left = min(m_points[m_totallines*LINEARRAYSIZE + i].x, invalidRect.left);
+								invalidRect.top = min(m_points[m_totallines*LINEARRAYSIZE + i].y, invalidRect.top);
+								invalidRect.right = max(m_points[m_totallines*LINEARRAYSIZE + i].x, invalidRect.right);
+								invalidRect.bottom = max(m_points[m_totallines*LINEARRAYSIZE + i].y, invalidRect.bottom);
+							}
+							InflateRect(&invalidRect, 2*m_currentpenwidth, 2*m_currentpenwidth);
+							invalidRect.left = max(0, invalidRect.left);
+							invalidRect.top = max(0, invalidRect.top);
+							InvalidateRect(*this, &invalidRect, FALSE);
+						}
 					}
 				}
 				else if (wParam & MK_RBUTTON)
