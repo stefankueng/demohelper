@@ -493,7 +493,7 @@ bool CMainWindow::StartPresentationMode()
 	{
 		if (m_hCursor)
 			DestroyCursor(m_hCursor);
-		m_hCursor = CreateDrawCursor(m_colors[m_colorindex], m_currentpenwidth);
+		m_hCursor = CreateDrawCursor(m_colors[m_colorindex], max(2, m_currentpenwidth));
 		m_hPreviousCursor = SetCursor(m_hCursor);
 	}
 	else
@@ -589,7 +589,7 @@ bool CMainWindow::UpdateCursor()
 		SetCursor(NULL);
 	}
 	DestroyCursor(m_hCursor);
-	m_hCursor = CreateDrawCursor(m_colors[m_colorindex], m_currentpenwidth);
+	m_hCursor = CreateDrawCursor(m_colors[m_colorindex], max(2, m_currentpenwidth));
 	if (m_hCursor)
 	{
 		SetCursor(m_hCursor);
