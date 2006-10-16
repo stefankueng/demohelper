@@ -144,13 +144,13 @@ BEGIN
     LTEXT           "escape",IDC_STATIC,16,199,50,8
     LTEXT           "quits drawing mode",IDC_STATIC,66,198,128,8
     LTEXT           "backspace",IDC_STATIC,16,217,50,8
-    LTEXT           "escape",IDC_STATIC,16,271,50,8
-    LTEXT           "escape",IDC_STATIC,16,253,50,8
+    LTEXT           "T",IDC_STATIC,16,271,50,8
+    LTEXT           "M",IDC_STATIC,16,253,50,8
     LTEXT           "E",IDC_STATIC,16,235,50,8
     LTEXT           "removes the last line drawn",IDC_STATIC,66,217,128,8
     LTEXT           "removes all drawn lines",IDC_STATIC,66,235,128,8
     LTEXT           "toggles the marker on/off",IDC_STATIC,66,254,128,8
-    LTEXT           "escape",IDC_STATIC,16,289,50,8
+    LTEXT           "Z",IDC_STATIC,16,289,50,8
     LTEXT           "toggles between solid and merged drawing",IDC_STATIC,66,272,128,8
     LTEXT           "select a rectangle to zoom in",IDC_STATIC,66,289,128,8
 END
