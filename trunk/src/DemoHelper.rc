@@ -86,7 +86,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,115,237,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,175,237,50,14
     ICON            IDI_DEMOHELPER,IDC_MYICON2,7,7,20,20
-    LTEXT           "DemoHelper v1.0",IDC_STATIC,40,7,61,8
+    LTEXT           "DemoHelper v1.1",IDC_STATIC,40,7,61,8
     LTEXT           "Copyright 2006 Stefan Küng",IDC_STATIC,40,20,185,8
     LTEXT           "Stefan's Tools - tools.tortoisesvn.net",IDC_WEBLINK,40,32,185,8
     LTEXT           "After enabling the zoom mode, you can zoom in and out using the mouse wheel or the up/down arrow keys. Exit zoom mode with Escape.",IDC_STATIC,14,97,205,26
