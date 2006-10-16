@@ -57,6 +57,7 @@ BEGIN
         MENUITEM "&Draw",                       ID_TRAYCONTEXT_DRAW
         MENUITEM SEPARATOR
         MENUITEM "&Options",                    ID_TRAYCONTEXT_OPTIONS
+        MENUITEM "&Help",                       IDHELP
         MENUITEM SEPARATOR
         MENUITEM "E&xit",                       IDM_EXIT
     END
