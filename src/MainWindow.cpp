@@ -179,7 +179,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 							else if ((m_lineStartPoint[i].x>=0) && (m_lineStartPoint[i].y>=0) && (m_lineEndPoint[i].x>=0) && (m_lineEndPoint[i].y>=0))
 							{
 								SetROP2(memdc, m_rop[i]);
-								if (m_linetypes[i] == arrow)
+								if (m_lineType[i] == arrow)
 									DrawArrow(memdc, i);
 								else
 								{
@@ -321,11 +321,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 					if (wParam & MK_CONTROL)
 					{
 						// control pressed means normal lines, not arrows
-						m_linetypes[m_totallines] = normal;
+						m_lineType[m_totallines] = normal;
 					}
 					else
 					{
-						m_linetypes[m_totallines] = arrow;
+						m_lineType[m_totallines] = arrow;
 					}
 					RECT invalidRect;
 					invalidRect.left = min(m_lineStartPoint[m_totallines].x, xPos);
