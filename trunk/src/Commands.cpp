@@ -150,10 +150,10 @@ LRESULT CMainWindow::DoCommand(int id)
 		}
 		break;
 	case ID_TRAYCONTEXT_DRAW:
-		StartPresentationMode();
+		SetTimer(*this, TIMER_ID_DRAW, 300, NULL);
 		break;
 	case ID_TRAYCONTEXT_ZOOM:
-		StartZoomingMode();
+		SetTimer(*this, TIMER_ID_ZOOM, 300, NULL);
 		break;
 	default:
 		break;

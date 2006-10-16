@@ -432,6 +432,18 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 			RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
 		}
 		break;
+	case WM_TIMER:
+		if (wParam == TIMER_ID_DRAW)
+		{
+			KillTimer(*this, TIMER_ID_DRAW);
+			StartPresentationMode();
+		}
+		else if (wParam == TIMER_ID_ZOOM)
+		{
+			KillTimer(*this, TIMER_ID_ZOOM);
+			StartZoomingMode();
+		}
+		break;
 	case WM_DESTROY:
 		Shell_NotifyIcon(NIM_DELETE,&niData);
 		bWindowClosed = TRUE;

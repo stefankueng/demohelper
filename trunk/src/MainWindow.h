@@ -12,6 +12,10 @@
 #define DRAW_HOTKEY 100
 #define ZOOM_HOTKEY 101
 
+#define TIMER_ID_DRAW	101
+#define TIMER_ID_ZOOM	102
+
+
 typedef enum LineTypes
 {
 	normal,
