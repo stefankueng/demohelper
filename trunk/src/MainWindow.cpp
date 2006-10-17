@@ -535,6 +535,7 @@ bool CMainWindow::StartPresentationMode()
 	{
 		SetCursor(NULL);
 	}
+	m_bInlineZoom = false;
 	return true;
 }
 
@@ -555,6 +556,7 @@ bool CMainWindow::EndPresentationMode()
 		DestroyCursor(m_hCursor);
 		m_hCursor = NULL;
 	}
+	m_bInlineZoom = false;
 	return true;
 }
 
