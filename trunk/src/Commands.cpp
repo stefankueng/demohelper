@@ -158,6 +158,25 @@ LRESULT CMainWindow::DoCommand(int id)
 	case ID_CMD_INLINEZOOM:
 		StartInlineZoom();
 		break;
+	case ID_CMD_CLEARSCREEN:
+		{
+			// clear the whole screen for drawing on it
+			RECT rect;
+			rect.left = 0;
+			rect.top = 0;
+			rect.right = GetSystemMetrics(SM_CXSCREEN);
+			rect.bottom = GetSystemMetrics(SM_CYSCREEN);
+			SetBkColor(hDesktopCompatibleDC, ::GetSysColor(COLOR_WINDOW));
+			::ExtTextOut(hDesktopCompatibleDC, 0, 0, ETO_OPAQUE, &rect, NULL, 0, NULL);
+			// also clear all lines already drawn
+			m_bDrawing = false;
+			m_lineindex[0] = 0;
+			m_lineStartPoint[0].x = -1;
+			m_lineStartPoint[0].y = -1;
+			m_totallines = -1;
+			RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
+		}
+		break;
 	case IDHELP:
 		DialogBox(hResource, MAKEINTRESOURCE(IDD_HELPDIALOG), *this, (DLGPROC)HelpDlgProc);
 		break;
