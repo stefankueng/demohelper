@@ -88,6 +88,46 @@ LRESULT CMainWindow::DoCommand(int id)
 		}
 		UpdateCursor();
 		break;
+	case ID_CMD_COLOR0:
+		m_colorindex = 0;
+		UpdateCursor();
+		break;
+	case ID_CMD_COLOR1:
+		m_colorindex = 1;
+		UpdateCursor();
+		break;
+	case ID_CMD_COLOR2:
+		m_colorindex = 2;
+		UpdateCursor();
+		break;
+	case ID_CMD_COLOR3:
+		m_colorindex = 3;
+		UpdateCursor();
+		break;
+	case ID_CMD_COLOR4:
+		m_colorindex = 4;
+		UpdateCursor();
+		break;
+	case ID_CMD_COLOR5:
+		m_colorindex = 5;
+		UpdateCursor();
+		break;
+	case ID_CMD_COLOR6:
+		m_colorindex = 6;
+		UpdateCursor();
+		break;
+	case ID_CMD_COLOR7:
+		m_colorindex = 7;
+		UpdateCursor();
+		break;
+	case ID_CMD_COLOR8:
+		m_colorindex = 8;
+		UpdateCursor();
+		break;
+	case ID_CMD_COLOR9:
+		m_colorindex = 9;
+		UpdateCursor();
+		break;
 	case ID_CMD_CLEARLINES:
 		m_bDrawing = false;
 		m_lineindex[0] = 0;
@@ -112,7 +152,7 @@ LRESULT CMainWindow::DoCommand(int id)
 			m_oldrop = m_currentrop;
 
 			m_currentpenwidth = GetSystemMetrics(SM_CXCURSOR);
-			m_colorindex = 1;
+			m_colorindex = 0;
 			m_currentrop = R2_MASKPEN;
 
 			m_bMarker = true;

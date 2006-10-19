@@ -34,7 +34,7 @@ public:
 		, hDesktopCompatibleBitmap(NULL)
 		, hOldBmp(NULL)
 		, m_totallines(-1)
-		, m_colorindex(0)
+		, m_colorindex(1)
 		, m_currentpenwidth(6)
 		, m_hCursor(NULL)
 		, m_currentrop(R2_MASKPEN)
@@ -42,8 +42,8 @@ public:
 		, m_bInlineZoom(false)
 	{
 		SetWindowTitle((LPCTSTR)ResString(hResource, IDS_APP_TITLE));
-		m_colors[0] = RGB(255, 0, 0);
-		m_colors[1] = RGB(255, 255, 0);
+		m_colors[0] = RGB(255, 255, 0);
+		m_colors[1] = RGB(255, 0, 0);
 		m_colors[2] = RGB(150, 0, 0);
 		m_colors[3] = RGB(0, 255, 0);
 		m_colors[4] = RGB(0, 150, 0);
