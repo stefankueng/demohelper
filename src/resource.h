@@ -37,6 +37,16 @@
 #define ID_CMD_INLINEZOOM               32787
 #define ID_TRAYCONTEXT_HELP             32790
 #define ID_CMD_CLEARSCREEN              32791
+#define ID_CMD_COLOR1                   32793
+#define ID_CMD_COLOR2                   32794
+#define ID_CMD_COLOR3                   32795
+#define ID_CMD_COLOR4                   32796
+#define ID_CMD_COLOR5                   32797
+#define ID_CMD_COLOR6                   32798
+#define ID_CMD_COLOR7                   32799
+#define ID_CMD_COLOR8                   32800
+#define ID_CMD_COLOR9                   32801
+#define ID_CMD_COLOR0                   32802
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -45,7 +55,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        131
-#define _APS_NEXT_COMMAND_VALUE         32793
+#define _APS_NEXT_COMMAND_VALUE         32804
 #define _APS_NEXT_CONTROL_VALUE         1006
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

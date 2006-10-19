@@ -73,6 +73,7 @@ IDR_DEMOHELPER ACCELERATORS
 BEGIN
     VK_RETURN,      ID_CMD_ACCEPT,          VIRTKEY, NOINVERT
     "e",            ID_CMD_CLEARLINES,      ASCII,  NOINVERT
+    "c",            ID_CMD_CLEARSCREEN,     ASCII,  NOINVERT
     VK_DOWN,        ID_CMD_DECREASE,        VIRTKEY, NOINVERT
     VK_UP,          ID_CMD_INCREASE,        VIRTKEY, NOINVERT
     "z",            ID_CMD_INLINEZOOM,      ASCII,  NOINVERT
@@ -85,7 +86,16 @@ BEGIN
     VK_F1,          IDHELP,                 VIRTKEY, NOINVERT
     "/",            IDM_ABOUT,              ASCII,  ALT, NOINVERT
     "?",            IDM_ABOUT,              ASCII,  ALT, NOINVERT
-    "c",            ID_CMD_CLEARSCREEN,     ASCII,  NOINVERT
+    "1",            ID_CMD_COLOR1,          ASCII,  NOINVERT
+    "2",            ID_CMD_COLOR2,          ASCII,  NOINVERT
+    "3",            ID_CMD_COLOR3,          ASCII,  NOINVERT
+    "4",            ID_CMD_COLOR4,          ASCII,  NOINVERT
+    "5",            ID_CMD_COLOR5,          ASCII,  NOINVERT
+    "6",            ID_CMD_COLOR6,          ASCII,  NOINVERT
+    "7",            ID_CMD_COLOR7,          ASCII,  NOINVERT
+    "8",            ID_CMD_COLOR8,          ASCII,  NOINVERT
+    "9",            ID_CMD_COLOR9,          ASCII,  NOINVERT
+    "0",            ID_CMD_COLOR0,          ASCII,  NOINVERT
 END
 
 
