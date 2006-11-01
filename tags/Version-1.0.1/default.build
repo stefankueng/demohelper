@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<project name="DemoHelper" default="build">
+
+	<include buildfile="default.build.user" />
+
+	<target name="build" depends="VSNET,env">
+		<!-- run SubWCRev to get the revision of the working copy -->
+		<exec program="SubWCRev.exe">
+			<arg value="." />
+			<arg value="src/version.in" />
+			<arg value="src/version.h" />
+		</exec>
+
+		<exec program="devenv.com" >
+			<arg value="DemoHelper.sln" />
+			<arg value="/rebuild" />
+			<arg value="debug|win32" />
+		</exec>
+		<exec program="devenv.com" >
+			<arg value="DemoHelper.sln" />
+			<arg value="/rebuild" />
+			<arg value="release|win32" />
+		</exec>
+
+	</target>
+
+</project>
+
