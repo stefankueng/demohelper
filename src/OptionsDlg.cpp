@@ -14,6 +14,7 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
 			CRegStdWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
 			CRegStdWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
 			CRegStdWORD regCursor(_T("Software\\DemoHelper\\capturecursor"), TRUE);
+			CRegStdWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 0);
 			SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_SETHOTKEY, (WPARAM)(DWORD)regZoom, 0);
 			SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_SETHOTKEY, (WPARAM)(DWORD)regDraw, 0);
 			SendMessage(GetDlgItem(hwndDlg, IDC_CURSORCHECK), BM_SETCHECK, DWORD(regCursor) ? BST_CHECKED : BST_UNCHECKED, 0);
@@ -21,6 +22,8 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
 			TCHAR buffer[128] = {0};
 			LoadString(hInst, IDS_WEBLINK, buffer, 128);
 			m_link.ConvertStaticToHyperlink(hwndDlg, IDC_WEBLINK, buffer);
+			_stprintf_s(buffer, 128, _T("%ld"), (DWORD)regFadeSeconds);
+			SetWindowText(GetDlgItem(hwndDlg, IDC_FADESECONDS), buffer);
 
 			// position the dialog box on the screen
 			HWND hwndOwner; 
@@ -47,12 +50,16 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
 				CRegStdWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
 				CRegStdWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
 				CRegStdWORD regCursor(_T("Software\\DemoHelper\\capturecursor"), TRUE);
+				CRegStdWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 0);
 				LRESULT res = SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_GETHOTKEY, 0, 0);
 				regDraw = res;
 				res = SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_GETHOTKEY, 0, 0);
 				regZoom = res;
 				res = SendMessage(GetDlgItem(hwndDlg, IDC_CURSORCHECK), BM_GETCHECK, 0, 0);
 				regCursor = (res == BST_CHECKED ? TRUE : FALSE);
+				TCHAR buffer[128];
+				GetWindowText(GetDlgItem(hwndDlg, IDC_FADESECONDS), buffer, 128);
+				regFadeSeconds = _ttol(buffer);
 			}
 			// Fall through. 
 		case IDCANCEL: 

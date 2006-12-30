@@ -14,7 +14,7 @@
 
 #define TIMER_ID_DRAW	101
 #define TIMER_ID_ZOOM	102
-
+#define TIMER_ID_FADE	103
 
 typedef enum LineTypes
 {
@@ -40,6 +40,7 @@ public:
 		, m_currentrop(R2_MASKPEN)
 		, m_bMarker(false)
 		, m_bInlineZoom(false)
+		, m_fadeseconds(0)
 	{
 		SetWindowTitle((LPCTSTR)ResString(hResource, IDS_APP_TITLE));
 		m_colors[0] = RGB(255, 255, 0);
@@ -103,6 +104,7 @@ protected:
 	POINT *				m_points;
 	BYTE *				m_linetypes;
 	int					m_rop[MAX_NUMBEROFLINES];
+	int					m_fadecount[MAX_NUMBEROFLINES];
 
 	POINT				m_lineStartPoint[MAX_NUMBEROFLINES];
 	POINT				m_lineEndPoint[MAX_NUMBEROFLINES];
@@ -113,6 +115,7 @@ protected:
 	int					m_colorindex;
 	int					m_currentpenwidth;
 	int					m_currentrop;
+	int					m_fadeseconds;
 
 	POINT				m_lineStartShiftPoint;
 

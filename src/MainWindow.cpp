@@ -239,6 +239,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 				m_linetypes[m_totallines*LINEARRAYSIZE + m_lineindex[m_totallines]] = PT_MOVETO;
 				m_linecolorindex[m_totallines] = m_colorindex;
 				m_penwidth[m_totallines] = m_currentpenwidth;
+				m_fadecount[m_totallines] = m_fadeseconds*10;
 			}
 		}
 		break;
@@ -478,6 +479,53 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 			KillTimer(*this, TIMER_ID_ZOOM);
 			StartZoomingMode();
 		}
+		else if (wParam == TIMER_ID_FADE)
+		{
+			// go through all lines and reduce the fade-count value
+			bool bRedraw = false;
+			int i=0;
+			for (i=0; i<=m_totallines; ++i)
+			{
+				m_fadecount[i]--;
+				if (m_fadecount[i] < 0)
+					m_fadecount[i] = 0;
+				if (m_fadecount[i] == m_penwidth[i])
+				{
+					m_penwidth[i]--;
+					bRedraw = true;
+				}
+			}
+			// go through all lines again, and remove all lines with a pen width
+			// of zero
+			i=0;
+			while (i <= m_totallines)
+			{
+				if (m_penwidth[i] == 0)
+				{
+					bRedraw = true;
+					for (int j=i; j<m_totallines; ++j)
+					{
+						m_lineindex[j] = m_lineindex[j+1];
+						m_rop[j] = m_rop[j+1];
+						m_fadecount[j] = m_fadecount[j+1];
+						m_penwidth[j] = m_penwidth[j+1];
+						m_linecolorindex[j] = m_linecolorindex[j+1];
+						m_lineStartPoint[j] = m_lineStartPoint[j+1];
+						m_lineEndPoint[j] = m_lineEndPoint[j+1];
+						m_lineType[j] = m_lineType[j+1];
+					}
+					memmove_s(&m_points[i*LINEARRAYSIZE], (MAX_NUMBEROFLINES-i)*LINEARRAYSIZE*sizeof(POINT), 
+						&m_points[(i+1)*LINEARRAYSIZE], (MAX_NUMBEROFLINES-i-1)*LINEARRAYSIZE*sizeof(POINT));
+					memmove_s(&m_linetypes[i*LINEARRAYSIZE], (MAX_NUMBEROFLINES-i)*LINEARRAYSIZE*sizeof(BYTE),
+						&m_linetypes[(i+1)*LINEARRAYSIZE], (MAX_NUMBEROFLINES-i-1)*LINEARRAYSIZE*sizeof(BYTE));
+					m_totallines--;
+				}
+				else
+					i++;
+			}
+			if (bRedraw)
+				RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
+		}
 		break;
 	case WM_DESTROY:
 		Shell_NotifyIcon(NIM_DELETE,&niData);
@@ -536,6 +584,13 @@ bool CMainWindow::StartPresentationMode()
 		SetCursor(NULL);
 	}
 	m_bInlineZoom = false;
+
+	CRegStdWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 5);
+	m_fadeseconds = int(DWORD(regFadeSeconds));
+	if (m_fadeseconds > 0)
+	{
+		::SetTimer(*this, TIMER_ID_FADE, 100, NULL);
+	}
 	return true;
 }
 
