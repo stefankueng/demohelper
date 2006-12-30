@@ -26,6 +26,29 @@ LRESULT CMainWindow::DoCommand(int id)
 			m_totallines--;
 		RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
 		break;
+	case ID_CMD_REMOVEFIRST:
+		{
+			m_bDrawing = false;
+			for (int j=0; j<m_totallines; ++j)
+			{
+				m_lineindex[j] = m_lineindex[j+1];
+				m_rop[j] = m_rop[j+1];
+				m_fadecount[j] = m_fadecount[j+1];
+				m_penwidth[j] = m_penwidth[j+1];
+				m_linecolorindex[j] = m_linecolorindex[j+1];
+				m_lineStartPoint[j] = m_lineStartPoint[j+1];
+				m_lineEndPoint[j] = m_lineEndPoint[j+1];
+				m_lineType[j] = m_lineType[j+1];
+			}
+			memmove_s(&m_points[0], (MAX_NUMBEROFLINES)*LINEARRAYSIZE*sizeof(POINT), 
+				&m_points[LINEARRAYSIZE], (MAX_NUMBEROFLINES-1)*LINEARRAYSIZE*sizeof(POINT));
+			memmove_s(&m_linetypes[0], (MAX_NUMBEROFLINES)*LINEARRAYSIZE*sizeof(BYTE),
+				&m_linetypes[LINEARRAYSIZE], (MAX_NUMBEROFLINES-1)*LINEARRAYSIZE*sizeof(BYTE));
+			if (m_totallines > 0)
+				m_totallines--;
+			RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
+		}
+		break;
 	case ID_CMD_INCREASE:
 		if (m_bZooming)
 		{
