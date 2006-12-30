@@ -112,19 +112,22 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,115,237,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,175,237,50,14
     ICON            IDI_DEMOHELPER,IDC_MYICON2,7,7,20,20
-    LTEXT           "DemoHelper v1.1",IDC_STATIC,40,7,61,8
+    LTEXT           "DemoHelper v1.2",IDC_STATIC,40,7,61,8
     LTEXT           "Copyright 2006 Stefan Küng",IDC_STATIC,40,20,185,8
     LTEXT           "Stefan's Tools - tools.tortoisesvn.net",IDC_WEBLINK,40,32,185,8
-    LTEXT           "After enabling the zoom mode, you can zoom in and out using the mouse wheel or the up/down arrow keys. Exit zoom mode with Escape.",IDC_STATIC,14,97,205,26
-    LTEXT           "Zoom Mode:",IDC_STATIC,14,127,54,8
-    LTEXT           "After enabling the drawing mode, increase or decrease the pen size with the up/down arrow keys. Cycle through the available colors with the right/left arrow keys. Erase the last line with the Backspace key.",IDC_STATIC,14,166,205,37
-    LTEXT           "Draw Mode:",IDC_STATIC,14,209,54,8
-    CONTROL         "",IDC_HOTKEY_ZOOMMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,124,125,14
-    CONTROL         "",IDC_HOTKEY_DRAWMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,206,125,14
-    GROUPBOX        "Zoom",IDC_STATIC,7,87,218,62
-    GROUPBOX        "Draw",IDC_STATIC,7,154,218,72
-    GROUPBOX        "Misc",IDC_STATIC,7,43,218,39
     CONTROL         "Capture the mouse cursor",IDC_CURSORCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,55,99,10
+    LTEXT           "After enabling the zoom mode, you can zoom in and out using the mouse wheel or the up/down arrow keys. Exit zoom mode with Escape.",IDC_STATIC,14,86,205,26
+    LTEXT           "Zoom Mode:",IDC_STATIC,14,116,54,8
+    CONTROL         "",IDC_HOTKEY_ZOOMMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,113,125,14
+    LTEXT           "After enabling the drawing mode, increase or decrease the pen size with the up/down arrow keys. Cycle through the available colors with the right/left arrow keys. Erase the last line with the Backspace key.",IDC_STATIC,14,155,205,37
+    LTEXT           "Draw Mode:",IDC_STATIC,14,198,54,8
+    CONTROL         "",IDC_HOTKEY_DRAWMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,195,125,14
+    LTEXT           "Remove lines after",IDC_STATIC,14,216,61,8
+    EDITTEXT        IDC_FADESECONDS,94,213,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "seconds",IDC_STATIC,139,216,27,8
+    GROUPBOX        "Misc",IDC_STATIC,7,43,218,29
+    GROUPBOX        "Zoom",IDC_STATIC,7,76,218,62
+    GROUPBOX        "Draw",IDC_STATIC,7,143,218,88
 END
 
 IDD_HELPDIALOG DIALOGEX 0, 0, 263, 276
@@ -267,12 +270,12 @@ BEGIN
     "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
     "#include ""windows.h""\r\n"
     "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
-    "#include ""DemoHelper.rc2""\0"
+    "#include ""DemoHelper.rc2\0"
 END
 
 3 TEXTINCLUDE 
 BEGIN
-    "\r\n"
+    "\r\0"
 END
 
 #endif    // APSTUDIO_INVOKED
