@@ -141,7 +141,7 @@ BEGIN
     LTEXT           "Up",IDC_STATIC,16,22,50,8
     LTEXT           "Down",IDC_STATIC,16,32,50,8
     LTEXT           "Enter",IDC_STATIC,16,42,50,8
-    LTEXT           "Escape",IDC_STATIC,16,56,50,8
+    LTEXT           "Escape",IDC_STATIC,16,52,50,8
     LTEXT           "Up/Down",IDC_STATIC,16,87,50,8
     LTEXT           "zoom in",IDC_STATIC,66,22,180,8
     LTEXT           "zoom out",IDC_STATIC,66,32,180,8
@@ -160,19 +160,21 @@ BEGIN
     LTEXT           "escape",IDC_STATIC,16,137,50,8
     LTEXT           "quits drawing mode",IDC_STATIC,66,137,180,8
     LTEXT           "backspace",IDC_STATIC,16,147,50,8
-    LTEXT           "T",IDC_STATIC,16,187,50,8
-    LTEXT           "M",IDC_STATIC,16,177,50,8
-    LTEXT           "E",IDC_STATIC,16,167,50,8
+    LTEXT           "T",IDC_STATIC,16,196,50,8
+    LTEXT           "M",IDC_STATIC,16,186,50,8
+    LTEXT           "E",IDC_STATIC,16,176,50,8
     LTEXT           "removes the last line drawn",IDC_STATIC,66,147,180,8
-    LTEXT           "removes all drawn lines",IDC_STATIC,66,167,180,8
-    LTEXT           "toggles the marker on/off",IDC_STATIC,66,177,180,8
-    LTEXT           "Z",IDC_STATIC,16,197,50,8
-    LTEXT           "toggles between solid and merged drawing",IDC_STATIC,66,187,180,8
-    LTEXT           "select a rectangle to zoom in",IDC_STATIC,66,197,180,8
-    LTEXT           "C",IDC_STATIC,16,207,50,8
-    LTEXT           "clear the screen with the window color",IDC_STATIC,66,207,180,8
-    LTEXT           "1-8",IDC_STATIC,16,217,50,8
-    LTEXT           "choose the brush color",IDC_STATIC,66,217,180,8
+    LTEXT           "removes all drawn lines",IDC_STATIC,66,176,180,8
+    LTEXT           "toggles the marker on/off",IDC_STATIC,66,186,180,8
+    LTEXT           "Z",IDC_STATIC,16,206,50,8
+    LTEXT           "toggles between solid and merged drawing",IDC_STATIC,66,196,180,8
+    LTEXT           "select a rectangle to zoom in",IDC_STATIC,66,206,180,8
+    LTEXT           "C",IDC_STATIC,16,216,50,8
+    LTEXT           "clear the screen with the window color",IDC_STATIC,66,216,180,8
+    LTEXT           "1-8",IDC_STATIC,16,226,50,8
+    LTEXT           "choose the brush color",IDC_STATIC,66,226,180,8
+    LTEXT           "delete",IDC_STATIC,16,157,50,8
+    LTEXT           "removes the first line drawn",IDC_STATIC,66,157,180,8
 END
 
 
