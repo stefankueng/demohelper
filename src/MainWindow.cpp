@@ -585,7 +585,7 @@ bool CMainWindow::StartPresentationMode()
 	}
 	m_bInlineZoom = false;
 
-	CRegStdWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 5);
+	CRegStdWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 0);
 	m_fadeseconds = int(DWORD(regFadeSeconds));
 	if (m_fadeseconds > 0)
 	{
