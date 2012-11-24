@@ -1,6 +1,6 @@
 // demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008 - Stefan Kueng
+// Copyright (C) 2007-2008, 2012 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -131,8 +131,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 		{
 			WORD key = MAKEWORD(HIWORD(lParam), LOWORD(lParam));
 			key = HotKey2HotKeyControl(key);
-			CRegStdWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
-			CRegStdWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
+			CRegStdDWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
+			CRegStdDWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
 			if (key == (WORD)(DWORD)regZoom)
 			{
 				m_bZooming = true;
@@ -570,7 +570,7 @@ bool CMainWindow::StartPresentationMode()
 	hDesktopCompatibleBitmap = CreateCompatibleBitmap(hDesktopDC, nScreenWidth, nScreenHeight);
 	hOldBmp = (HBITMAP)SelectObject(hDesktopCompatibleDC,hDesktopCompatibleBitmap); 
 	BitBlt(hDesktopCompatibleDC,0,0,nScreenWidth,nScreenHeight, hDesktopDC,0,0,SRCCOPY|CAPTUREBLT);
-	CRegStdWORD regShowCursor(_T("Software\\DemoHelper\\capturecursor"), TRUE);
+	CRegStdDWORD regShowCursor(_T("Software\\DemoHelper\\capturecursor"), TRUE);
 	if (DWORD(regShowCursor))
 	{
 		// capture the cursor
@@ -603,7 +603,7 @@ bool CMainWindow::StartPresentationMode()
 	}
 	m_bInlineZoom = false;
 
-	CRegStdWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 0);
+	CRegStdDWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 0);
 	m_fadeseconds = int(DWORD(regFadeSeconds));
 	if (m_fadeseconds > 0)
 	{
@@ -641,8 +641,8 @@ bool CMainWindow::DrawArrow(HDC hdc, int index)
 
 void CMainWindow::RegisterHotKeys()
 {
-	CRegStdWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
-	CRegStdWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
+	CRegStdDWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
+	CRegStdDWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
 	WORD zoom = (WORD)(DWORD)regZoom;
 	WORD draw = (WORD)(DWORD)regDraw;
 	zoom = HotKeyControl2HotKey(zoom);
