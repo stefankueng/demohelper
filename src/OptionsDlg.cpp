@@ -1,6 +1,6 @@
 // demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008 - Stefan Kueng
+// Copyright (C) 2007-2008, 2012 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -29,10 +29,10 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
 	{
 	case WM_INITDIALOG:
 		{
-			CRegStdWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
-			CRegStdWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
-			CRegStdWORD regCursor(_T("Software\\DemoHelper\\capturecursor"), TRUE);
-			CRegStdWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 0);
+			CRegStdDWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
+			CRegStdDWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
+			CRegStdDWORD regCursor(_T("Software\\DemoHelper\\capturecursor"), TRUE);
+			CRegStdDWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 0);
 			SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_SETHOTKEY, (WPARAM)(DWORD)regZoom, 0);
 			SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_SETHOTKEY, (WPARAM)(DWORD)regDraw, 0);
 			SendMessage(GetDlgItem(hwndDlg, IDC_CURSORCHECK), BM_SETCHECK, DWORD(regCursor) ? BST_CHECKED : BST_UNCHECKED, 0);
@@ -65,10 +65,10 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
 		{
 		case IDOK: 
 			{
-				CRegStdWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
-				CRegStdWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
-				CRegStdWORD regCursor(_T("Software\\DemoHelper\\capturecursor"), TRUE);
-				CRegStdWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 0);
+				CRegStdDWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
+				CRegStdDWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
+				CRegStdDWORD regCursor(_T("Software\\DemoHelper\\capturecursor"), TRUE);
+				CRegStdDWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 0);
 				LRESULT res = SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_GETHOTKEY, 0, 0);
 				regDraw = res;
 				res = SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_GETHOTKEY, 0, 0);
