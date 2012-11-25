@@ -16,6 +16,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
+
 #include "stdafx.h"
 #include "MainWindow.h"
 #include "math.h"
@@ -90,12 +91,12 @@ HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
     ::DeleteDC(hAndMaskDC);
     ::DeleteDC(hMainDC);
 
-    ICONINFO iconinfo = {0};
-    iconinfo.fIcon          = FALSE;
-    iconinfo.xHotspot       = GetSystemMetrics(SM_CXCURSOR)/2;
-    iconinfo.yHotspot       = GetSystemMetrics(SM_CYCURSOR)/2;
-    iconinfo.hbmMask        = hAndMaskBitmap;
-    iconinfo.hbmColor       = hXorMaskBitmap;
+    ICONINFO iconinfo   = {0};
+    iconinfo.fIcon      = FALSE;
+    iconinfo.xHotspot   = GetSystemMetrics(SM_CXCURSOR)/2;
+    iconinfo.yHotspot   = GetSystemMetrics(SM_CYCURSOR)/2;
+    iconinfo.hbmMask    = hAndMaskBitmap;
+    iconinfo.hbmColor   = hXorMaskBitmap;
 
     return ::CreateIconIndirect(&iconinfo);
 }

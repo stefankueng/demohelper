@@ -2,4 +2,3 @@
 #define PRODUCTVER     1,2,0,$WCREV$
 #define STRFILEVER     "1, 2, 0, $WCREV$\0"
 #define STRPRODUCTVER  "1, 2, 0, $WCREV$\0"
-
