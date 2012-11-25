@@ -16,7 +16,9 @@
 // along with this program; if not, write to the Free Software Foundation,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
+
 #pragma once
+
 #include "basewindow.h"
 #include "Resource.h"
 #include "shellapi.h"
@@ -71,8 +73,8 @@ public:
         m_colors[7] = RGB(0, 0, 0);
         m_colors[8] = RGB(150, 150, 150);
         m_colors[9] = RGB(0, 255, 255);
-        m_points = new POINT[MAX_NUMBEROFLINES*LINEARRAYSIZE];
-        m_linetypes = new BYTE[MAX_NUMBEROFLINES*LINEARRAYSIZE];
+        m_points    = new POINT[MAX_NUMBEROFLINES * LINEARRAYSIZE];
+        m_linetypes = new BYTE[MAX_NUMBEROFLINES * LINEARRAYSIZE];
     };
     ~CMainWindow(void)
     {
