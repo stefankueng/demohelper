@@ -55,13 +55,12 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     hResource = hInstance;
     // TODO: Place code here.
     MSG msg;
-    HACCEL hAccelTable;
 
     CMainWindow trayWindow(hResource);
 
     if (trayWindow.RegisterAndCreateWindow())
     {
-        hAccelTable = LoadAccelerators(hResource, MAKEINTRESOURCE(IDR_DEMOHELPER));
+        HACCEL hAccelTable = LoadAccelerators(hResource, MAKEINTRESOURCE(IDR_DEMOHELPER));
         // Main message loop:
         while (GetMessage(&msg, NULL, 0, 0))
         {
