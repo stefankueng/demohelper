@@ -74,23 +74,17 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <Optimization>MinSpace</Optimization>
-      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <Optimization>MaxSpeed</Optimization>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <SmallerTypeCheck>false</SmallerTypeCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Precise</FloatingPointModel>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>..\sktoolslib</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -98,24 +92,20 @@
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <LinkTimeCodeGeneration>
-      </LinkTimeCodeGeneration>
       <EntryPointSymbol>
       </EntryPointSymbol>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
+      <SetChecksum>true</SetChecksum>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\sktoolslib\BaseWindow.cpp" />
+    <ClCompile Include="..\sktoolslib\hyperlink.cpp" />
     <ClCompile Include="..\sktoolslib\Registry.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="DemoHelper.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="HelpDlg.cpp" />
-    <ClCompile Include="hyperlink.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="OptionsDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -125,12 +115,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\sktoolslib\BaseWindow.h" />
+    <ClInclude Include="..\sktoolslib\hyperlink.h" />
     <ClInclude Include="..\sktoolslib\Registry.h" />
     <ClInclude Include="DemoHelper.h" />
-    <ClInclude Include="hyperlink.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MemDC.h" />
-    <ClInclude Include="Resource.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
