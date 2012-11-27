@@ -1,1 +1,1 @@
-ShowHelper: a small application for presentations
+DemoHelper: a small application for presentations
