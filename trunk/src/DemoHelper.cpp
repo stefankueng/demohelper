@@ -25,7 +25,6 @@
 #define MAX_LOADSTRING 100
 
 // Global Variables:
-// Global Variables:
 HINSTANCE hInst;                                // current instance
 HINSTANCE hResource;                            // the resource dll
 
