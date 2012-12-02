@@ -26,10 +26,8 @@
 
 #define TRAY_WM_MESSAGE     WM_APP+1
 
-#pragma comment(lib, "Msimg32")
-
-
 #define PACKVERSION(major,minor) MAKELONG(minor,major)
+
 DWORD CMainWindow::GetDllVersion(LPCTSTR lpszDllName)
 {
     HINSTANCE hinstDll;

@@ -20,7 +20,7 @@
 #endif
 
 #ifndef _WIN32_IE               // Allow use of features specific to IE 6.0 or later.
-#define _WIN32_IE 0x0600        // Change this to the appropriate value to target other versions of IE.
+#define _WIN32_IE 0x0700        // Change this to the appropriate value to target other versions of IE.
 #endif
 
 #define WIN32_LEAN_AND_MEAN     // Exclude rarely-used stuff from Windows headers
@@ -36,3 +36,5 @@
 #include <comdef.h>
 
 #include "MemDC.h"
+
+#pragma comment(linker, "\"/manifestdependency:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
