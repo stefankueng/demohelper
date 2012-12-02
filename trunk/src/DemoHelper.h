@@ -25,6 +25,3 @@
 
 extern HINSTANCE hInst;                     // current instance
 extern HINSTANCE hResource;                 // the resource dll
-
-
-#pragma comment(lib, "comctl32")
