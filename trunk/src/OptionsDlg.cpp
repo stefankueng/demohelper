@@ -71,9 +71,9 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
                 CRegStdDWORD regCursor(_T("Software\\DemoHelper\\capturecursor"), TRUE);
                 CRegStdDWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 0);
                 LRESULT res = SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_GETHOTKEY, 0, 0);
-                regDraw = res;
+                regDraw = (DWORD)res;
                 res = SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_GETHOTKEY, 0, 0);
-                regZoom = res;
+                regZoom = (DWORD)res;
                 res = SendMessage(GetDlgItem(hwndDlg, IDC_CURSORCHECK), BM_GETCHECK, 0, 0);
                 regCursor = (res == BST_CHECKED ? TRUE : FALSE);
                 TCHAR buffer[128];
