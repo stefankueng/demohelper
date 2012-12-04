@@ -192,7 +192,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="DemoHelper.ico" />
-    <None Include="small.ico" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
