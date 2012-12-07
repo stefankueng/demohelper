@@ -39,9 +39,9 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
             SendMessage(GetDlgItem(hwndDlg, IDC_CURSORCHECK), BM_SETCHECK, DWORD(regCursor) ? BST_CHECKED : BST_UNCHECKED, 0);
 
             TCHAR buffer[128] = {0};
-            LoadString(hInst, IDS_WEBLINK, buffer, 128);
+            LoadString(hInst, IDS_WEBLINK, buffer, _countof(buffer));
             m_link.ConvertStaticToHyperlink(hwndDlg, IDC_WEBLINK, buffer);
-            _stprintf_s(buffer, 128, _T("%ld"), (DWORD)regFadeSeconds);
+            _stprintf_s(buffer, _countof(buffer), _T("%ld"), (DWORD)regFadeSeconds);
             SetWindowText(GetDlgItem(hwndDlg, IDC_FADESECONDS), buffer);
 
             // position the dialog box on the screen
@@ -77,7 +77,7 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
                 res = SendMessage(GetDlgItem(hwndDlg, IDC_CURSORCHECK), BM_GETCHECK, 0, 0);
                 regCursor = (res == BST_CHECKED ? TRUE : FALSE);
                 TCHAR buffer[128];
-                GetWindowText(GetDlgItem(hwndDlg, IDC_FADESECONDS), buffer, 128);
+                GetWindowText(GetDlgItem(hwndDlg, IDC_FADESECONDS), buffer, _countof(buffer));
                 regFadeSeconds = _ttol(buffer);
             }
             // Fall through.
