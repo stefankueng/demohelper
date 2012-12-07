@@ -1,4 +1,4 @@
-#define FILEVER        1,2,0,$WCREV$
-#define PRODUCTVER     1,2,0,$WCREV$
-#define STRFILEVER     "1.2.0.$WCREV$"
-#define STRPRODUCTVER  "1.2.0.$WCREV$"
+#define FILEVER         1,2,0,$WCREV$
+#define PRODUCTVER      1,2,0,$WCREV$
+#define STRFILEVER      "1.2.0.$WCREV$"
+#define STRPRODUCTVER   "1.2.0.$WCREV$"
