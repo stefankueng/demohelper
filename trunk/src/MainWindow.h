@@ -1,6 +1,6 @@
 // demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008 - Stefan Kueng
+// Copyright (C) 2007-2008, 2012 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -27,8 +27,8 @@
 #include <commctrl.h>
 #include <vector>
 
-#define LINEARRAYSIZE 4000
-#define MAX_NUMBEROFLINES 50
+#define LINEARRAYSIZE 4096
+#define MAX_NUMBEROFLINES 500
 #define DRAW_HOTKEY 100
 #define ZOOM_HOTKEY 101
 
