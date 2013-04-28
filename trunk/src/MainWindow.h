@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include "basewindow.h"
-#include "Resource.h"
-#include "shellapi.h"
-#include "shlwapi.h"
+#include "BaseWindow.h"
+#include "resource.h"
+#include <shellapi.h>
+#include <shlwapi.h>
 #include "hyperlink.h"
 #include <commctrl.h>
 #include <vector>
