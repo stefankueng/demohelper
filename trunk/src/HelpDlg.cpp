@@ -20,7 +20,7 @@
 #include "stdafx.h"
 #include "DemoHelper.h"
 #include "MainWindow.h"
-#include "registry.h"
+#include "Registry.h"
 
 
 BOOL CALLBACK CMainWindow::HelpDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM /*lParam*/)
