@@ -19,7 +19,7 @@
 
 #include "stdafx.h"
 #include "MainWindow.h"
-#include "math.h"
+#include <math.h>
 
 HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
 {
