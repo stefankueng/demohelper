@@ -101,7 +101,7 @@ BEGIN
     ICON            IDI_DEMOHELPER,IDC_MYICON2,7,7,20,20
     LTEXT           "DemoHelper v1.2",IDC_STATIC,40,7,61,8
     LTEXT           "Copyright 2006 Stefan Küng",IDC_STATIC,40,20,185,8
-    LTEXT           "Stefan's Tools - tools.tortoisesvn.net",IDC_WEBLINK,40,32,185,8
+    LTEXT           "Stefan's Tools - stefanstools.sourceforge.net",IDC_WEBLINK,40,32,185,8
     CONTROL         "Capture the mouse cursor",IDC_CURSORCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,55,99,10
     LTEXT           "After enabling the zoom mode, you can zoom in and out using the mouse wheel or the up/down arrow keys. Exit zoom mode with Escape.",IDC_STATIC,14,86,205,26
     LTEXT           "Zoom Mode:",IDC_STATIC,14,116,54,8
@@ -254,7 +254,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_APP_TITLE           "DemoHelper"
-    IDS_WEBLINK             "http://tools.tortoisesvn.net"
+    IDS_WEBLINK             "http://stefanstools.sourceforge.net"
     IDC_DEMOHELPER          "DemoHelper"
 END
 
