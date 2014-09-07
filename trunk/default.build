@@ -11,26 +11,38 @@
       <arg value="src/version.h" />
     </exec>
 
-    <exec program="devenv.com" >
+    <exec program="msbuild.exe" >
       <arg value="DemoHelper.sln" />
-      <arg value="/rebuild" />
-      <arg value="Debug|Win32" />
+      <arg value="/t:Rebuild" />
+      <arg value="/p:Configuration=Debug" />
+      <arg value="/p:Platform=Win32" />
+      <arg value="/verbosity:minimal" />
+      <arg value="/maxcpucount" />
     </exec>
-    <exec program="devenv.com" >
+    <exec program="msbuild.exe" >
       <arg value="DemoHelper.sln" />
-      <arg value="/rebuild" />
-      <arg value="Release|Win32" />
+      <arg value="/t:Rebuild" />
+      <arg value="/p:Configuration=Release" />
+      <arg value="/p:Platform=Win32" />
+      <arg value="/verbosity:minimal" />
+      <arg value="/maxcpucount" />
     </exec>
 
-    <exec program="devenv.com" >
+    <exec program="msbuild.exe" >
       <arg value="DemoHelper.sln" />
-      <arg value="/rebuild" />
-      <arg value="Debug|x64" />
+      <arg value="/t:Rebuild" />
+      <arg value="/p:Configuration=Debug" />
+      <arg value="/p:Platform=x64" />
+      <arg value="/verbosity:minimal" />
+      <arg value="/maxcpucount" />
     </exec>
-    <exec program="devenv.com" >
+    <exec program="msbuild.exe" >
       <arg value="DemoHelper.sln" />
-      <arg value="/rebuild" />
-      <arg value="Release|x64" />
+      <arg value="/t:Rebuild" />
+      <arg value="/p:Configuration=Release" />
+      <arg value="/p:Platform=x64" />
+      <arg value="/verbosity:minimal" />
+      <arg value="/maxcpucount" />
     </exec>
 
   </target>
