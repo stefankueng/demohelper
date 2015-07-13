@@ -1,6 +1,6 @@
 // demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008 - Stefan Kueng
+// Copyright (C) 2007-2008, 2015 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -23,5 +23,5 @@
 #include <commctrl.h>
 #include <shellapi.h>
 
-extern HINSTANCE hInst;                     // current instance
-extern HINSTANCE hResource;                 // the resource dll
+extern HINSTANCE g_hInstance;      // current instance
+extern HINSTANCE g_hResource;      // the resource dll
