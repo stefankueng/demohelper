@@ -1,6 +1,6 @@
 // demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008, 2012-2013 - Stefan Kueng
+// Copyright (C) 2007-2008, 2012-2013, 2015 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -711,7 +711,7 @@ bool CMainWindow::UpdateCursor()
 bool CMainWindow::StartInlineZoom()
 {
     m_bInlineZoom = true;
-    HCURSOR hCur = LoadCursor(NULL, MAKEINTRESOURCE(IDC_CROSS));
+    HCURSOR hCur = LoadCursor(NULL, IDC_CROSS);
     SetCursor(hCur);
     m_ptInlineZoomStartPoint.x = -1;
     m_ptInlineZoomStartPoint.y = -1;

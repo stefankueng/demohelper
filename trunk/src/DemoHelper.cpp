@@ -1,6 +1,6 @@
 // demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008 - Stefan Kueng
+// Copyright (C) 2007-2008, 2015 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -25,8 +25,8 @@
 #define MAX_LOADSTRING 100
 
 // Global Variables:
-HINSTANCE hInst;                                // current instance
-HINSTANCE hResource;                            // the resource dll
+HINSTANCE g_hInstance;      // current instance
+HINSTANCE g_hResource;      // the resource dll
 
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
@@ -44,15 +44,16 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     };
     InitCommonControlsEx(&used);
 
-    hResource = hInstance;
+    g_hResource = hInstance;
+    g_hInstance = hInstance;
     // TODO: Place code here.
     MSG msg;
 
-    CMainWindow trayWindow(hResource);
+    CMainWindow trayWindow(g_hResource);
 
     if (trayWindow.RegisterAndCreateWindow())
     {
-        HACCEL hAccelTable = LoadAccelerators(hResource, MAKEINTRESOURCE(IDR_DEMOHELPER));
+        HACCEL hAccelTable = LoadAccelerators(g_hResource, MAKEINTRESOURCE(IDR_DEMOHELPER));
         // Main message loop:
         while (GetMessage(&msg, NULL, 0, 0))
         {
