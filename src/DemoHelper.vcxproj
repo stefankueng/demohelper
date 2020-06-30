@@ -224,11 +224,18 @@
     <None Include="..\default.build" />
     <None Include="..\default.build.user" />
     <None Include="..\default.build.user.tmpl" />
+    <None Include="..\version.build.in" />
+    <None Include="..\versioninfo.build" />
     <None Include="DemoHelper.ico" />
+    <None Include="DemoHelper.rc2" />
     <None Include="ReadMe.txt" />
+    <None Include="version.in" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DemoHelper.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="compatibility.manifest" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

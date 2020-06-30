@@ -60,6 +60,18 @@
     <None Include="..\default.build.user">
       <Filter>scripts</Filter>
     </None>
+    <None Include="..\version.build.in">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="..\versioninfo.build">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="version.in">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="DemoHelper.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DemoHelper.rc">
@@ -97,5 +109,10 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="compatibility.manifest">
+      <Filter>Resource Files</Filter>
+    </Manifest>
   </ItemGroup>
 </Project>
