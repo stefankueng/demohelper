@@ -1,6 +1,6 @@
 // demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008, 2012 - Stefan Kueng
+// Copyright (C) 2007-2008, 2012, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -109,7 +109,6 @@ protected:
 
     void                RegisterHotKeys();
     bool                UpdateCursor();
-    DWORD               GetDllVersion(LPCTSTR lpszDllName);
 protected:
     NOTIFYICONDATA      niData;
     HDC                 hDesktopCompatibleDC;

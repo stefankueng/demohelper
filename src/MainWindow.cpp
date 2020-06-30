@@ -1,6 +1,6 @@
 // demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008, 2012-2013, 2015 - Stefan Kueng
+// Copyright (C) 2007-2008, 2012-2013, 2015, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@
 #include "stdafx.h"
 #include "MainWindow.h"
 #include "Registry.h"
+#include "DPIAware.h"
 
 #define GET_X_LPARAM(lp) ((int)(short)LOWORD(lp))
 #define GET_Y_LPARAM(lp) ((int)(short)HIWORD(lp))
@@ -28,39 +29,6 @@
 
 #define PACKVERSION(major,minor) MAKELONG(minor,major)
 
-DWORD CMainWindow::GetDllVersion(LPCTSTR lpszDllName)
-{
-    HINSTANCE hinstDll;
-    DWORD dwVersion = 0;
-
-    hinstDll = LoadLibrary(lpszDllName);
-
-    if (hinstDll)
-    {
-        DLLGETVERSIONPROC pDllGetVersion;
-        pDllGetVersion = (DLLGETVERSIONPROC)GetProcAddress(hinstDll,
-            "DllGetVersion");
-
-        if (pDllGetVersion)
-        {
-            DLLVERSIONINFO dvi;
-            HRESULT hr;
-
-            SecureZeroMemory(&dvi, sizeof(dvi));
-            dvi.cbSize = sizeof(dvi);
-
-            hr = (*pDllGetVersion)(&dvi);
-
-            if (SUCCEEDED(hr))
-            {
-                dwVersion = PACKVERSION(dvi.dwMajorVersion, dvi.dwMinorVersion);
-            }
-        }
-
-        FreeLibrary(hinstDll);
-    }
-    return dwVersion;
-}
 
 bool CMainWindow::RegisterAndCreateWindow()
 {
@@ -87,20 +55,15 @@ bool CMainWindow::RegisterAndCreateWindow()
             // since our main window is hidden most of the time
             // we have to add an auxiliary window to the system tray
 
+            const auto iconSizeX = CDPIAware::Instance().Scale(*this, GetSystemMetrics(SM_CXSMICON));
+            const auto iconSizeY = CDPIAware::Instance().Scale(*this, GetSystemMetrics(SM_CYSMICON));
             SecureZeroMemory(&niData,sizeof(NOTIFYICONDATA));
-
-            ULONGLONG ullVersion = GetDllVersion(_T("Shell32.dll"));
-            if (ullVersion >= MAKEDLLVERULL(6,0,0,0))
-                niData.cbSize = sizeof(NOTIFYICONDATA);
-            else if(ullVersion >= MAKEDLLVERULL(5,0,0,0))
-                niData.cbSize = NOTIFYICONDATA_V2_SIZE;
-            else niData.cbSize = NOTIFYICONDATA_V1_SIZE;
 
             niData.uID = IDI_DEMOHELPER;
             niData.uFlags = NIF_ICON|NIF_MESSAGE|NIF_TIP|NIF_INFO;
 
             niData.hIcon = (HICON)LoadImage(hResource, MAKEINTRESOURCE(IDI_DEMOHELPER),
-                IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
+                IMAGE_ICON, iconSizeX, iconSizeY, LR_DEFAULTCOLOR);
             niData.hWnd = *this;
             niData.uCallbackMessage = TRAY_WM_MESSAGE;
 
@@ -589,7 +552,7 @@ bool CMainWindow::StartPresentationMode()
 
     ReleaseDC(hDesktopWnd,hDesktopDC);
 
-    SetWindowPos(*this, HWND_TOP/*MOST*/, 0, 0, nScreenWidth, nScreenHeight, SWP_SHOWWINDOW);
+    SetWindowPos(*this, HWND_TOP/*MOST*/, 0, 0, nScreenWidth, nScreenHeight, SWP_SHOWWINDOW | SWP_DRAWFRAME);
     if (!m_bZooming)
     {
         if (m_hCursor)

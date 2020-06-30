@@ -212,6 +212,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\sktoolslib\BaseWindow.h" />
+    <ClInclude Include="..\sktoolslib\DPIAware.h" />
     <ClInclude Include="..\sktoolslib\hyperlink.h" />
     <ClInclude Include="..\sktoolslib\Registry.h" />
     <ClInclude Include="DemoHelper.h" />

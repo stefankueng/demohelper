@@ -19,6 +19,7 @@
 
 #include "stdafx.h"
 #include "MainWindow.h"
+#include "DPIAware.h"
 #include <math.h>
 
 HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
@@ -31,25 +32,27 @@ HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
     HDC hAndMaskDC = ::CreateCompatibleDC(hDC);
     HDC hXorMaskDC = ::CreateCompatibleDC(hDC);
 
+    const auto cursorSizeX = CDPIAware::Instance().Scale(*this, GetSystemMetrics(SM_CXCURSOR));
+    const auto cursorSizeY = CDPIAware::Instance().Scale(*this, GetSystemMetrics(SM_CYCURSOR));
     // Create the mask bitmaps
-    HBITMAP hSourceBitmap = ::CreateCompatibleBitmap(hDC, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR)); // original
-    HBITMAP hAndMaskBitmap = ::CreateBitmap(GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR), 1, 1, NULL); // monochrome
-    HBITMAP hXorMaskBitmap  = ::CreateCompatibleBitmap(hDC, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR)); // color
+    auto hSourceBitmap = ::CreateCompatibleBitmap(hDC, cursorSizeX, cursorSizeY); // original
+    auto hAndMaskBitmap = ::CreateBitmap(cursorSizeX, cursorSizeY, 1, 1, NULL); // monochrome
+    auto hXorMaskBitmap  = ::CreateCompatibleBitmap(hDC, cursorSizeX, cursorSizeY); // color
 
     // Release the system display DC
     ::ReleaseDC(*this, hDC);
 
     // Select the bitmaps to helper DC
-    HBITMAP hOldMainBitmap = (HBITMAP)::SelectObject(hMainDC, hSourceBitmap);
-    HBITMAP hOldAndMaskBitmap  = (HBITMAP)::SelectObject(hAndMaskDC, hAndMaskBitmap);
-    HBITMAP hOldXorMaskBitmap  = (HBITMAP)::SelectObject(hXorMaskDC, hXorMaskBitmap);
+    auto hOldMainBitmap = (HBITMAP)::SelectObject(hMainDC, hSourceBitmap);
+    auto hOldAndMaskBitmap  = (HBITMAP)::SelectObject(hAndMaskDC, hAndMaskBitmap);
+    auto hOldXorMaskBitmap  = (HBITMAP)::SelectObject(hXorMaskDC, hXorMaskBitmap);
 
     // fill our bitmap with the 'transparent' color RGB(1,1,1)
     RECT rc;
     rc.left = 0;
     rc.top = 0;
-    rc.right = GetSystemMetrics(SM_CXCURSOR);
-    rc.bottom = GetSystemMetrics(SM_CYCURSOR);
+    rc.right = cursorSizeX;
+    rc.bottom = cursorSizeY;
     SetBkColor(hMainDC, RGB(1,1,1));
     ::ExtTextOut(hMainDC, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL);
     // set up the pen and brush to draw
@@ -61,7 +64,7 @@ HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
     hOldBrush = (HBRUSH)SelectObject(hMainDC, hBrush);
 
     // draw the brush circle
-    Ellipse(hMainDC, (GetSystemMetrics(SM_CXCURSOR)-penwidth)/2, (GetSystemMetrics(SM_CYCURSOR)-penwidth)/2, (GetSystemMetrics(SM_CXCURSOR)-penwidth)/2+penwidth, (GetSystemMetrics(SM_CYCURSOR)-penwidth)/2+penwidth);
+    Ellipse(hMainDC, (cursorSizeX-penwidth)/2, (cursorSizeY-penwidth)/2, (cursorSizeX-penwidth)/2+penwidth, (cursorSizeY-penwidth)/2+penwidth);
 
     SelectObject(hMainDC, hOldBrush);
     SelectObject(hMainDC, hOldPen);
@@ -71,15 +74,15 @@ HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
     // Assign the monochrome AND mask bitmap pixels so that a pixels of the source bitmap
     //    with 'clrTransparent' will be white pixels of the monochrome bitmap
     ::SetBkColor(hMainDC, RGB(1,1,1));
-    ::BitBlt(hAndMaskDC, 0, 0, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR), hMainDC, 0, 0, SRCCOPY);
+    ::BitBlt(hAndMaskDC, 0, 0, cursorSizeX, cursorSizeY, hMainDC, 0, 0, SRCCOPY);
 
     // Assign the color XOR mask bitmap pixels so that a pixels of the source bitmap
     //    with 'clrTransparent' will be black and rest the pixels same as corresponding
     //    pixels of the source bitmap
     ::SetBkColor(hXorMaskDC, RGB(0, 0, 0));
     ::SetTextColor(hXorMaskDC, RGB(255, 255, 255));
-    ::BitBlt(hXorMaskDC, 0, 0, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR), hAndMaskDC, 0, 0, SRCCOPY);
-    ::BitBlt(hXorMaskDC, 0, 0, GetSystemMetrics(SM_CXCURSOR), GetSystemMetrics(SM_CYCURSOR), hMainDC, 0,0, SRCAND);
+    ::BitBlt(hXorMaskDC, 0, 0, cursorSizeX, cursorSizeY, hAndMaskDC, 0, 0, SRCCOPY);
+    ::BitBlt(hXorMaskDC, 0, 0, cursorSizeX, cursorSizeY, hMainDC, 0,0, SRCAND);
 
     // Deselect bitmaps from the helper DC
     ::SelectObject(hMainDC, hOldMainBitmap);
@@ -93,8 +96,8 @@ HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
 
     ICONINFO iconinfo   = {0};
     iconinfo.fIcon      = FALSE;
-    iconinfo.xHotspot   = GetSystemMetrics(SM_CXCURSOR)/2;
-    iconinfo.yHotspot   = GetSystemMetrics(SM_CYCURSOR)/2;
+    iconinfo.xHotspot   = cursorSizeX/2;
+    iconinfo.yHotspot   = cursorSizeY/2;
     iconinfo.hbmMask    = hAndMaskBitmap;
     iconinfo.hbmColor   = hXorMaskBitmap;
 
@@ -129,8 +132,9 @@ bool CMainWindow::ArrowTo(HDC hdc, LONG x, LONG y, int width)
     vecLeft[1] = vecLine[0];
 
     fLength = sqrtf(vecLine[0]*vecLine[0] + vecLine[1]*vecLine[1])/fLength;
-    th = width / (2.0f * fLength);
-    ta = width / (2.0f * 0.15f * fLength);
+    auto twoPix = CDPIAware::Instance().Scale(*this, 2);
+    th = width / (twoPix * fLength);
+    ta = width / (twoPix * 0.15f * fLength);
 
     // find the base of the arrow
     pBase.x = (int) (aptPoly[0].x + -ta * vecLine[0]);
