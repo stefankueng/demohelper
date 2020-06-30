@@ -3,31 +3,40 @@
 
   <include buildfile="default.build.user" />
 
-  <target name="build" depends="VSNET,env">
-    <!-- run SubWCRev to get the revision of the working copy -->
-    <exec program="SubWCRev.exe">
-      <arg value="." />
-      <arg value="src/version.in" />
-      <arg value="src/version.h" />
-    </exec>
+  <property name="signtool" value="signtool.exe" />
 
-    <exec program="msbuild.exe" >
-      <arg value="DemoHelper.sln" />
-      <arg value="/t:Rebuild" />
-      <arg value="/p:Configuration=Debug" />
-      <arg value="/p:Platform=Win32" />
-      <arg value="/verbosity:minimal" />
-      <arg value="/maxcpucount" />
-    </exec>
-    <exec program="msbuild.exe" >
-      <arg value="DemoHelper.sln" />
-      <arg value="/t:Rebuild" />
-      <arg value="/p:Configuration=Release" />
-      <arg value="/p:Platform=Win32" />
-      <arg value="/verbosity:minimal" />
-      <arg value="/maxcpucount" />
-    </exec>
+  <!-- the signinfo.txt file has to contain one line with parameters for signtool.exe,
+       for example:
+       /t "url/to/timestamp/server" /q
+    -->
+  <loadfile file="signinfo.txt" property="signinfo" failonerror="false" if="${file::exists('signinfo.txt')}"/>
 
+  <target name="VersionInfo" depends="VSNET,env">
+    <description>
+      Sets the version information as properties, env variables
+      and sets up the different version specific files.
+    </description>
+    <nant target="versioninfo">
+      <buildfiles>
+        <include name="versioninfo.build" />
+      </buildfiles>
+    </nant>
+    <loadfile file="src\version.in" property="versionheaderfile">
+      <filterchain>
+        <replacetokens begintoken="$" endtoken="$">
+          <token key="MajorVersion" value="${environment::get-variable('MajorVersion')}" />
+          <token key="MinorVersion" value="${environment::get-variable('MinorVersion')}" />
+          <token key="MicroVersion" value="${environment::get-variable('Microversion')}" />
+          <token key="WCREV" value="${environment::get-variable('WCREV')}" />
+          <token key="WCLOGCOUNT" value="${environment::get-variable('WCLOGCOUNT')}" />
+          <token key="WCDATE" value="${environment::get-variable('WCDATE')}" />
+        </replacetokens>
+      </filterchain>
+    </loadfile>
+    <echo file="src\version.h" message="${versionheaderfile}" />
+  </target>
+
+  <target name="build" depends="VersionInfo">
     <exec program="msbuild.exe" >
       <arg value="DemoHelper.sln" />
       <arg value="/t:Rebuild" />
@@ -45,6 +54,70 @@
       <arg value="/maxcpucount" />
     </exec>
 
+    <!-- sign all binaries -->
+    <if test="${file::exists('signinfo.txt')}">
+      <foreach item="File" property="filename">
+        <in>
+          <items>
+            <include name="bin\Release\x64\*.exe" />
+          </items>
+        </in>
+        <do>
+          <exec program="${signtool}">
+            <arg value="sign" />
+            <arg value="${signinfo}" />
+            <arg value="${filename}" />
+          </exec>
+        </do>
+      </foreach>
+    </if>
+
+    <property name="verstring" value="${environment::get-variable('MajorVersion')}.${environment::get-variable('MinorVersion')}.${environment::get-variable('MicroVersion')}" />
+    <property name="verstringfull" value="${verstring}.${environment::get-variable('WCLOGCOUNT')}" />
+    <zip zipfile="bin\DemoHelper-${verstring}.zip" ziplevel="9">
+      <fileset basedir="bin\${configuration}\bin">
+        <include name="DemoHelper.exe" />
+      </fileset>
+    </zip>
+    <exec program="checksum" output="bin\checksum64.txt">
+      <arg value="-t" />
+      <arg value="sha256" />
+      <arg value="-f" />
+      <arg value="bin\DemoHelper-${verstring}.zip" />
+    </exec>
+    <loadfile file="bin\checksum64.txt" property="checksum64" />
+
+    <loadfile file="choco\demohelper.nuspec" property="nuspecfile">
+      <filterchain>
+        <replacetokens begintoken="$" endtoken="$">
+          <token key="MajorVersion" value="${environment::get-variable('MajorVersion')}" />
+          <token key="MinorVersion" value="${environment::get-variable('MinorVersion')}" />
+          <token key="MicroVersion" value="${environment::get-variable('Microversion')}" />
+          <token key="WCREV" value="${environment::get-variable('WCLOGCOUNT')}" />
+          <token key="WCDATE" value="${environment::get-variable('WCDATE')}" />
+        </replacetokens>
+      </filterchain>
+    </loadfile>
+    <echo file="choco\package\demohelper.nuspec" message="${nuspecfile}" />
+    <loadfile file="choco\chocolateyInstall.ps1" property="cinstfile">
+      <filterchain>
+        <replacetokens begintoken="$" endtoken="$">
+          <token key="MajorVersion" value="${environment::get-variable('MajorVersion')}" />
+          <token key="MinorVersion" value="${environment::get-variable('MinorVersion')}" />
+          <token key="MicroVersion" value="${environment::get-variable('Microversion')}" />
+          <token key="WCREV" value="${environment::get-variable('WCLOGCOUNT')}" />
+          <token key="WCDATE" value="${environment::get-variable('WCDATE')}" />
+          <token key="checksum64" value="${string::trim(checksum64)}" />
+        </replacetokens>
+      </filterchain>
+    </loadfile>
+    <echo file="choco\package\tools\chocolateyInstall.ps1" message="${cinstfile}" />
+    <echo>
+      now start an admin console in choco\package and then run
+      choco pack
+      to upload the package, run
+      cpush demohelper-x.x.x.nupkg
+    </echo>
   </target>
 
 </project>

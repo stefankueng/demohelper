@@ -16,6 +16,9 @@
     <Filter Include="sktoolslib">
       <UniqueIdentifier>{49e8bfba-7391-4a67-88f8-d925f77c5b60}</UniqueIdentifier>
     </Filter>
+    <Filter Include="scripts">
+      <UniqueIdentifier>{0b59c782-7415-401f-916e-b9f6739a1874}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DemoHelper.h">
@@ -48,6 +51,15 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="ReadMe.txt" />
+    <None Include="..\default.build">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="..\default.build.user.tmpl">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="..\default.build.user">
+      <Filter>scripts</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DemoHelper.rc">

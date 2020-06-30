@@ -1,6 +1,12 @@
 #pragma once
 
-#define FILEVER         1, 3, 0, $WCREV$
-#define PRODUCTVER      1, 3, 0, $WCREV$
-#define STRFILEVER      "1.3.0.$WCREV$\0"
-#define STRPRODUCTVER   "1.3.0.$WCREV$\0"
+#define FILEVER         $MajorVersion$, $MinorVersion$, $MicroVersion$, $WCLOGCOUNT$
+#define PRODUCTVER      $MajorVersion$, $MinorVersion$, $MicroVersion$, $WCLOGCOUNT$
+#define STRFILEVER      "$MajorVersion$.$MinorVersion$.$MicroVersion$.$WCLOGCOUNT$\0"
+#define STRPRODUCTVER   "$MajorVersion$.$MinorVersion$.$MicroVersion$.$WCLOGCOUNT$\0"
+
+#define DH_VERMAJOR     $MajorVersion$
+#define DH_VERMINOR     $MinorVersion$
+#define DH_VERMICRO     $MicroVersion$
+#define DH_VERBUILD     $WCLOGCOUNT$
+#define DH_VERDATE      "$WCDATE$"

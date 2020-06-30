@@ -1,3 +1,6 @@
 /.vs
 /obj
 /src/DemoHelper.vcxproj.user
+/src/*.aps
+/bin
+/default.build.user

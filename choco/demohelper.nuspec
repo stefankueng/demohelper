@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata>
+    <id>demohelper</id>
+    <title>DemoHelper</title>
+    <version>$MajorVersion$.$MinorVersion$.$MicroVersion$</version>
+    <authors>Stefan Kueng</authors>
+    <owners>Stefan Kueng</owners>
+    <projectUrl>https://tools.stefankueng.com/DemoHelper.html</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A tool which helps in demonstrations, presentations or if you just need to explain someone something on your computer.
+DemoHelper is an annotation and screen zoom tool you can use for technical presentations that include application demonstrations.
+DemoHelper runs unobtrusively in the system tray and is activated by either customizable hotkeys or the context menu of the tray icon.
+You can draw on the screen to mark special areas, or you can zoom in on an area on the screen.
+Use cases include meetings where you have to explain something on the screen or teachers presenting lectures to students in computer classes.
+</description>
+    <summary>Annotate and draw directly on the screen</summary>
+    <releaseNotes />
+    <copyright>© Stefan Kueng</copyright>
+    <tags>zoom presentation screen annotation</tags>
+    <description>BowPad is a small and fast text editor with a ribbon user interface and syntax highlighting. It supports plugins written in jscript or vbscript and has a lot of useful features.</description>
+    <licenseUrl>http://www.gnu.org/licenses/old-licenses/gpl-2.0.html</licenseUrl>
+    <iconUrl>https://github.com/stefankueng/demohelper/raw/main/src/demohelper256.png</iconUrl>
+    <projectSourceUrl>https://github.com/stefankueng/demohelper</projectSourceUrl>
+    <bugTrackerUrl>https://github.com/stefankueng/demohelper/issues</bugTrackerUrl>
+  </metadata>
+</package>
