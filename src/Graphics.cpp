@@ -1,6 +1,6 @@
 // demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008 - Stefan Kueng
+// Copyright (C) 2007-2008, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -128,7 +128,7 @@ bool CMainWindow::ArrowTo(HDC hdc, LONG x, LONG y, int width)
     vecLeft[0] = -vecLine[1];
     vecLeft[1] = vecLine[0];
 
-    fLength = sqrt(vecLine[0]*vecLine[0] + vecLine[1]*vecLine[1])/fLength;
+    fLength = sqrtf(vecLine[0]*vecLine[0] + vecLine[1]*vecLine[1])/fLength;
     th = width / (2.0f * fLength);
     ta = width / (2.0f * 0.15f * fLength);
 
