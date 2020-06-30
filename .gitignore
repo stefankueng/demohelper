@@ -4,3 +4,6 @@
 /src/*.aps
 /bin
 /default.build.user
+/choco/package
+/src/version.h
+/version.build
