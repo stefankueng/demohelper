@@ -1,4 +1,4 @@
-// demoHelper - screen drawing and presentation tool
+﻿// demoHelper - screen drawing and presentation tool
 
 // Copyright (C) 2007-2008, 2012, 2020 - Stefan Kueng
 
@@ -26,24 +26,46 @@
 #include "hyperlink.h"
 #include <commctrl.h>
 #include <vector>
+#include <deque>
 
-#define LINEARRAYSIZE 4096
+#define LINEARRAYSIZE     4096
 #define MAX_NUMBEROFLINES 500
-#define DRAW_HOTKEY 100
-#define ZOOM_HOTKEY 101
+#define DRAW_HOTKEY       100
+#define ZOOM_HOTKEY       101
 
-#define TIMER_ID_DRAW   101
-#define TIMER_ID_ZOOM   102
-#define TIMER_ID_FADE   103
+#define TIMER_ID_DRAW 101
+#define TIMER_ID_ZOOM 102
+#define TIMER_ID_FADE 103
 
-typedef enum LineTypes
+enum class LineType
 {
-    normal,
+    hand,
+    straight,
     arrow,
-} LineTypes;
+};
 
-class CMainWindow :
-    public CWindow
+class DrawLine
+{
+public:
+    DrawLine()
+    {
+    }
+
+    LineType           lineType  = LineType::hand;
+    int                lineIndex = 0;
+    std::vector<POINT> points;
+    std::vector<BYTE>  pointTypes;
+    int                rop = R2_MASKPEN;
+
+    POINT lineStartPoint = {-1, -1};
+    POINT lineEndPoint   = {-1, -1};
+
+    int penWidth   = 1;
+    int colorIndex = 0;
+    int fadeCount  = 0;
+};
+
+class CMainWindow : public CWindow
 {
 public:
     CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL)
@@ -54,7 +76,6 @@ public:
         , hDesktopCompatibleDC(NULL)
         , hDesktopCompatibleBitmap(NULL)
         , hOldBmp(NULL)
-        , m_totallines(-1)
         , m_colorindex(1)
         , m_currentpenwidth(6)
         , m_hCursor(NULL)
@@ -74,84 +95,68 @@ public:
         m_colors[7] = RGB(0, 0, 0);
         m_colors[8] = RGB(150, 150, 150);
         m_colors[9] = RGB(0, 255, 255);
-        m_points    = new POINT[MAX_NUMBEROFLINES * LINEARRAYSIZE];
-        m_linetypes = new BYTE[MAX_NUMBEROFLINES * LINEARRAYSIZE];
     };
-    ~CMainWindow(void)
-    {
-        delete [] m_points;
-        delete [] m_linetypes;
-    };
+    ~CMainWindow(void){};
 
-    bool                RegisterAndCreateWindow();
+    bool RegisterAndCreateWindow();
 
 protected:
     /// the message handler for this window
-    LRESULT CALLBACK    WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     /// Handles all the WM_COMMAND window messages (e.g. menu commands)
-    LRESULT             DoCommand(int id);
+    LRESULT DoCommand(int id);
 
-    bool                StartPresentationMode();
-    bool                EndPresentationMode();
-    bool                StartInlineZoom();
-    bool                StartZoomingMode();
-    bool                EndZoomingMode();
-    bool                DrawArrow(HDC hdc, int index);
-    bool                ArrowTo(HDC hdc, LONG x, LONG y, int width);
-    bool                DrawZoom(HDC hdc, POINT pt);
-    HCURSOR             CreateDrawCursor(COLORREF color, int penwidth);
+    bool    StartPresentationMode();
+    bool    EndPresentationMode();
+    bool    StartInlineZoom();
+    bool    StartZoomingMode();
+    bool    EndZoomingMode();
+    bool    DrawArrow(HDC hdc, const DrawLine& line);
+    bool    ArrowTo(HDC hdc, LONG x, LONG y, int width);
+    bool    DrawZoom(HDC hdc, POINT pt);
+    HCURSOR CreateDrawCursor(COLORREF color, int penwidth);
 
     static BOOL CALLBACK OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
-    static WORD         HotKeyControl2HotKey(WORD hk);
-    static WORD         HotKey2HotKeyControl(WORD hk);
+    static WORD          HotKeyControl2HotKey(WORD hk);
+    static WORD          HotKey2HotKeyControl(WORD hk);
     static BOOL CALLBACK HelpDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
-    void                RegisterHotKeys();
-    bool                UpdateCursor();
+    void RegisterHotKeys();
+    bool UpdateCursor();
+
 protected:
-    NOTIFYICONDATA      niData;
-    HDC                 hDesktopCompatibleDC;
-    HBITMAP             hDesktopCompatibleBitmap;
-    HBITMAP             hOldBmp;
+    NOTIFYICONDATA niData;
+    HDC            hDesktopCompatibleDC;
+    HBITMAP        hDesktopCompatibleBitmap;
+    HBITMAP        hOldBmp;
 
-    bool                m_bDrawing;
-    float               m_zoomfactor;
-    bool                m_bZooming;
+    bool  m_bDrawing;
+    float m_zoomfactor;
+    bool  m_bZooming;
 
-    int                 m_totallines;
-    int                 m_lineindex[MAX_NUMBEROFLINES];
-    POINT *             m_points;
-    BYTE *              m_linetypes;
-    int                 m_rop[MAX_NUMBEROFLINES];
-    int                 m_fadecount[MAX_NUMBEROFLINES];
+    int m_colorindex;
+    int m_currentpenwidth;
+    int m_currentrop;
+    int m_fadeseconds;
 
-    POINT               m_lineStartPoint[MAX_NUMBEROFLINES];
-    POINT               m_lineEndPoint[MAX_NUMBEROFLINES];
-    LineTypes           m_lineType[MAX_NUMBEROFLINES];
+    POINT m_lineStartShiftPoint;
 
-    int                 m_penwidth[MAX_NUMBEROFLINES];
-    int                 m_linecolorindex[MAX_NUMBEROFLINES];
-    int                 m_colorindex;
-    int                 m_currentpenwidth;
-    int                 m_currentrop;
-    int                 m_fadeseconds;
+    COLORREF m_colors[10];
 
-    POINT               m_lineStartShiftPoint;
+    HCURSOR m_hCursor;
+    HCURSOR m_hPreviousCursor;
 
-    COLORREF            m_colors[10];
+    bool m_bMarker;
+    int  m_oldpenwidth;
+    int  m_oldcolorindex;
+    int  m_oldrop;
 
-    HCURSOR             m_hCursor;
-    HCURSOR             m_hPreviousCursor;
+    bool  m_bInlineZoom;
+    POINT m_ptInlineZoomStartPoint;
+    POINT m_ptInlineZoomEndPoint;
 
-    bool                m_bMarker;
-    int                 m_oldpenwidth;
-    int                 m_oldcolorindex;
-    int                 m_oldrop;
+    std::deque<DrawLine> m_drawLines;
 
-    bool                m_bInlineZoom;
-    POINT               m_ptInlineZoomStartPoint;
-    POINT               m_ptInlineZoomEndPoint;
-
-    static CHyperLink   m_link;
+    static CHyperLink m_link;
 };
