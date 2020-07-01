@@ -1,4 +1,4 @@
-// demoHelper - screen drawing and presentation tool
+﻿// demoHelper - screen drawing and presentation tool
 
 // Copyright (C) 2007-2008, 2020 - Stefan Kueng
 
@@ -104,51 +104,3 @@ HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
     return ::CreateIconIndirect(&iconinfo);
 }
 
-bool CMainWindow::ArrowTo(HDC hdc, LONG x, LONG y, int width)
-{
-
-    POINT pFrom;
-    POINT pBase;
-    POINT aptPoly[3];
-    float vecLine[2];
-    float vecLeft[2];
-    float fLength = 1.0f;
-    float th;
-    float ta;
-
-    // get from point
-    MoveToEx(hdc, 0, 0, &pFrom);
-
-    // set to point
-    aptPoly[0].x = x;
-    aptPoly[0].y = y;
-
-    // build the line vector
-    vecLine[0] = (float) aptPoly[0].x - pFrom.x;
-    vecLine[1] = (float) aptPoly[0].y - pFrom.y;
-
-    // build the arrow base vector - normal to the line
-    vecLeft[0] = -vecLine[1];
-    vecLeft[1] = vecLine[0];
-
-    fLength = sqrtf(vecLine[0]*vecLine[0] + vecLine[1]*vecLine[1])/fLength;
-    auto twoPix = CDPIAware::Instance().Scale(*this, 2);
-    th = width / (twoPix * fLength);
-    ta = width / (twoPix * 0.15f * fLength);
-
-    // find the base of the arrow
-    pBase.x = (int) (aptPoly[0].x + -ta * vecLine[0]);
-    pBase.y = (int) (aptPoly[0].y + -ta * vecLine[1]);
-
-    // build the points on the sides of the arrow
-    aptPoly[1].x = (int) (pBase.x + th * vecLeft[0]);
-    aptPoly[1].y = (int) (pBase.y + th * vecLeft[1]);
-    aptPoly[2].x = (int) (pBase.x + -th * vecLeft[0]);
-    aptPoly[2].y = (int) (pBase.y + -th * vecLeft[1]);
-
-    MoveToEx(hdc, pFrom.x, pFrom.y, NULL);
-
-    LineTo(hdc, aptPoly[0].x, aptPoly[0].y);
-    Polygon(hdc, aptPoly, 3);
-    return true;
-}

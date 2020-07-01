@@ -25,10 +25,10 @@ LRESULT CMainWindow::DoCommand(int id)
     switch (id)
     {
         case ID_CMD_TOGGLEROP:
-            if (m_currentrop == R2_MASKPEN)
-                m_currentrop = R2_COPYPEN;
+            if (m_currentalpha == 255)
+                m_currentalpha = LINE_ALPHA;
             else
-                m_currentrop = R2_MASKPEN;
+                m_currentalpha = 255;
             break;
         case ID_CMD_QUITMODE:
             m_bZooming = false;
@@ -37,13 +37,15 @@ LRESULT CMainWindow::DoCommand(int id)
             break;
         case ID_CMD_UNDOLINE:
             m_bDrawing = false;
-            m_drawLines.pop_back();
+            if (!m_drawLines.empty())
+                m_drawLines.pop_back();
             RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT | RDW_INVALIDATE);
             break;
         case ID_CMD_REMOVEFIRST:
         {
             m_bDrawing = false;
-            m_drawLines.pop_front();
+            if (!m_drawLines.empty())
+                m_drawLines.pop_front();
             RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT | RDW_INVALIDATE);
         }
         break;
@@ -160,18 +162,18 @@ LRESULT CMainWindow::DoCommand(int id)
             {
                 m_currentpenwidth = m_oldpenwidth;
                 m_colorindex      = m_oldcolorindex;
-                m_currentrop      = m_oldrop;
+                m_currentalpha    = m_oldalpha;
                 m_bMarker         = false;
             }
             else
             {
                 m_oldpenwidth   = m_currentpenwidth;
                 m_oldcolorindex = m_colorindex;
-                m_oldrop        = m_currentrop;
+                m_oldalpha      = m_currentalpha;
 
                 m_currentpenwidth = GetSystemMetrics(SM_CXCURSOR);
                 m_colorindex      = 0;
-                m_currentrop      = R2_MASKPEN;
+                m_currentalpha    = LINE_ALPHA;
 
                 m_bMarker = true;
             }
@@ -186,7 +188,6 @@ LRESULT CMainWindow::DoCommand(int id)
                 POINT pt;
                 GetCursorPos(&pt);
                 DrawZoom(hdc, pt);
-                BitBlt(hDesktopCompatibleDC, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), hdc, 0, 0, SRCCOPY);
                 DeleteDC(hdc);
                 RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT | RDW_INVALIDATE);
                 UpdateCursor();

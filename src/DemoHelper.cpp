@@ -1,6 +1,6 @@
-// demoHelper - screen drawing and presentation tool
+﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008, 2015 - Stefan Kueng
+// Copyright (C) 2007-2008, 2015, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,13 +21,9 @@
 #include "DemoHelper.h"
 #include "MainWindow.h"
 
-
-#define MAX_LOADSTRING 100
-
 // Global Variables:
-HINSTANCE g_hInstance;      // current instance
-HINSTANCE g_hResource;      // the resource dll
-
+HINSTANCE g_hInstance; // current instance
+HINSTANCE g_hResource; // the resource dll
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
                        HINSTANCE hPrevInstance,
@@ -40,17 +36,24 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
     INITCOMMONCONTROLSEX used = {
         sizeof(INITCOMMONCONTROLSEX),
-        ICC_STANDARD_CLASSES | ICC_BAR_CLASSES
-    };
+        ICC_STANDARD_CLASSES | ICC_BAR_CLASSES};
     InitCommonControlsEx(&used);
+    SetDllDirectory(L"");
+    HRESULT hr = CoInitialize(nullptr);
+    if (FAILED(hr))
+        return -1;
+    OnOutOfScope(CoUninitialize());
 
     g_hResource = hInstance;
     g_hInstance = hInstance;
-    // TODO: Place code here.
-    MSG msg;
 
+    ULONG_PTR                    gdiplusToken;
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
+
+    OnOutOfScope(Gdiplus::GdiplusShutdown(gdiplusToken));
+    MSG         msg;
     CMainWindow trayWindow(g_hResource);
-
     if (trayWindow.RegisterAndCreateWindow())
     {
         HACCEL hAccelTable = LoadAccelerators(g_hResource, MAKEINTRESOURCE(IDR_DEMOHELPER));
@@ -63,7 +66,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                 DispatchMessage(&msg);
             }
         }
-        return (int) msg.wParam;
+        return (int)msg.wParam;
     }
     return 1;
 }

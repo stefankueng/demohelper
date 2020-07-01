@@ -110,7 +110,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             HDC         hdc = BeginPaint(*this, &ps);
             {
                 CMemDC memdc(hdc, ps.rcPaint);
-                SetROP2(memdc, R2_MASKPEN);
                 if (m_bZooming)
                 {
                     // we're zooming,
@@ -130,44 +129,28 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                            ps.rcPaint.left,
                            ps.rcPaint.top,
                            SRCCOPY);
+                    Gdiplus::Graphics graphics(memdc);
+                    graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+
                     for (const auto& line : m_drawLines)
                     {
-                        HPEN   hPen      = CreatePen(PS_SOLID, line.penWidth, m_colors[line.colorIndex]);
-                        HPEN   hOldPen   = NULL;
-                        HBRUSH hOldBrush = NULL;
-                        if (hPen)
-                        {
-                            hOldPen = (HPEN)SelectObject(memdc, hPen);
-                        }
-                        HBRUSH hBrush = CreateSolidBrush(m_colors[line.colorIndex]);
-                        if (hBrush)
-                        {
-                            hOldBrush = (HBRUSH)SelectObject(memdc, hBrush);
-                        }
+                        Gdiplus::Color color;
+                        color.SetValue(Gdiplus::Color::MakeARGB(line.alpha, GetRValue(m_colors[line.colorIndex]), GetGValue(m_colors[line.colorIndex]), GetBValue(m_colors[line.colorIndex])));
+                        Gdiplus::Pen pen(color, (Gdiplus::REAL)line.penWidth);
 
                         if (line.lineType == LineType::hand)
                         {
-                            SetROP2(memdc, line.rop);
-                            PolyDraw(memdc, line.points.data(), line.pointTypes.data(), (int)line.points.size());
+                            graphics.DrawLines(&pen, line.points.data(), (int)line.points.size());
                         }
                         else
                         {
-                            SetROP2(memdc, line.rop);
                             if (line.lineType == LineType::arrow)
-                                DrawArrow(memdc, line);
-                            else if ((line.lineStartPoint.x >= 0) && (line.lineStartPoint.y >= 0) && (line.lineEndPoint.x >= 0) && (line.lineEndPoint.y >= 0))
+                                pen.SetEndCap(Gdiplus::LineCap::LineCapArrowAnchor);
+                            if ((line.lineStartPoint.X >= 0) && (line.lineStartPoint.Y >= 0) && (line.lineEndPoint.X >= 0) && (line.lineEndPoint.Y >= 0))
                             {
-                                MoveToEx(memdc, line.lineStartPoint.x, line.lineStartPoint.y, NULL);
-                                LineTo(memdc, line.lineEndPoint.x, line.lineEndPoint.y);
+                                graphics.DrawLine(&pen, line.lineStartPoint, line.lineEndPoint);
                             }
                         }
-
-                        if (hOldPen)
-                            SelectObject(memdc, hOldPen);
-                        DeleteObject(hPen);
-                        if (hOldBrush)
-                            SelectObject(memdc, hOldBrush);
-                        DeleteObject(hBrush);
                     }
                 }
             }
@@ -190,20 +173,17 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 POINT pt;
                 GetCursorPos(&pt);
                 DrawZoom(hdc, pt);
-                BitBlt(hDesktopCompatibleDC, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), hdc, 0, 0, SRCCOPY);
                 DeleteDC(hdc);
                 RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT | RDW_INVALIDATE);
             }
             m_bDrawing = true;
             DrawLine drawLine;
-            drawLine.lineStartPoint.x = GET_X_LPARAM(lParam);
-            drawLine.lineStartPoint.y = GET_Y_LPARAM(lParam);
-            drawLine.rop              = m_currentrop;
+            drawLine.lineStartPoint.X = GET_X_LPARAM(lParam);
+            drawLine.lineStartPoint.Y = GET_Y_LPARAM(lParam);
+            drawLine.alpha            = m_currentalpha;
             drawLine.points.push_back(drawLine.lineStartPoint);
-            drawLine.pointTypes.push_back(PT_MOVETO);
             drawLine.colorIndex = m_colorindex;
             drawLine.penWidth   = m_currentpenwidth;
-            drawLine.fadeCount  = m_fadeseconds * 10;
             m_drawLines.push_back(std::move(drawLine));
         }
         break;
@@ -251,8 +231,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             }
             else if (m_bDrawing)
             {
-                LONG xPos = GET_X_LPARAM(lParam);
-                LONG yPos = GET_Y_LPARAM(lParam);
+                int xPos = GET_X_LPARAM(lParam);
+                int yPos = GET_Y_LPARAM(lParam);
                 if (wParam & MK_LBUTTON)
                 {
                     if (wParam & MK_SHIFT)
@@ -288,38 +268,37 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         line.lineType = LineType::straight;
 
                         RECT invalidRect;
-                        invalidRect.left   = std::min(line.lineStartPoint.x, xPos);
-                        invalidRect.top    = std::min(line.lineStartPoint.y, yPos);
-                        invalidRect.right  = std::max(line.lineStartPoint.x, xPos);
-                        invalidRect.bottom = std::max(line.lineStartPoint.y, yPos);
+                        invalidRect.left   = std::min(line.lineStartPoint.X, xPos);
+                        invalidRect.top    = std::min(line.lineStartPoint.Y, yPos);
+                        invalidRect.right  = std::max(line.lineStartPoint.X, xPos);
+                        invalidRect.bottom = std::max(line.lineStartPoint.Y, yPos);
 
-                        invalidRect.left   = std::min(line.lineStartPoint.x, line.lineEndPoint.x);
-                        invalidRect.top    = std::min(line.lineStartPoint.y, line.lineEndPoint.y);
-                        invalidRect.right  = std::max(line.lineStartPoint.x, line.lineEndPoint.x);
-                        invalidRect.bottom = std::max(line.lineStartPoint.y, line.lineEndPoint.y);
+                        invalidRect.left   = std::min(line.lineStartPoint.X, line.lineEndPoint.X);
+                        invalidRect.top    = std::min(line.lineStartPoint.Y, line.lineEndPoint.Y);
+                        invalidRect.right  = std::max(line.lineStartPoint.X, line.lineEndPoint.X);
+                        invalidRect.bottom = std::max(line.lineStartPoint.Y, line.lineEndPoint.Y);
 
                         InflateRect(&invalidRect, 10 * m_currentpenwidth, 10 * m_currentpenwidth);
                         invalidRect.left = std::max(0L, invalidRect.left);
                         invalidRect.top  = std::max(0L, invalidRect.top);
                         InvalidateRect(*this, &invalidRect, FALSE);
-                        line.lineEndPoint.x = xPos;
-                        line.lineEndPoint.y = yPos;
+                        line.lineEndPoint.X = xPos;
+                        line.lineEndPoint.Y = yPos;
                     }
                     else
                     {
                         auto& line = m_drawLines.back();
 
-                        RECT  invalidRect = {0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)};
-                        POINT pt          = {xPos, yPos};
+                        RECT           invalidRect = {0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)};
+                        Gdiplus::Point pt          = {xPos, yPos};
                         line.points.push_back(pt);
-                        line.pointTypes.push_back(PT_LINETO);
                         line.lineType = LineType::hand;
                         for (const auto& linept : line.points)
                         {
-                            invalidRect.left   = std::min(linept.x, invalidRect.left);
-                            invalidRect.top    = std::min(linept.y, invalidRect.top);
-                            invalidRect.right  = std::max(linept.x, invalidRect.right);
-                            invalidRect.bottom = std::max(linept.y, invalidRect.bottom);
+                            invalidRect.left   = std::min(linept.X, (int)invalidRect.left);
+                            invalidRect.top    = std::min(linept.Y, (int)invalidRect.top);
+                            invalidRect.right  = std::max(linept.X, (int)invalidRect.right);
+                            invalidRect.bottom = std::max(linept.Y, (int)invalidRect.bottom);
                         }
                         InflateRect(&invalidRect, 2 * m_currentpenwidth, 2 * m_currentpenwidth);
                         invalidRect.left = std::max(0L, invalidRect.left);
@@ -333,15 +312,15 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     if (wParam & MK_SHIFT)
                     {
                         // if shift is pressed, the user want's to draw straight lines
-                        if (abs(xPos - line.lineStartPoint.x) > abs(yPos - line.lineStartPoint.y))
+                        if (abs(xPos - line.lineStartPoint.X) > abs(yPos - line.lineStartPoint.Y))
                         {
                             // straight line horizontally
-                            yPos = line.lineStartPoint.y;
+                            yPos = line.lineStartPoint.Y;
                         }
                         else
                         {
                             // straight line vertically
-                            xPos = line.lineStartPoint.x;
+                            xPos = line.lineStartPoint.X;
                         }
                     }
                     if (wParam & MK_CONTROL)
@@ -354,22 +333,22 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         line.lineType = LineType::arrow;
                     }
                     RECT invalidRect;
-                    invalidRect.left   = std::min(line.lineStartPoint.x, xPos);
-                    invalidRect.top    = std::min(line.lineStartPoint.y, yPos);
-                    invalidRect.right  = std::max(line.lineStartPoint.x, xPos);
-                    invalidRect.bottom = std::max(line.lineStartPoint.y, yPos);
+                    invalidRect.left   = std::min(line.lineStartPoint.X, xPos);
+                    invalidRect.top    = std::min(line.lineStartPoint.Y, yPos);
+                    invalidRect.right  = std::max(line.lineStartPoint.X, xPos);
+                    invalidRect.bottom = std::max(line.lineStartPoint.Y, yPos);
 
-                    invalidRect.left   = std::min(line.lineStartPoint.x, line.lineEndPoint.x);
-                    invalidRect.top    = std::min(line.lineStartPoint.y, line.lineEndPoint.y);
-                    invalidRect.right  = std::max(line.lineStartPoint.x, line.lineEndPoint.x);
-                    invalidRect.bottom = std::max(line.lineStartPoint.y, line.lineEndPoint.y);
+                    invalidRect.left   = std::min(line.lineStartPoint.X, line.lineEndPoint.X);
+                    invalidRect.top    = std::min(line.lineStartPoint.Y, line.lineEndPoint.Y);
+                    invalidRect.right  = std::max(line.lineStartPoint.X, line.lineEndPoint.X);
+                    invalidRect.bottom = std::max(line.lineStartPoint.Y, line.lineEndPoint.Y);
 
                     InflateRect(&invalidRect, 10 * m_currentpenwidth, 10 * m_currentpenwidth);
                     invalidRect.left = std::max(0L, invalidRect.left);
                     invalidRect.top  = std::max(0L, invalidRect.top);
                     InvalidateRect(*this, &invalidRect, FALSE);
-                    line.lineEndPoint.x = xPos;
-                    line.lineEndPoint.y = yPos;
+                    line.lineEndPoint.X = xPos;
+                    line.lineEndPoint.Y = yPos;
                 }
             }
         }
@@ -448,32 +427,26 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             else if (wParam == TIMER_ID_FADE)
             {
                 // go through all lines and reduce the fade-count value
-                bool bRedraw = false;
+                auto dec = std::max(BYTE(LINE_ALPHA / (m_fadeseconds * 10)), (BYTE)1);
                 for (auto& line : m_drawLines)
                 {
-                    line.fadeCount--;
-                    if (line.fadeCount < 0)
-                        line.fadeCount = 0;
-                    if (line.fadeCount == line.penWidth)
-                    {
-                        line.penWidth--;
-                        bRedraw = true;
-                    }
+                    if (line.alpha > dec)
+                        line.alpha -= dec;
+                    else
+                        line.alpha = 0;
                 }
                 // go through all lines again, and remove all lines with a pen width
                 // of zero
                 for (auto it = m_drawLines.begin(); it != m_drawLines.end();)
                 {
-                    if (it->penWidth == 0)
+                    if (it->alpha == 0)
                     {
-                        bRedraw = true;
-                        it      = m_drawLines.erase(it);
+                        it = m_drawLines.erase(it);
                     }
                     else
                         ++it;
                 }
-                if (bRedraw)
-                    RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT | RDW_INVALIDATE);
+                RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT | RDW_INVALIDATE);
             }
             break;
         case WM_DESTROY:
@@ -561,12 +534,6 @@ bool CMainWindow::EndPresentationMode()
     return true;
 }
 
-bool CMainWindow::DrawArrow(HDC hdc, const DrawLine& line)
-{
-    MoveToEx(hdc, line.lineStartPoint.x, line.lineStartPoint.y, NULL);
-    return ArrowTo(hdc, line.lineEndPoint.x, line.lineEndPoint.y, line.penWidth * 3);
-}
-
 void CMainWindow::RegisterHotKeys()
 {
     CRegStdDWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
@@ -605,6 +572,7 @@ bool CMainWindow::DrawZoom(HDC hdc, POINT pt)
     int zoomwindowx = int(float(cx) / m_zoomfactor);
     int zoomwindowy = int(float(cy) / m_zoomfactor);
 
+    Gdiplus::Rect desktopRC = {0, 0, cx, cy};
     // adjust the cursor position to the zoom factor
     int x = pt.x * (cx - zoomwindowx) / cx;
     int y = pt.y * (cy - zoomwindowy) / cy;

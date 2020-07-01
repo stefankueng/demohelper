@@ -21,9 +21,10 @@
 
 #include "BaseWindow.h"
 #include "resource.h"
+#include "hyperlink.h"
+#include "MemDC.h"
 #include <shellapi.h>
 #include <shlwapi.h>
-#include "hyperlink.h"
 #include <commctrl.h>
 #include <vector>
 #include <deque>
@@ -36,6 +37,8 @@
 #define TIMER_ID_DRAW 101
 #define TIMER_ID_ZOOM 102
 #define TIMER_ID_FADE 103
+
+#define LINE_ALPHA 100
 
 enum class LineType
 {
@@ -51,18 +54,16 @@ public:
     {
     }
 
-    LineType           lineType  = LineType::hand;
-    int                lineIndex = 0;
-    std::vector<POINT> points;
-    std::vector<BYTE>  pointTypes;
-    int                rop = R2_MASKPEN;
+    LineType                    lineType  = LineType::hand;
+    int                         lineIndex = 0;
+    std::vector<Gdiplus::Point> points;
+    BYTE                        alpha = 100;
 
-    POINT lineStartPoint = {-1, -1};
-    POINT lineEndPoint   = {-1, -1};
+    Gdiplus::Point lineStartPoint = {-1, -1};
+    Gdiplus::Point lineEndPoint   = {-1, -1};
 
     int penWidth   = 1;
     int colorIndex = 0;
-    int fadeCount  = 0;
 };
 
 class CMainWindow : public CWindow
@@ -79,7 +80,7 @@ public:
         , m_colorindex(1)
         , m_currentpenwidth(6)
         , m_hCursor(NULL)
-        , m_currentrop(R2_MASKPEN)
+        , m_currentalpha(LINE_ALPHA)
         , m_bMarker(false)
         , m_bInlineZoom(false)
         , m_fadeseconds(0)
@@ -112,8 +113,6 @@ protected:
     bool    StartInlineZoom();
     bool    StartZoomingMode();
     bool    EndZoomingMode();
-    bool    DrawArrow(HDC hdc, const DrawLine& line);
-    bool    ArrowTo(HDC hdc, LONG x, LONG y, int width);
     bool    DrawZoom(HDC hdc, POINT pt);
     HCURSOR CreateDrawCursor(COLORREF color, int penwidth);
 
@@ -135,10 +134,10 @@ protected:
     float m_zoomfactor;
     bool  m_bZooming;
 
-    int m_colorindex;
-    int m_currentpenwidth;
-    int m_currentrop;
-    int m_fadeseconds;
+    int  m_colorindex;
+    int  m_currentpenwidth;
+    BYTE m_currentalpha;
+    int  m_fadeseconds;
 
     POINT m_lineStartShiftPoint;
 
@@ -150,7 +149,7 @@ protected:
     bool m_bMarker;
     int  m_oldpenwidth;
     int  m_oldcolorindex;
-    int  m_oldrop;
+    BYTE m_oldalpha;
 
     bool  m_bInlineZoom;
     POINT m_ptInlineZoomStartPoint;
