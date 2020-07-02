@@ -221,10 +221,10 @@ LRESULT CMainWindow::DoCommand(int id)
         {
             // clear the whole screen for drawing on it
             RECT rect;
-            rect.left   = 0;
-            rect.top    = 0;
-            rect.right  = GetSystemMetrics(SM_CXSCREEN);
-            rect.bottom = GetSystemMetrics(SM_CYSCREEN);
+            rect.left   = GetSystemMetrics(SM_XVIRTUALSCREEN);
+            rect.top    = GetSystemMetrics(SM_YVIRTUALSCREEN);
+            rect.right  = rect.left + GetSystemMetrics(SM_CXVIRTUALSCREEN);
+            rect.bottom = rect.top + GetSystemMetrics(SM_CYVIRTUALSCREEN);
             SetBkColor(hDesktopCompatibleDC, ::GetSysColor(COLOR_WINDOW));
             ::ExtTextOut(hDesktopCompatibleDC, 0, 0, ETO_OPAQUE, &rect, NULL, 0, NULL);
             // also clear all lines already drawn

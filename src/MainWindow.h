@@ -73,7 +73,7 @@ public:
         : CWindow(hInst, wcx)
         , m_bDrawing(false)
         , m_bZooming(false)
-        , m_zoomfactor(2.0f)
+        , m_zoomfactor(1.2f)
         , hDesktopCompatibleDC(NULL)
         , hDesktopCompatibleBitmap(NULL)
         , hOldBmp(NULL)

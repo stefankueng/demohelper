@@ -37,7 +37,7 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.cbClsExtra  = 0;
     wcx.cbWndExtra  = 0;
     wcx.hInstance   = hResource;
-    wcx.hCursor     = NULL;
+    wcx.hCursor     = LoadCursor(nullptr, IDC_ARROW);
     ResString clsname(hResource, IDS_APP_TITLE);
     wcx.lpszClassName = clsname;
     wcx.hIcon         = LoadIcon(hResource, MAKEINTRESOURCE(IDI_DEMOHELPER));
@@ -115,7 +115,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     // we're zooming,
                     // just stretch the part of the original window around the mouse pointer
                     POINT pt;
-                    GetCursorPos(&pt);
+                    auto  msgPos = GetMessagePos();
+                    pt.x         = GET_X_LPARAM(msgPos);
+                    pt.y         = GET_Y_LPARAM(msgPos);
                     DrawZoom(memdc, pt);
                 }
                 else
@@ -162,8 +164,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         {
             if (m_bInlineZoom)
             {
-                GetCursorPos(&m_ptInlineZoomStartPoint);
-                GetCursorPos(&m_ptInlineZoomEndPoint);
+                m_ptInlineZoomStartPoint.x = GET_X_LPARAM(lParam);
+                m_ptInlineZoomStartPoint.y = GET_Y_LPARAM(lParam);
+                m_ptInlineZoomEndPoint.x   = GET_X_LPARAM(lParam);
+                m_ptInlineZoomEndPoint.y   = GET_Y_LPARAM(lParam);
             }
             if (m_bZooming)
             {
@@ -171,8 +175,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 // now make the zoomed window the 'default'
                 HDC   hdc = GetDC(*this);
                 POINT pt;
-                GetCursorPos(&pt);
+                pt.x = GET_X_LPARAM(lParam);
+                pt.y = GET_Y_LPARAM(lParam);
                 DrawZoom(hdc, pt);
+                BitBlt(hDesktopCompatibleDC, 0, 0, GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN), hdc, 0, 0, SRCCOPY);
                 DeleteDC(hdc);
                 RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT | RDW_INVALIDATE);
             }
@@ -191,10 +197,15 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         case WM_LBUTTONUP:
             if (m_bInlineZoom)
             {
-                m_bInlineZoom = false;
+                m_bInlineZoom      = false;
+                auto x1            = GetSystemMetrics(SM_XVIRTUALSCREEN);
+                auto y1            = GetSystemMetrics(SM_YVIRTUALSCREEN);
+                auto nScreenWidth  = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+                auto nScreenHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+
                 StretchBlt(hDesktopCompatibleDC,
-                           0, 0,
-                           GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN),
+                           x1, y1,
+                           nScreenWidth, nScreenHeight,
                            hDesktopCompatibleDC,
                            m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y,
                            abs(m_ptInlineZoomStartPoint.x - m_ptInlineZoomEndPoint.x), abs(m_ptInlineZoomStartPoint.y - m_ptInlineZoomEndPoint.y),
@@ -220,7 +231,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     SetROP2(hDC, R2_NOT);
                     SelectObject(hDC, GetStockObject(NULL_BRUSH));
                     Rectangle(hDC, m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y, m_ptInlineZoomEndPoint.x, m_ptInlineZoomEndPoint.y);
-                    GetCursorPos(&m_ptInlineZoomEndPoint);
+                    m_ptInlineZoomEndPoint.x = GET_X_LPARAM(lParam);
+                    m_ptInlineZoomEndPoint.y = GET_Y_LPARAM(lParam);
                     Rectangle(hDC, m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y, m_ptInlineZoomEndPoint.x, m_ptInlineZoomEndPoint.y);
                     ReleaseDC(*this, hDC);
                 }
@@ -466,14 +478,15 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 
 bool CMainWindow::StartPresentationMode()
 {
-    int  nScreenWidth        = GetSystemMetrics(SM_CXSCREEN);
-    int  nScreenHeight       = GetSystemMetrics(SM_CYSCREEN);
-    HWND hDesktopWnd         = GetDesktopWindow();
-    HDC  hDesktopDC          = GetDC(hDesktopWnd);
+    auto x1                  = GetSystemMetrics(SM_XVIRTUALSCREEN);
+    auto y1                  = GetSystemMetrics(SM_YVIRTUALSCREEN);
+    auto nScreenWidth        = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    auto nScreenHeight       = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+    HDC  hDesktopDC          = GetDC(nullptr);
     hDesktopCompatibleDC     = CreateCompatibleDC(hDesktopDC);
     hDesktopCompatibleBitmap = CreateCompatibleBitmap(hDesktopDC, nScreenWidth, nScreenHeight);
     hOldBmp                  = (HBITMAP)SelectObject(hDesktopCompatibleDC, hDesktopCompatibleBitmap);
-    BitBlt(hDesktopCompatibleDC, 0, 0, nScreenWidth, nScreenHeight, hDesktopDC, 0, 0, SRCCOPY | CAPTUREBLT);
+    BitBlt(hDesktopCompatibleDC, 0, 0, nScreenWidth, nScreenHeight, hDesktopDC, x1, y1, SRCCOPY | CAPTUREBLT);
     CRegStdDWORD regShowCursor(_T("Software\\DemoHelper\\capturecursor"), TRUE);
     if (DWORD(regShowCursor))
     {
@@ -486,14 +499,18 @@ bool CMainWindow::StartPresentationMode()
             HICON    hIcon = CopyIcon(ci.hCursor);
             ICONINFO ii;
             GetIconInfo(hIcon, &ii);
-            DrawIcon(hDesktopCompatibleDC, ci.ptScreenPos.x - ii.xHotspot, ci.ptScreenPos.y - ii.yHotspot, hIcon);
+            DrawIcon(hDesktopCompatibleDC, x1 + ci.ptScreenPos.x - ii.xHotspot, y1 + ci.ptScreenPos.y - ii.yHotspot, hIcon);
             DestroyIcon(hIcon);
         }
     }
 
-    ReleaseDC(hDesktopWnd, hDesktopDC);
-
-    SetWindowPos(*this, HWND_TOP /*MOST*/, 0, 0, nScreenWidth, nScreenHeight, SWP_SHOWWINDOW | SWP_DRAWFRAME);
+    ReleaseDC(nullptr, hDesktopDC);
+#ifdef _DEBUG
+    auto topWnd = HWND_TOP;
+#else
+    auto topWnd = HWND_TOPMOST;
+#endif
+    SetWindowPos(*this, topWnd, x1, y1, nScreenWidth, nScreenHeight, SWP_SHOWWINDOW | SWP_DRAWFRAME);
     if (!m_bZooming)
     {
         if (m_hCursor)
@@ -503,7 +520,7 @@ bool CMainWindow::StartPresentationMode()
     }
     else
     {
-        SetCursor(NULL);
+        SetCursor(LoadCursor(nullptr, IDC_ARROW));
     }
     m_bInlineZoom = false;
 
@@ -567,25 +584,23 @@ bool CMainWindow::DrawZoom(HDC hdc, POINT pt)
     // to zoom, we need to stretch the part around the cursor to the full screen
     // zoomfactor 1 = whole screen
     // zoomfactor 2 = quarter screen to fullscreen
-    int cx          = GetSystemMetrics(SM_CXSCREEN);
-    int cy          = GetSystemMetrics(SM_CYSCREEN);
-    int zoomwindowx = int(float(cx) / m_zoomfactor);
-    int zoomwindowy = int(float(cy) / m_zoomfactor);
+    auto cx          = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    auto cy          = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+    auto zoomwindowx = long(float(cx) / m_zoomfactor);
+    auto zoomwindowy = long(float(cy) / m_zoomfactor);
 
-    Gdiplus::Rect desktopRC = {0, 0, cx, cy};
     // adjust the cursor position to the zoom factor
-    int x = pt.x * (cx - zoomwindowx) / cx;
-    int y = pt.y * (cy - zoomwindowy) / cy;
+    ScreenToClient(*this, &pt);
+    POINT resPt;
+    resPt.x = pt.x * (cx - zoomwindowx) / cx;
+    resPt.y = pt.y * (cy - zoomwindowy) / cy;
+    //ClientToScreen(*this, &resPt);
 
-    if (x < 0)
-        x = 0;
-    if (y < 0)
-        y = 0;
-    if (x + zoomwindowx > cx)
-        x = cx - zoomwindowx;
-    if (y + zoomwindowy > cy)
-        y = cy - zoomwindowy;
-    return !!StretchBlt(hdc, 0, 0, cx, cy, hDesktopCompatibleDC, x, y, zoomwindowx, zoomwindowy, SRCCOPY);
+    //if (x + zoomwindowx > (cx + x1))
+    //    x = cx - zoomwindowx;
+    //if (y + zoomwindowy > (cy + y1))
+    //    y = cy - zoomwindowy;
+    return !!StretchBlt(hdc, 0, 0, cx, cy, hDesktopCompatibleDC, resPt.x, resPt.y, zoomwindowx, zoomwindowy, SRCCOPY);
 }
 
 bool CMainWindow::UpdateCursor()
