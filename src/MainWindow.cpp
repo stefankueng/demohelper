@@ -392,7 +392,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
             if (m_bZooming)
             {
-                if (zDelta < 0)
+                if (zDelta > 0)
                 {
                     m_zoomfactor += 0.2f;
                     if (m_zoomfactor > 4.0f)
@@ -409,14 +409,14 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             {
                 if (wParam & MK_CONTROL)
                 {
-                    if (zDelta < 0)
+                    if (zDelta > 0)
                         DoCommand(ID_CMD_DECREASE);
                     else
                         DoCommand(ID_CMD_INCREASE);
                 }
                 else
                 {
-                    if (zDelta < 0)
+                    if (zDelta > 0)
                         DoCommand(ID_CMD_PREVCOLOR);
                     else
                         DoCommand(ID_CMD_NEXTCOLOR);
