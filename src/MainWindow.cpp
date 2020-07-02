@@ -28,7 +28,7 @@
 
 bool CMainWindow::RegisterAndCreateWindow()
 {
-    WNDCLASSEX wcx = { 0 };
+    WNDCLASSEX wcx = {0};
 
     // Fill in the window class structure with default parameters
     wcx.cbSize      = sizeof(WNDCLASSEX);
@@ -171,14 +171,16 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             }
             if (m_bZooming)
             {
-                m_bZooming = false;
                 // now make the zoomed window the 'default'
                 HDC   hdc = GetDC(*this);
                 POINT pt;
-                pt.x = GET_X_LPARAM(lParam);
-                pt.y = GET_Y_LPARAM(lParam);
+                auto  msgPos = GetMessagePos();
+                pt.x = GET_X_LPARAM(msgPos);
+                pt.y = GET_Y_LPARAM(msgPos);
                 DrawZoom(hdc, pt);
-                BitBlt(hDesktopCompatibleDC, 0, 0, GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN), hdc, 0, 0, SRCCOPY);
+                m_bZooming = false;
+                BitBlt(hDesktopCompatibleDC, 0, 0, GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN),
+                       hdc, 0, 0, SRCCOPY);
                 DeleteDC(hdc);
                 InvalidateRect(*this, nullptr, false);
             }
