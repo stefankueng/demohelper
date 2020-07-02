@@ -180,7 +180,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 DrawZoom(hdc, pt);
                 BitBlt(hDesktopCompatibleDC, 0, 0, GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN), hdc, 0, 0, SRCCOPY);
                 DeleteDC(hdc);
-                RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT | RDW_INVALIDATE);
+                InvalidateRect(*this, nullptr, false);
             }
             m_bDrawing = true;
             DrawLine drawLine;
@@ -211,7 +211,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                            abs(m_ptInlineZoomStartPoint.x - m_ptInlineZoomEndPoint.x), abs(m_ptInlineZoomStartPoint.y - m_ptInlineZoomEndPoint.y),
                            SRCCOPY);
                 UpdateCursor();
-                RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT | RDW_INVALIDATE);
+                InvalidateRect(*this, nullptr, false);
             }
             else
             {
@@ -239,7 +239,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             }
             else if (m_bZooming)
             {
-                RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT | RDW_INVALIDATE);
+                InvalidateRect(*this, nullptr, false);
             }
             else if (m_bDrawing)
             {
@@ -422,7 +422,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         DoCommand(ID_CMD_NEXTCOLOR);
                 }
             }
-            RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT | RDW_INVALIDATE);
+            InvalidateRect(*this, nullptr, false);
         }
         break;
         case WM_TIMER:
@@ -458,7 +458,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     else
                         ++it;
                 }
-                RedrawWindow(*this, NULL, NULL, RDW_INTERNALPAINT | RDW_INVALIDATE);
+                InvalidateRect(*this, nullptr, false);
             }
             break;
         case WM_DESTROY:
