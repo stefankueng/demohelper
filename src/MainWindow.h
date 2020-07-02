@@ -82,6 +82,14 @@ public:
         , m_bMarker(false)
         , m_bInlineZoom(false)
         , m_fadeseconds(0)
+        , m_hPreviousCursor(nullptr)
+        , m_lineStartShiftPoint({})
+        , m_ptInlineZoomStartPoint({})
+        , m_ptInlineZoomEndPoint({})
+        , m_oldalpha(0)
+        , m_oldcolorindex(0)
+        , m_oldpenwidth(2)
+        , niData({0})
     {
         SetWindowTitle((LPCTSTR)ResString(hResource, IDS_APP_TITLE));
         m_colors[0] = RGB(255, 255, 0);
