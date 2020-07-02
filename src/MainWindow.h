@@ -29,8 +29,6 @@
 #include <vector>
 #include <deque>
 
-#define LINEARRAYSIZE     4096
-#define MAX_NUMBEROFLINES 500
 #define DRAW_HOTKEY       100
 #define ZOOM_HOTKEY       101
 
