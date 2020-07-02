@@ -28,7 +28,7 @@
 
 bool CMainWindow::RegisterAndCreateWindow()
 {
-    WNDCLASSEX wcx;
+    WNDCLASSEX wcx = { 0 };
 
     // Fill in the window class structure with default parameters
     wcx.cbSize      = sizeof(WNDCLASSEX);
@@ -37,7 +37,7 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.cbClsExtra  = 0;
     wcx.cbWndExtra  = 0;
     wcx.hInstance   = hResource;
-    wcx.hCursor     = LoadCursor(nullptr, IDC_ARROW);
+    //wcx.hCursor     = LoadCursor(nullptr, IDC_ARROW);
     ResString clsname(hResource, IDS_APP_TITLE);
     wcx.lpszClassName = clsname;
     wcx.hIcon         = LoadIcon(hResource, MAKEINTRESOURCE(IDI_DEMOHELPER));
@@ -607,7 +607,7 @@ bool CMainWindow::UpdateCursor()
 {
     if (m_bZooming)
     {
-        SetCursor(NULL);
+        SetCursor(LoadCursor(nullptr, IDC_ARROW));
     }
     DestroyCursor(m_hCursor);
     m_hCursor = CreateDrawCursor(m_colors[m_colorindex], std::max(2, m_currentpenwidth));

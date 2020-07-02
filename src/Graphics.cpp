@@ -28,43 +28,51 @@ HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
     HDC hDC = ::GetDC(*this);
 
     // Create helper DC
-    HDC hMainDC = ::CreateCompatibleDC(hDC);
+    HDC hMainDC    = ::CreateCompatibleDC(hDC);
     HDC hAndMaskDC = ::CreateCompatibleDC(hDC);
     HDC hXorMaskDC = ::CreateCompatibleDC(hDC);
 
-    const auto cursorSizeX = CDPIAware::Instance().Scale(*this, GetSystemMetrics(SM_CXCURSOR));
-    const auto cursorSizeY = CDPIAware::Instance().Scale(*this, GetSystemMetrics(SM_CYCURSOR));
+    auto cursorSizeX = CDPIAware::Instance().Scale(*this, GetSystemMetrics(SM_CXCURSOR));
+    auto cursorSizeY = CDPIAware::Instance().Scale(*this, GetSystemMetrics(SM_CYCURSOR));
+
     // Create the mask bitmaps
-    auto hSourceBitmap = ::CreateCompatibleBitmap(hDC, cursorSizeX, cursorSizeY); // original
-    auto hAndMaskBitmap = ::CreateBitmap(cursorSizeX, cursorSizeY, 1, 1, NULL); // monochrome
-    auto hXorMaskBitmap  = ::CreateCompatibleBitmap(hDC, cursorSizeX, cursorSizeY); // color
+    auto hSourceBitmap  = ::CreateCompatibleBitmap(hDC, cursorSizeX, cursorSizeY); // original
+    auto hAndMaskBitmap = ::CreateBitmap(cursorSizeX, cursorSizeY, 1, 1, NULL);    // monochrome
+    auto hXorMaskBitmap = ::CreateCompatibleBitmap(hDC, cursorSizeX, cursorSizeY); // color
 
     // Release the system display DC
     ::ReleaseDC(*this, hDC);
 
     // Select the bitmaps to helper DC
-    auto hOldMainBitmap = (HBITMAP)::SelectObject(hMainDC, hSourceBitmap);
-    auto hOldAndMaskBitmap  = (HBITMAP)::SelectObject(hAndMaskDC, hAndMaskBitmap);
-    auto hOldXorMaskBitmap  = (HBITMAP)::SelectObject(hXorMaskDC, hXorMaskBitmap);
+    auto hOldMainBitmap    = (HBITMAP)::SelectObject(hMainDC, hSourceBitmap);
+    auto hOldAndMaskBitmap = (HBITMAP)::SelectObject(hAndMaskDC, hAndMaskBitmap);
+    auto hOldXorMaskBitmap = (HBITMAP)::SelectObject(hXorMaskDC, hXorMaskBitmap);
 
     // fill our bitmap with the 'transparent' color RGB(1,1,1)
     RECT rc;
-    rc.left = 0;
-    rc.top = 0;
-    rc.right = cursorSizeX;
+    rc.left   = 0;
+    rc.top    = 0;
+    rc.right  = cursorSizeX;
     rc.bottom = cursorSizeY;
-    SetBkColor(hMainDC, RGB(1,1,1));
+    SetBkColor(hMainDC, RGB(1, 1, 1));
     ::ExtTextOut(hMainDC, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL);
     // set up the pen and brush to draw
-    HPEN hPen = CreatePen(PS_SOLID, 1, color);
-    HPEN hOldPen = NULL;
+    HPEN   hPen      = CreatePen(PS_SOLID, 1, color);
+    HPEN   hOldPen   = NULL;
     HBRUSH hOldBrush = NULL;
-    hOldPen = (HPEN)SelectObject(hMainDC, hPen);
-    HBRUSH hBrush = CreateSolidBrush(color);
-    hOldBrush = (HBRUSH)SelectObject(hMainDC, hBrush);
+    hOldPen          = (HPEN)SelectObject(hMainDC, hPen);
+    HBRUSH hBrush    = CreateSolidBrush(color);
+    hOldBrush        = (HBRUSH)SelectObject(hMainDC, hBrush);
+
+    // draw the real cursor
+    HICON    hIcon = CopyIcon(LoadCursor(nullptr, IDC_ARROW));
+    ICONINFO ii;
+    GetIconInfo(hIcon, &ii);
+    DrawIcon(hMainDC, cursorSizeX / 2, cursorSizeY / 2, hIcon);
+    DestroyIcon(hIcon);
 
     // draw the brush circle
-    Ellipse(hMainDC, (cursorSizeX-penwidth)/2, (cursorSizeY-penwidth)/2, (cursorSizeX-penwidth)/2+penwidth, (cursorSizeY-penwidth)/2+penwidth);
+    Ellipse(hMainDC, (cursorSizeX - penwidth) / 2, (cursorSizeY - penwidth) / 2, (cursorSizeX - penwidth) / 2 + penwidth, (cursorSizeY - penwidth) / 2 + penwidth);
 
     SelectObject(hMainDC, hOldBrush);
     SelectObject(hMainDC, hOldPen);
@@ -73,7 +81,7 @@ HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
 
     // Assign the monochrome AND mask bitmap pixels so that a pixels of the source bitmap
     //    with 'clrTransparent' will be white pixels of the monochrome bitmap
-    ::SetBkColor(hMainDC, RGB(1,1,1));
+    ::SetBkColor(hMainDC, RGB(1, 1, 1));
     ::BitBlt(hAndMaskDC, 0, 0, cursorSizeX, cursorSizeY, hMainDC, 0, 0, SRCCOPY);
 
     // Assign the color XOR mask bitmap pixels so that a pixels of the source bitmap
@@ -82,7 +90,7 @@ HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
     ::SetBkColor(hXorMaskDC, RGB(0, 0, 0));
     ::SetTextColor(hXorMaskDC, RGB(255, 255, 255));
     ::BitBlt(hXorMaskDC, 0, 0, cursorSizeX, cursorSizeY, hAndMaskDC, 0, 0, SRCCOPY);
-    ::BitBlt(hXorMaskDC, 0, 0, cursorSizeX, cursorSizeY, hMainDC, 0,0, SRCAND);
+    ::BitBlt(hXorMaskDC, 0, 0, cursorSizeX, cursorSizeY, hMainDC, 0, 0, SRCAND);
 
     // Deselect bitmaps from the helper DC
     ::SelectObject(hMainDC, hOldMainBitmap);
@@ -94,13 +102,12 @@ HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
     ::DeleteDC(hAndMaskDC);
     ::DeleteDC(hMainDC);
 
-    ICONINFO iconinfo   = {0};
-    iconinfo.fIcon      = FALSE;
-    iconinfo.xHotspot   = cursorSizeX/2;
-    iconinfo.yHotspot   = cursorSizeY/2;
-    iconinfo.hbmMask    = hAndMaskBitmap;
-    iconinfo.hbmColor   = hXorMaskBitmap;
+    ICONINFO iconinfo = {0};
+    iconinfo.fIcon    = FALSE;
+    iconinfo.xHotspot = cursorSizeX / 2;
+    iconinfo.yHotspot = cursorSizeY / 2;
+    iconinfo.hbmMask  = hAndMaskBitmap;
+    iconinfo.hbmColor = hXorMaskBitmap;
 
     return ::CreateIconIndirect(&iconinfo);
 }
-
