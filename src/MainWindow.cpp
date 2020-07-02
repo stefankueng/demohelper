@@ -175,8 +175,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 HDC   hdc = GetDC(*this);
                 POINT pt;
                 auto  msgPos = GetMessagePos();
-                pt.x = GET_X_LPARAM(msgPos);
-                pt.y = GET_Y_LPARAM(msgPos);
+                pt.x         = GET_X_LPARAM(msgPos);
+                pt.y         = GET_Y_LPARAM(msgPos);
                 DrawZoom(hdc, pt);
                 m_bZooming = false;
                 BitBlt(hDesktopCompatibleDC, 0, 0, GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN),
@@ -568,7 +568,8 @@ void CMainWindow::RegisterHotKeys()
 
 bool CMainWindow::StartZoomingMode()
 {
-    m_bZooming = true;
+    m_bZooming      = true;
+    m_zoomfactor    = 1.2;
     StartPresentationMode();
     return true;
 }
