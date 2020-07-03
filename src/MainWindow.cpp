@@ -573,6 +573,9 @@ bool CMainWindow::EndPresentationMode()
         m_hCursor = NULL;
     }
     m_bInlineZoom = false;
+    m_zoomfactor = 1.2f;
+    m_colorindex = 1;
+    m_currentpenwidth = 6;
     return true;
 }
 

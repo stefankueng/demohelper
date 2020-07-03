@@ -88,7 +88,7 @@ public:
         , m_ptInlineZoomEndPoint({})
         , m_oldalpha(0)
         , m_oldcolorindex(0)
-        , m_oldpenwidth(2)
+        , m_oldpenwidth(6)
         , niData({0})
         , m_rcScreen({0})
     {
