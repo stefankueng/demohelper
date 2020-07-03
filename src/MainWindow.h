@@ -29,8 +29,8 @@
 #include <vector>
 #include <deque>
 
-#define DRAW_HOTKEY       100
-#define ZOOM_HOTKEY       101
+#define DRAW_HOTKEY 100
+#define ZOOM_HOTKEY 101
 
 #define TIMER_ID_DRAW 101
 #define TIMER_ID_ZOOM 102
@@ -90,6 +90,7 @@ public:
         , m_oldcolorindex(0)
         , m_oldpenwidth(2)
         , niData({0})
+        , m_rcScreen({0})
     {
         SetWindowTitle((LPCTSTR)ResString(hResource, IDS_APP_TITLE));
         m_colors[0] = RGB(255, 255, 0);
@@ -161,7 +162,7 @@ protected:
     POINT m_ptInlineZoomStartPoint;
     POINT m_ptInlineZoomEndPoint;
 
-    std::deque<DrawLine> m_drawLines;
+    RECT m_rcScreen;
 
-    static CHyperLink m_link;
+    std::deque<DrawLine> m_drawLines;
 };

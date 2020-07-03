@@ -109,7 +109,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <Manifest>
-      <EnableDpiAwareness>true</EnableDpiAwareness>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
     <ResourceCompile>
       <AdditionalIncludeDirectories>last</AdditionalIncludeDirectories>
@@ -132,7 +132,7 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <Manifest>
-      <EnableDpiAwareness>true</EnableDpiAwareness>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
     <ResourceCompile>
       <AdditionalIncludeDirectories>last</AdditionalIncludeDirectories>
@@ -162,7 +162,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <Manifest>
-      <EnableDpiAwareness>true</EnableDpiAwareness>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
     <ResourceCompile>
       <AdditionalIncludeDirectories>last</AdditionalIncludeDirectories>
@@ -190,7 +190,7 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <Manifest>
-      <EnableDpiAwareness>true</EnableDpiAwareness>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
     <ResourceCompile>
       <AdditionalIncludeDirectories>last</AdditionalIncludeDirectories>

@@ -1,6 +1,6 @@
-// demoHelper - screen drawing and presentation tool
+﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008, 2012, 2015 - Stefan Kueng
+// Copyright (C) 2007-2008, 2012, 2015, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -22,8 +22,6 @@
 #include "MainWindow.h"
 #include "Registry.h"
 
-CHyperLink  CMainWindow::m_link;
-
 BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
     switch (message)
@@ -32,15 +30,14 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
         {
             CRegStdDWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
             CRegStdDWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
-            CRegStdDWORD regCursor(_T("Software\\DemoHelper\\capturecursor"), TRUE);
+            CRegStdDWORD regMonitor(_T("Software\\DemoHelper\\allmonitors"), FALSE);
             CRegStdDWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_SETHOTKEY, (WPARAM)(DWORD)regZoom, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_SETHOTKEY, (WPARAM)(DWORD)regDraw, 0);
-            SendMessage(GetDlgItem(hwndDlg, IDC_CURSORCHECK), BM_SETCHECK, DWORD(regCursor) ? BST_CHECKED : BST_UNCHECKED, 0);
+            CheckRadioButton(hwndDlg, IDC_CURRENTMONITOR, IDC_ALLMONITORS, DWORD(regMonitor) ? IDC_ALLMONITORS : IDC_CURRENTMONITOR);
 
             TCHAR buffer[128] = {0};
             LoadString(g_hInstance, IDS_WEBLINK, buffer, _countof(buffer));
-            m_link.ConvertStaticToHyperlink(hwndDlg, IDC_WEBLINK, buffer);
             _stprintf_s(buffer, _countof(buffer), _T("%ld"), (DWORD)regFadeSeconds);
             SetWindowText(GetDlgItem(hwndDlg, IDC_FADESECONDS), buffer);
 
@@ -68,17 +65,16 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
             {
                 CRegStdDWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
                 CRegStdDWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
-                CRegStdDWORD regCursor(_T("Software\\DemoHelper\\capturecursor"), TRUE);
+                CRegStdDWORD regMonitor(_T("Software\\DemoHelper\\allmonitors"), FALSE);
                 CRegStdDWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 0);
                 LRESULT res = SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_GETHOTKEY, 0, 0);
                 regDraw = (DWORD)res;
                 res = SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_GETHOTKEY, 0, 0);
                 regZoom = (DWORD)res;
-                res = SendMessage(GetDlgItem(hwndDlg, IDC_CURSORCHECK), BM_GETCHECK, 0, 0);
-                regCursor = (res == BST_CHECKED ? TRUE : FALSE);
                 TCHAR buffer[128];
                 GetWindowText(GetDlgItem(hwndDlg, IDC_FADESECONDS), buffer, _countof(buffer));
                 regFadeSeconds = _ttol(buffer);
+                regMonitor = IsDlgButtonChecked(hwndDlg, IDC_ALLMONITORS) ? 1 : 0;
             }
             // Fall through.
         case IDCANCEL:

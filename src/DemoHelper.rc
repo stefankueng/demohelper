@@ -30,6 +30,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // remains consistent on all systems.
 IDI_DEMOHELPER          ICON                    "DemoHelper.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
@@ -92,29 +93,28 @@ END
 //
 
 IDD_OPTIONS DIALOGEX 0, 0, 232, 258
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "DemoHelper Options"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,115,237,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,175,237,50,14
     ICON            IDI_DEMOHELPER,IDC_MYICON2,7,7,20,20
-    LTEXT           "DemoHelper v1.2",IDC_STATIC,40,7,61,8
-    LTEXT           "Copyright 2006 Stefan Küng",IDC_STATIC,40,20,185,8
-    LTEXT           "Stefan's Tools - stefanstools.sourceforge.net",IDC_WEBLINK,40,32,185,8
-    CONTROL         "Capture the mouse cursor",IDC_CURSORCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,55,99,10
+    GROUPBOX        "Misc",IDC_STATIC,7,25,218,47
+    CONTROL         "Current Monitor",IDC_CURRENTMONITOR,"Button",BS_AUTORADIOBUTTON,14,53,70,10
+    CONTROL         "All Monitors",IDC_ALLMONITORS,"Button",BS_AUTORADIOBUTTON,94,53,80,10
+    GROUPBOX        "Zoom",IDC_STATIC,7,76,218,62
     LTEXT           "After enabling the zoom mode, you can zoom in and out using the mouse wheel or the up/down arrow keys. Exit zoom mode with Escape.",IDC_STATIC,14,86,205,26
     LTEXT           "Zoom Mode:",IDC_STATIC,14,116,54,8
     CONTROL         "",IDC_HOTKEY_ZOOMMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,113,125,14
+    GROUPBOX        "Draw",IDC_STATIC,7,143,218,88
     LTEXT           "After enabling the drawing mode, increase or decrease the pen size with the up/down arrow keys. Cycle through the available colors with the right/left arrow keys. Erase the last line with the Backspace key.",IDC_STATIC,14,155,205,37
     LTEXT           "Draw Mode:",IDC_STATIC,14,198,54,8
     CONTROL         "",IDC_HOTKEY_DRAWMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,195,125,14
     LTEXT           "Remove lines after",IDC_STATIC,14,216,61,8
     EDITTEXT        IDC_FADESECONDS,94,213,40,14,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "seconds",IDC_STATIC,139,216,27,8
-    GROUPBOX        "Misc",IDC_STATIC,7,43,218,29
-    GROUPBOX        "Zoom",IDC_STATIC,7,76,218,62
-    GROUPBOX        "Draw",IDC_STATIC,7,143,218,88
+    DEFPUSHBUTTON   "OK",IDOK,115,237,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,175,237,50,14
+    LTEXT           "Whether to capture only the monitor where the cursor is at, or the whole virtual screen covering all monitors.",IDC_STATIC,14,33,205,19
 END
 
 IDD_HELPDIALOG DIALOGEX 0, 0, 263, 276

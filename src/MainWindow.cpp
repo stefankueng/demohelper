@@ -108,8 +108,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         case WM_PAINT:
         {
             ProfileTimer profiler(L"WM_PAINT");
-            PAINTSTRUCT ps;
-            HDC         hdc = BeginPaint(*this, &ps);
+            PAINTSTRUCT  ps;
+            HDC          hdc = BeginPaint(*this, &ps);
             {
                 CMemDC memdc(hdc, ps.rcPaint);
                 if (m_bZooming)
@@ -180,8 +180,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 pt.x         = GET_X_LPARAM(msgPos);
                 pt.y         = GET_Y_LPARAM(msgPos);
                 DrawZoom(hdc, pt);
-                m_bZooming = false;
-                BitBlt(hDesktopCompatibleDC, 0, 0, GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN),
+                m_bZooming         = false;
+                auto nScreenWidth  = m_rcScreen.right - m_rcScreen.left;
+                auto nScreenHeight = m_rcScreen.bottom - m_rcScreen.top;
+
+                BitBlt(hDesktopCompatibleDC, 0, 0, nScreenWidth, nScreenHeight,
                        hdc, 0, 0, SRCCOPY);
                 DeleteDC(hdc);
                 InvalidateRect(*this, nullptr, false);
@@ -202,13 +205,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             if (m_bInlineZoom)
             {
                 m_bInlineZoom      = false;
-                auto x1            = GetSystemMetrics(SM_XVIRTUALSCREEN);
-                auto y1            = GetSystemMetrics(SM_YVIRTUALSCREEN);
-                auto nScreenWidth  = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-                auto nScreenHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+                auto nScreenWidth  = m_rcScreen.right - m_rcScreen.left;
+                auto nScreenHeight = m_rcScreen.bottom - m_rcScreen.top;
 
                 StretchBlt(hDesktopCompatibleDC,
-                           x1, y1,
+                           m_rcScreen.left, m_rcScreen.top,
                            nScreenWidth, nScreenHeight,
                            hDesktopCompatibleDC,
                            m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y,
@@ -485,39 +486,56 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 
 bool CMainWindow::StartPresentationMode()
 {
-    auto x1                  = GetSystemMetrics(SM_XVIRTUALSCREEN);
-    auto y1                  = GetSystemMetrics(SM_YVIRTUALSCREEN);
-    auto nScreenWidth        = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-    auto nScreenHeight       = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-    HDC  hDesktopDC          = GetDC(nullptr);
+    int          nScreenWidth  = 0;
+    int          nScreenHeight = 0;
+    std::wstring devName;
+    auto         allMonitors = !!DWORD(CRegStdDWORD(_T("Software\\DemoHelper\\allmonitors"), FALSE));
+    if (allMonitors)
+    {
+        m_rcScreen.left   = GetSystemMetrics(SM_XVIRTUALSCREEN);
+        m_rcScreen.top    = GetSystemMetrics(SM_YVIRTUALSCREEN);
+        nScreenWidth      = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+        nScreenHeight     = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+        m_rcScreen.right  = m_rcScreen.left + nScreenWidth;
+        m_rcScreen.bottom = m_rcScreen.top + nScreenHeight;
+    }
+    else
+    {
+        POINT pt;
+        GetCursorPos(&pt);
+        auto          hMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+        MONITORINFOEX mi       = {};
+        mi.cbSize              = sizeof(MONITORINFOEX);
+        GetMonitorInfo(hMonitor, &mi);
+        m_rcScreen    = mi.rcMonitor;
+        nScreenWidth  = m_rcScreen.right - m_rcScreen.left;
+        nScreenHeight = m_rcScreen.bottom - m_rcScreen.top;
+        devName       = mi.szDevice;
+    }
+
+    HDC hDesktopDC = nullptr;
+    if (allMonitors)
+        hDesktopDC = GetDC(nullptr);
+    else
+        hDesktopDC = CreateDC(nullptr, devName.c_str(), nullptr, nullptr);
     hDesktopCompatibleDC     = CreateCompatibleDC(hDesktopDC);
     hDesktopCompatibleBitmap = CreateCompatibleBitmap(hDesktopDC, nScreenWidth, nScreenHeight);
     hOldBmp                  = (HBITMAP)SelectObject(hDesktopCompatibleDC, hDesktopCompatibleBitmap);
-    BitBlt(hDesktopCompatibleDC, 0, 0, nScreenWidth, nScreenHeight, hDesktopDC, x1, y1, SRCCOPY | CAPTUREBLT);
-    CRegStdDWORD regShowCursor(_T("Software\\DemoHelper\\capturecursor"), TRUE);
-    if (DWORD(regShowCursor))
-    {
-        // capture the cursor
-        CURSORINFO ci;
-        ci.cbSize = sizeof(CURSORINFO);
-        GetCursorInfo(&ci);
-        if (ci.flags & CURSOR_SHOWING)
-        {
-            HICON    hIcon = CopyIcon(ci.hCursor);
-            ICONINFO ii;
-            GetIconInfo(hIcon, &ii);
-            DrawIcon(hDesktopCompatibleDC, x1 + ci.ptScreenPos.x - ii.xHotspot, y1 + ci.ptScreenPos.y - ii.yHotspot, hIcon);
-            DestroyIcon(hIcon);
-        }
-    }
+    BitBlt(hDesktopCompatibleDC, 0, 0, nScreenWidth, nScreenHeight,
+           hDesktopDC, allMonitors ? m_rcScreen.left : 0, allMonitors ? m_rcScreen.top : 0,
+           SRCCOPY | CAPTUREBLT);
 
-    ReleaseDC(nullptr, hDesktopDC);
 #ifdef _DEBUG
     auto topWnd = HWND_TOP;
 #else
     auto topWnd = HWND_TOPMOST;
 #endif
-    SetWindowPos(*this, topWnd, x1, y1, nScreenWidth, nScreenHeight, SWP_SHOWWINDOW | SWP_DRAWFRAME);
+    SetWindowPos(*this, topWnd, m_rcScreen.left, m_rcScreen.top, nScreenWidth, nScreenHeight, SWP_SHOWWINDOW | SWP_DRAWFRAME);
+
+    if (devName.empty())
+        ReleaseDC(nullptr, hDesktopDC);
+    else
+        DeleteDC(hDesktopDC);
     if (!m_bZooming)
     {
         if (m_hCursor)
@@ -592,8 +610,8 @@ bool CMainWindow::DrawZoom(HDC hdc, POINT pt)
     // to zoom, we need to stretch the part around the cursor to the full screen
     // zoomfactor 1 = whole screen
     // zoomfactor 2 = quarter screen to fullscreen
-    auto cx          = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-    auto cy          = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+    auto cx          = m_rcScreen.right - m_rcScreen.left;
+    auto cy          = m_rcScreen.bottom - m_rcScreen.top;
     auto zoomwindowx = long(float(cx) / m_zoomfactor);
     auto zoomwindowy = long(float(cy) / m_zoomfactor);
 
@@ -602,12 +620,7 @@ bool CMainWindow::DrawZoom(HDC hdc, POINT pt)
     POINT resPt;
     resPt.x = pt.x * (cx - zoomwindowx) / cx;
     resPt.y = pt.y * (cy - zoomwindowy) / cy;
-    //ClientToScreen(*this, &resPt);
 
-    //if (x + zoomwindowx > (cx + x1))
-    //    x = cx - zoomwindowx;
-    //if (y + zoomwindowy > (cy + y1))
-    //    y = cy - zoomwindowy;
     return !!StretchBlt(hdc, 0, 0, cx, cy, hDesktopCompatibleDC, resPt.x, resPt.y, zoomwindowx, zoomwindowy, SRCCOPY);
 }
 
