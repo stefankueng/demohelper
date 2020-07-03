@@ -29,3 +29,5 @@
 #undef min
 #undef max
 #include "OnOutOfScope.h"
+
+#define DEBUGOUTPUTREGPATH L"Software\\DemoHelper\\Debug"

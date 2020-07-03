@@ -48,6 +48,9 @@
     <ClInclude Include="..\sktoolslib\DPIAware.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="..\sktoolslib\DebugOutput.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DemoHelper.ico">
@@ -111,6 +114,9 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sktoolslib\DebugOutput.cpp">
+      <Filter>sktoolslib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

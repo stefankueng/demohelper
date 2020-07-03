@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "Registry.h"
 #include "DPIAware.h"
+#include "DebugOutput.h"
 
 #include <algorithm>
 
@@ -106,6 +107,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             return 1; // don't erase the background!
         case WM_PAINT:
         {
+            ProfileTimer profiler(L"WM_PAINT");
             PAINTSTRUCT ps;
             HDC         hdc = BeginPaint(*this, &ps);
             {
@@ -451,16 +453,19 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 }
                 // go through all lines again, and remove all lines with a pen width
                 // of zero
+                bool doRedraw = !m_drawLines.empty();
                 for (auto it = m_drawLines.begin(); it != m_drawLines.end();)
                 {
                     if (it->alpha == 0)
                     {
-                        it = m_drawLines.erase(it);
+                        it       = m_drawLines.erase(it);
+                        doRedraw = true;
                     }
                     else
                         ++it;
                 }
-                InvalidateRect(*this, nullptr, false);
+                if (doRedraw)
+                    InvalidateRect(*this, nullptr, false);
             }
             break;
         case WM_DESTROY:
@@ -568,8 +573,8 @@ void CMainWindow::RegisterHotKeys()
 
 bool CMainWindow::StartZoomingMode()
 {
-    m_bZooming      = true;
-    m_zoomfactor    = 1.2;
+    m_bZooming   = true;
+    m_zoomfactor = 1.2f;
     StartPresentationMode();
     return true;
 }
