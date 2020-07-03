@@ -197,6 +197,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\sktoolslib\AnimationManager.cpp" />
     <ClCompile Include="..\sktoolslib\BaseWindow.cpp" />
     <ClCompile Include="..\sktoolslib\DebugOutput.cpp" />
     <ClCompile Include="..\sktoolslib\hyperlink.cpp" />
@@ -212,6 +213,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\sktoolslib\AnimationManager.h" />
     <ClInclude Include="..\sktoolslib\BaseWindow.h" />
     <ClInclude Include="..\sktoolslib\DebugOutput.h" />
     <ClInclude Include="..\sktoolslib\DPIAware.h" />

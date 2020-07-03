@@ -409,6 +409,12 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     if (m_zoomfactor < 1.0f)
                         m_zoomfactor = 1.0f;
                 }
+                auto transZoom  = Animator::Instance().CreateLinearTransition(0.3, m_zoomfactor);
+                auto storyBoard = Animator::Instance().CreateStoryBoard();
+                storyBoard->AddTransition(m_AnimVarZoom, transZoom);
+                Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                    InvalidateRect(*this, nullptr, false);
+                });
             }
             else
             {
@@ -572,9 +578,9 @@ bool CMainWindow::EndPresentationMode()
         DestroyCursor(m_hCursor);
         m_hCursor = NULL;
     }
-    m_bInlineZoom = false;
-    m_zoomfactor = 1.2f;
-    m_colorindex = 1;
+    m_bInlineZoom     = false;
+    m_zoomfactor      = 1.2f;
+    m_colorindex      = 1;
     m_currentpenwidth = 6;
     return true;
 }
@@ -594,8 +600,14 @@ void CMainWindow::RegisterHotKeys()
 
 bool CMainWindow::StartZoomingMode()
 {
-    m_bZooming   = true;
-    m_zoomfactor = 1.2f;
+    m_bZooming      = true;
+    m_zoomfactor    = 1.2f;
+    auto transZoom  = Animator::Instance().CreateLinearTransition(0.5, m_zoomfactor);
+    auto storyBoard = Animator::Instance().CreateStoryBoard();
+    storyBoard->AddTransition(m_AnimVarZoom, transZoom);
+    Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+        InvalidateRect(*this, nullptr, false);
+    });
     StartPresentationMode();
     return true;
 }
@@ -615,8 +627,9 @@ bool CMainWindow::DrawZoom(HDC hdc, POINT pt)
     // zoomfactor 2 = quarter screen to fullscreen
     auto cx          = m_rcScreen.right - m_rcScreen.left;
     auto cy          = m_rcScreen.bottom - m_rcScreen.top;
-    auto zoomwindowx = long(float(cx) / m_zoomfactor);
-    auto zoomwindowy = long(float(cy) / m_zoomfactor);
+    auto zoomfactor  = Animator::GetValue(m_AnimVarZoom);
+    auto zoomwindowx = long(double(cx) / zoomfactor);
+    auto zoomwindowy = long(double(cy) / zoomfactor);
 
     // adjust the cursor position to the zoom factor
     ScreenToClient(*this, &pt);

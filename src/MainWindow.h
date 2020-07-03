@@ -23,6 +23,7 @@
 #include "resource.h"
 #include "hyperlink.h"
 #include "MemDC.h"
+#include "AnimationManager.h"
 #include <shellapi.h>
 #include <shlwapi.h>
 #include <commctrl.h>
@@ -93,16 +94,17 @@ public:
         , m_rcScreen({0})
     {
         SetWindowTitle((LPCTSTR)ResString(hResource, IDS_APP_TITLE));
-        m_colors[0] = RGB(255, 255, 0);
-        m_colors[1] = RGB(255, 0, 0);
-        m_colors[2] = RGB(150, 0, 0);
-        m_colors[3] = RGB(0, 255, 0);
-        m_colors[4] = RGB(0, 150, 0);
-        m_colors[5] = RGB(0, 0, 255);
-        m_colors[6] = RGB(0, 0, 150);
-        m_colors[7] = RGB(0, 0, 0);
-        m_colors[8] = RGB(150, 150, 150);
-        m_colors[9] = RGB(0, 255, 255);
+        m_colors[0]   = RGB(255, 255, 0);
+        m_colors[1]   = RGB(255, 0, 0);
+        m_colors[2]   = RGB(150, 0, 0);
+        m_colors[3]   = RGB(0, 255, 0);
+        m_colors[4]   = RGB(0, 150, 0);
+        m_colors[5]   = RGB(0, 0, 255);
+        m_colors[6]   = RGB(0, 0, 150);
+        m_colors[7]   = RGB(0, 0, 0);
+        m_colors[8]   = RGB(150, 150, 150);
+        m_colors[9]   = RGB(0, 255, 255);
+        m_AnimVarZoom = Animator::Instance().CreateAnimationVariable(1.2);
     };
     ~CMainWindow(void){};
 
@@ -162,7 +164,7 @@ protected:
     POINT m_ptInlineZoomStartPoint;
     POINT m_ptInlineZoomEndPoint;
 
-    RECT m_rcScreen;
-
-    std::deque<DrawLine> m_drawLines;
+    RECT                    m_rcScreen;
+    IUIAnimationVariablePtr m_AnimVarZoom;
+    std::deque<DrawLine>    m_drawLines;
 };
