@@ -1,6 +1,6 @@
-// demoHelper - screen drawing and presentation tool
+﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008 - Stefan Kueng
+// Copyright (C) 2007-2008, 2020 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,7 +20,6 @@
 #include "stdafx.h"
 #include "DemoHelper.h"
 #include "MainWindow.h"
-#include "Registry.h"
 
 
 BOOL CALLBACK CMainWindow::HelpDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM /*lParam*/)

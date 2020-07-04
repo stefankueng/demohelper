@@ -42,9 +42,6 @@
     <ClInclude Include="..\sktoolslib\hyperlink.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
-    <ClInclude Include="..\sktoolslib\Registry.h">
-      <Filter>sktoolslib</Filter>
-    </ClInclude>
     <ClInclude Include="..\sktoolslib\DPIAware.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
@@ -52,6 +49,21 @@
       <Filter>sktoolslib</Filter>
     </ClInclude>
     <ClInclude Include="..\sktoolslib\AnimationManager.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sktoolslib\SimpleIni.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sktoolslib\IniSettings.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sktoolslib\PathUtils.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sktoolslib\StringUtils.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sktoolslib\Registry.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
   </ItemGroup>
@@ -94,9 +106,6 @@
     <ClCompile Include="..\sktoolslib\hyperlink.cpp">
       <Filter>sktoolslib</Filter>
     </ClCompile>
-    <ClCompile Include="..\sktoolslib\Registry.cpp">
-      <Filter>sktoolslib</Filter>
-    </ClCompile>
     <ClCompile Include="Commands.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -122,6 +131,18 @@
       <Filter>sktoolslib</Filter>
     </ClCompile>
     <ClCompile Include="..\sktoolslib\AnimationManager.cpp">
+      <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sktoolslib\IniSettings.cpp">
+      <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sktoolslib\PathUtils.cpp">
+      <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sktoolslib\StringUtils.cpp">
+      <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sktoolslib\Registry.cpp">
       <Filter>sktoolslib</Filter>
     </ClCompile>
   </ItemGroup>

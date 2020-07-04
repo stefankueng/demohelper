@@ -19,9 +19,9 @@
 
 #include "stdafx.h"
 #include "MainWindow.h"
-#include "Registry.h"
 #include "DPIAware.h"
 #include "DebugOutput.h"
+#include "IniSettings.h"
 
 #include <algorithm>
 
@@ -90,14 +90,14 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         {
             WORD key = MAKEWORD(HIWORD(lParam), LOWORD(lParam));
             key      = HotKey2HotKeyControl(key);
-            CRegStdDWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
-            CRegStdDWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
-            if (key == (WORD)(DWORD)regZoom)
+            WORD         zoom = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231);
+            WORD         draw = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232);
+            if (key == zoom)
             {
                 m_bZooming = true;
                 StartZoomingMode();
             }
-            else if (key == (WORD)(DWORD)regDraw)
+            else if (key == draw)
             {
                 StartPresentationMode();
             }
@@ -495,7 +495,7 @@ bool CMainWindow::StartPresentationMode()
     int          nScreenWidth  = 0;
     int          nScreenHeight = 0;
     std::wstring devName;
-    auto         allMonitors = !!DWORD(CRegStdDWORD(_T("Software\\DemoHelper\\allmonitors"), FALSE));
+    auto         allMonitors = CIniSettings::Instance().GetInt64(L"Misc", L"allmonitors", 0) != 0;
     if (allMonitors)
     {
         m_rcScreen.left   = GetSystemMetrics(SM_XVIRTUALSCREEN);
@@ -555,8 +555,7 @@ bool CMainWindow::StartPresentationMode()
     }
     m_bInlineZoom = false;
 
-    CRegStdDWORD regFadeSeconds(_T("Software\\DemoHelper\\fadeseconds"), 0);
-    m_fadeseconds = int(DWORD(regFadeSeconds));
+    m_fadeseconds = (int)CIniSettings::Instance().GetInt64(L"Draw", L"fadeseconds", 0);
     if (m_fadeseconds > 0)
     {
         ::SetTimer(*this, TIMER_ID_FADE, 100, NULL);
@@ -587,10 +586,8 @@ bool CMainWindow::EndPresentationMode()
 
 void CMainWindow::RegisterHotKeys()
 {
-    CRegStdDWORD regZoom(_T("Software\\DemoHelper\\zoomhotkey"), 0x331);
-    CRegStdDWORD regDraw(_T("Software\\DemoHelper\\drawhotkey"), 0x332);
-    WORD         zoom = (WORD)(DWORD)regZoom;
-    WORD         draw = (WORD)(DWORD)regDraw;
+    WORD         zoom = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231);
+    WORD         draw = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232);
     zoom              = HotKeyControl2HotKey(zoom);
     draw              = HotKeyControl2HotKey(draw);
 

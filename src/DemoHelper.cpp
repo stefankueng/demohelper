@@ -20,6 +20,8 @@
 #include "stdafx.h"
 #include "DemoHelper.h"
 #include "MainWindow.h"
+#include "IniSettings.h"
+#include "PathUtils.h"
 
 // Global Variables:
 HINSTANCE g_hInstance; // current instance
@@ -47,6 +49,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     g_hResource = hInstance;
     g_hInstance = hInstance;
 
+    CIniSettings::Instance().SetIniPath(CPathUtils::GetModuleDir() + L"\\DemoHelper.ini");
+
     ULONG_PTR                    gdiplusToken;
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
@@ -66,6 +70,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                 DispatchMessage(&msg);
             }
         }
+        CIniSettings::Instance().Save();
         return (int)msg.wParam;
     }
     return 1;

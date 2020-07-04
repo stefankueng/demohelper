@@ -201,7 +201,10 @@
     <ClCompile Include="..\sktoolslib\BaseWindow.cpp" />
     <ClCompile Include="..\sktoolslib\DebugOutput.cpp" />
     <ClCompile Include="..\sktoolslib\hyperlink.cpp" />
+    <ClCompile Include="..\sktoolslib\IniSettings.cpp" />
+    <ClCompile Include="..\sktoolslib\PathUtils.cpp" />
     <ClCompile Include="..\sktoolslib\Registry.cpp" />
+    <ClCompile Include="..\sktoolslib\StringUtils.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="DemoHelper.cpp" />
     <ClCompile Include="Graphics.cpp" />
@@ -218,7 +221,11 @@
     <ClInclude Include="..\sktoolslib\DebugOutput.h" />
     <ClInclude Include="..\sktoolslib\DPIAware.h" />
     <ClInclude Include="..\sktoolslib\hyperlink.h" />
+    <ClInclude Include="..\sktoolslib\IniSettings.h" />
+    <ClInclude Include="..\sktoolslib\PathUtils.h" />
     <ClInclude Include="..\sktoolslib\Registry.h" />
+    <ClInclude Include="..\sktoolslib\SimpleIni.h" />
+    <ClInclude Include="..\sktoolslib\StringUtils.h" />
     <ClInclude Include="DemoHelper.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MemDC.h" />
