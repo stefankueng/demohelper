@@ -209,6 +209,7 @@
     <ClCompile Include="DemoHelper.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="HelpDlg.cpp" />
+    <ClCompile Include="KeyboardOverlay.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="OptionsDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -227,6 +228,7 @@
     <ClInclude Include="..\sktoolslib\SimpleIni.h" />
     <ClInclude Include="..\sktoolslib\StringUtils.h" />
     <ClInclude Include="DemoHelper.h" />
+    <ClInclude Include="KeyboardOverlay.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MemDC.h" />
     <ClInclude Include="resource.h" />

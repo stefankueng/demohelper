@@ -26,6 +26,194 @@
 #include <algorithm>
 
 #define TRAY_WM_MESSAGE WM_APP + 1
+extern HINSTANCE g_hInstance; // current instance
+extern HINSTANCE g_hResource; // the resource dll
+
+HHOOK               CMainWindow::m_hKeyboardHook   = 0;
+HHOOK               CMainWindow::m_hMouseHook      = 0;
+DWORD               CMainWindow::m_lastHookTime    = 0;
+POINT               CMainWindow::m_lastHookPoint   = {0};
+WPARAM              CMainWindow::m_lastHookMsg     = 0;
+RECT                CMainWindow::m_lastOverlayPos  = {0};
+CKeyboardOverlayWnd CMainWindow::m_keyboardOverlay = CKeyboardOverlayWnd(g_hInstance, nullptr);
+
+LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    if (nCode == 0)
+    {
+        std::wstring    text;
+        MSLLHOOKSTRUCT* phs      = (MSLLHOOKSTRUCT*)lParam;
+        auto            bControl = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+        auto            bAlt     = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
+        auto            bShift   = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+        if ((bControl))
+            text += L"Ctrl +\r\n";
+        if (bAlt)
+            text += L"Alt +\r\n";
+        if (bShift)
+            text += L"Shift +\r\n";
+        switch (wParam)
+        {
+            case WM_LBUTTONDOWN:
+            {
+                bool dbl = false;
+                if (m_lastHookMsg == wParam)
+                {
+                    if (m_lastHookTime + GetDoubleClickTime() > phs->time)
+                    {
+                        if ((abs(m_lastHookPoint.x - phs->pt.x) <= GetSystemMetrics(SM_CXDOUBLECLK)) &&
+                            (abs(m_lastHookPoint.y - phs->pt.y) <= GetSystemMetrics(SM_CYDOUBLECLK)))
+                        {
+                            text += L"left double-click";
+                            dbl = true;
+                        }
+                    }
+                }
+                if (!dbl)
+                    text += L"left click";
+                m_lastHookMsg   = wParam;
+                m_lastHookPoint = phs->pt;
+                m_lastHookTime  = phs->time;
+            }
+            break;
+            case WM_RBUTTONDOWN:
+            {
+                bool dbl = false;
+                if (m_lastHookMsg == wParam)
+                {
+                    if (m_lastHookTime + GetDoubleClickTime() > phs->time)
+                    {
+                        if ((abs(m_lastHookPoint.x - phs->pt.x) <= GetSystemMetrics(SM_CXDOUBLECLK)) &&
+                            (abs(m_lastHookPoint.y - phs->pt.y) <= GetSystemMetrics(SM_CYDOUBLECLK)))
+                        {
+                            text += L"right double-click";
+                            dbl = true;
+                        }
+                    }
+                }
+                if (!dbl)
+                    text += L"right click";
+                m_lastHookMsg   = wParam;
+                m_lastHookPoint = phs->pt;
+                m_lastHookTime  = phs->time;
+            }
+            break;
+            case WM_MBUTTONDOWN:
+            {
+                bool dbl = false;
+                if (m_lastHookMsg == wParam)
+                {
+                    if (m_lastHookTime + GetDoubleClickTime() > phs->time)
+                    {
+                        if ((abs(m_lastHookPoint.x - phs->pt.x) <= GetSystemMetrics(SM_CXDOUBLECLK)) &&
+                            (abs(m_lastHookPoint.y - phs->pt.y) <= GetSystemMetrics(SM_CYDOUBLECLK)))
+                        {
+                            text += L"middle double-click";
+                            dbl = true;
+                        }
+                    }
+                }
+                if (!dbl)
+                    text += L"middle click";
+                m_lastHookMsg   = wParam;
+                m_lastHookPoint = phs->pt;
+                m_lastHookTime  = phs->time;
+            }
+            break;
+            default:
+                break;
+        }
+        if (!text.empty())
+        {
+            m_keyboardOverlay.Show(text);
+
+            auto          hMonitor = MonitorFromPoint(phs->pt, MONITOR_DEFAULTTOPRIMARY);
+            MONITORINFOEX mi       = {};
+            mi.cbSize              = sizeof(MONITORINFOEX);
+            GetMonitorInfo(hMonitor, &mi);
+            const long width  = CDPIAware::Instance().Scale(nullptr, 180);
+            const long height = CDPIAware::Instance().Scale(nullptr, 100);
+            if ((m_lastOverlayPos.left == mi.rcWork.left) &&
+                (m_lastOverlayPos.top == mi.rcWork.top) &&
+                (m_lastOverlayPos.right == mi.rcWork.right) &&
+                (m_lastOverlayPos.bottom == mi.rcWork.bottom))
+                ShowWindow(m_keyboardOverlay, SW_SHOWNOACTIVATE);
+            else
+                SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, mi.rcWork.right - width, mi.rcWork.bottom - height, width, height, SWP_SHOWWINDOW);
+            m_lastOverlayPos = mi.rcWork;
+        }
+    }
+    return CallNextHookEx(m_hMouseHook, nCode, wParam, lParam);
+}
+LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    // lParam is cast as KBDLLHOOKSTRUCT
+    KBDLLHOOKSTRUCT keyInfo = *((KBDLLHOOKSTRUCT*)lParam);
+
+    // wParam is the The identifier of the keyboard message.
+    // This parameter can be one of the following messages: WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, or WM_SYSKEYUP.
+    switch (wParam)
+    {
+        case WM_KEYDOWN:
+            wchar_t buffer[1024] = {};
+            DWORD   dwMsg        = 1;
+            dwMsg += keyInfo.scanCode << 16;
+            dwMsg += keyInfo.flags << 24;
+
+            std::wstring text;
+
+            auto bControl = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+            auto bAlt     = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
+            auto bShift   = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+            if ((bControl))
+                text += L"Ctrl +\r\n";
+            if (bAlt)
+                text += L"Alt +\r\n";
+            if (bShift)
+                text += L"Shift +\r\n";
+            switch (keyInfo.vkCode)
+            {
+                case VK_CONTROL:
+                case VK_SHIFT:
+                case VK_MENU:
+                case VK_LSHIFT:
+                case VK_RSHIFT:
+                case VK_LCONTROL:
+                case VK_RCONTROL:
+                case VK_LMENU:
+                case VK_RMENU:
+                    break;
+                default:
+                    GetKeyNameText((LONG)dwMsg, buffer, sizeof(buffer));
+                    if ((wcslen(buffer) > 1) || bControl || bAlt || bShift)
+                    {
+                        text += buffer;
+                        m_keyboardOverlay.Show(text);
+
+                        auto          hFocus   = GetFocus();
+                        auto          hMonitor = MonitorFromWindow(hFocus, MONITOR_DEFAULTTOPRIMARY);
+                        MONITORINFOEX mi       = {};
+                        mi.cbSize              = sizeof(MONITORINFOEX);
+                        GetMonitorInfo(hMonitor, &mi);
+                        const long width  = CDPIAware::Instance().Scale(hFocus, 180);
+                        const long height = CDPIAware::Instance().Scale(hFocus, 100);
+                        if ((m_lastOverlayPos.left == mi.rcWork.left) &&
+                            (m_lastOverlayPos.top == mi.rcWork.top) &&
+                            (m_lastOverlayPos.right == mi.rcWork.right) &&
+                            (m_lastOverlayPos.bottom == mi.rcWork.bottom))
+                            ShowWindow(m_keyboardOverlay, SW_SHOWNOACTIVATE);
+                        else
+                            SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, mi.rcWork.right - width, mi.rcWork.bottom - height, width, height, SWP_SHOWWINDOW);
+                        m_lastOverlayPos = mi.rcWork;
+                    }
+                    break;
+            }
+
+            break;
+    }
+    // Passes the hook information to the next hook procedure. So other hooks can work
+    return CallNextHookEx(m_hKeyboardHook, nCode, wParam, lParam);
+}
 
 bool CMainWindow::RegisterAndCreateWindow()
 {
@@ -81,6 +269,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         {
             m_hwnd = hwnd;
             RegisterHotKeys();
+            m_hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, g_hInstance, 0);
+            m_hMouseHook    = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, g_hInstance, 0);
         }
         break;
         case WM_COMMAND:
@@ -88,10 +278,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             break;
         case WM_HOTKEY:
         {
-            WORD key = MAKEWORD(HIWORD(lParam), LOWORD(lParam));
-            key      = HotKey2HotKeyControl(key);
-            WORD         zoom = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231);
-            WORD         draw = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232);
+            WORD key  = MAKEWORD(HIWORD(lParam), LOWORD(lParam));
+            key       = HotKey2HotKeyControl(key);
+            WORD zoom = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231);
+            WORD draw = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232);
             if (key == zoom)
             {
                 m_bZooming = true;
@@ -478,6 +668,12 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         case WM_DESTROY:
             Shell_NotifyIcon(NIM_DELETE, &niData);
             bWindowClosed = TRUE;
+            if (m_hKeyboardHook)
+                UnhookWindowsHookEx(m_hKeyboardHook);
+            if (m_hMouseHook)
+                UnhookWindowsHookEx(m_hMouseHook);
+            m_hKeyboardHook = nullptr;
+            m_hMouseHook    = nullptr;
             PostQuitMessage(0);
             break;
         case WM_CLOSE:
@@ -560,6 +756,7 @@ bool CMainWindow::StartPresentationMode()
     {
         ::SetTimer(*this, TIMER_ID_FADE, 100, NULL);
     }
+
     return true;
 }
 
@@ -586,10 +783,10 @@ bool CMainWindow::EndPresentationMode()
 
 void CMainWindow::RegisterHotKeys()
 {
-    WORD         zoom = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231);
-    WORD         draw = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232);
-    zoom              = HotKeyControl2HotKey(zoom);
-    draw              = HotKeyControl2HotKey(draw);
+    WORD zoom = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231);
+    WORD draw = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232);
+    zoom      = HotKeyControl2HotKey(zoom);
+    draw      = HotKeyControl2HotKey(draw);
 
     RegisterHotKey(*this, DRAW_HOTKEY, HIBYTE(draw), LOBYTE(draw));
     RegisterHotKey(*this, ZOOM_HOTKEY, HIBYTE(zoom), LOBYTE(zoom));

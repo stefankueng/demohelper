@@ -19,6 +19,10 @@
 
 #include "stdafx.h"
 #include "MainWindow.h"
+#include "IniSettings.h"
+
+extern HINSTANCE g_hInstance; // current instance
+extern HINSTANCE g_hResource; // the resource dll
 
 LRESULT CMainWindow::DoCommand(int id)
 {
@@ -203,9 +207,21 @@ LRESULT CMainWindow::DoCommand(int id)
             // deregister our hotkeys
             UnregisterHotKey(*this, DRAW_HOTKEY);
             UnregisterHotKey(*this, ZOOM_HOTKEY);
+            // remove hooks
+            if (m_hKeyboardHook)
+                UnhookWindowsHookEx(m_hKeyboardHook);
+            if (m_hMouseHook)
+                UnhookWindowsHookEx(m_hMouseHook);
+            m_hKeyboardHook = nullptr;
+            m_hMouseHook    = nullptr;
             DialogBox(hResource, MAKEINTRESOURCE(IDD_OPTIONS), *this, (DLGPROC)OptionsDlgProc);
             // now register our hotkeys again
             RegisterHotKeys();
+            // and install the hooks if requested
+            if (CIniSettings::Instance().GetInt64(L"Hooks", L"mouse", 1))
+                m_hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, g_hInstance, 0);
+            if (CIniSettings::Instance().GetInt64(L"Hooks", L"keyboard", 1))
+                m_hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, g_hInstance, 0);
         }
         break;
         case ID_TRAYCONTEXT_DRAW:

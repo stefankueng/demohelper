@@ -92,75 +92,80 @@ END
 // Dialog
 //
 
-IDD_OPTIONS DIALOGEX 0, 0, 232, 258
+IDD_OPTIONS DIALOGEX 0, 0, 232, 260
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "DemoHelper Options"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_DEMOHELPER,IDC_MYICON2,7,7,20,20
-    GROUPBOX        "Misc",IDC_STATIC,7,25,218,47
-    CONTROL         "Current Monitor",IDC_CURRENTMONITOR,"Button",BS_AUTORADIOBUTTON,14,53,70,10
-    CONTROL         "All Monitors",IDC_ALLMONITORS,"Button",BS_AUTORADIOBUTTON,94,53,80,10
-    GROUPBOX        "Zoom",IDC_STATIC,7,76,218,62
-    LTEXT           "After enabling the zoom mode, you can zoom in and out using the mouse wheel or the up/down arrow keys. Exit zoom mode with Escape.",IDC_STATIC,14,86,205,26
-    LTEXT           "Zoom Mode:",IDC_STATIC,14,116,54,8
-    CONTROL         "",IDC_HOTKEY_ZOOMMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,113,125,14
-    GROUPBOX        "Draw",IDC_STATIC,7,143,218,88
-    LTEXT           "After enabling the drawing mode, increase or decrease the pen size with the up/down arrow keys. Cycle through the available colors with the right/left arrow keys. Erase the last line with the Backspace key.",IDC_STATIC,14,155,205,37
-    LTEXT           "Draw Mode:",IDC_STATIC,14,198,54,8
-    CONTROL         "",IDC_HOTKEY_DRAWMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,195,125,14
-    LTEXT           "Remove lines after",IDC_STATIC,14,216,61,8
-    EDITTEXT        IDC_FADESECONDS,94,213,40,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "seconds",IDC_STATIC,139,216,27,8
-    DEFPUSHBUTTON   "OK",IDOK,115,237,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,175,237,50,14
+    GROUPBOX        "Misc",IDC_STATIC,7,25,218,40
+    CONTROL         "Current Monitor",IDC_CURRENTMONITOR,"Button",BS_AUTORADIOBUTTON,14,51,70,10
+    CONTROL         "All Monitors",IDC_ALLMONITORS,"Button",BS_AUTORADIOBUTTON,94,51,80,10
+    GROUPBOX        "Zoom",IDC_STATIC,7,66,218,55
+    LTEXT           "After enabling the zoom mode, you can zoom in and out using the mouse wheel or the up/down arrow keys. Exit zoom mode with Escape.",IDC_STATIC,14,76,205,26
+    LTEXT           "Zoom Mode:",IDC_STATIC,14,106,54,8
+    CONTROL         "",IDC_HOTKEY_ZOOMMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,103,125,14
+    GROUPBOX        "Draw",IDC_STATIC,7,122,218,83
+    LTEXT           "After enabling the drawing mode, increase or decrease the pen size with the up/down arrow keys. Cycle through the available colors with the right/left arrow keys. Erase the last line with the Backspace key.",IDC_STATIC,14,134,205,37
+    LTEXT           "Draw Mode:",IDC_STATIC,14,172,54,8
+    CONTROL         "",IDC_HOTKEY_DRAWMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,169,125,14
+    LTEXT           "Remove lines after",IDC_STATIC,14,189,61,8
+    EDITTEXT        IDC_FADESECONDS,94,186,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "seconds",IDC_STATIC,139,189,27,8
+    DEFPUSHBUTTON   "OK",IDOK,115,239,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,175,239,50,14
     LTEXT           "Whether to capture only the monitor where the cursor is at, or the whole virtual screen covering all monitors.",IDC_STATIC,14,33,205,19
+    GROUPBOX        "Overlays",IDC_STATIC,7,207,218,29
+    CONTROL         "Show keystrokes",IDC_KEYHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,218,70,10
+    CONTROL         "Show mouseclicks",IDC_MOUSEHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,94,218,75,10
+    CONTROL         "DemoHelper: visit our <a href=""https://tools.stefankueng.com/DemoHelper.html"">website</a>",IDC_SYSLINK1,
+                    "SysLink",WS_TABSTOP,40,13,179,12
 END
 
 IDD_HELPDIALOG DIALOGEX 0, 0, 263, 276
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "DemoHelper Help"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,206,255,50,14
     GROUPBOX        "Zooming Mode",IDC_STATIC,7,7,249,61
-    LTEXT           "Up",IDC_STATIC,16,22,50,8
-    LTEXT           "Down",IDC_STATIC,16,32,50,8
-    LTEXT           "Enter",IDC_STATIC,16,42,50,8
-    LTEXT           "Escape",IDC_STATIC,16,52,50,8
-    LTEXT           "Up/Down",IDC_STATIC,16,87,50,8
-    LTEXT           "zoom in",IDC_STATIC,66,22,180,8
-    LTEXT           "zoom out",IDC_STATIC,66,32,180,8
-    LTEXT           "activates drawing of the zoomed area",IDC_STATIC,66,42,180,8
-    LTEXT           "cancels zooming mode",IDC_STATIC,66,52,180,8
+    LTEXT           "Up/Mousewheel",IDC_STATIC,16,22,66,8
+    LTEXT           "Down/Mousewheel",IDC_STATIC,16,32,66,8
+    LTEXT           "Enter/Click",IDC_STATIC,16,42,66,8
+    LTEXT           "Escape",IDC_STATIC,16,52,66,8
+    LTEXT           "Up/Down or\nCtrl+MouseWheel",IDC_STATIC,16,83,66,18
+    LTEXT           "zoom in",IDC_STATIC,82,22,164,8
+    LTEXT           "zoom out",IDC_STATIC,82,32,164,8
+    LTEXT           "activates drawing of the zoomed area",IDC_STATIC,82,42,164,8
+    LTEXT           "cancels zooming mode",IDC_STATIC,82,52,164,8
     GROUPBOX        "Drawing Mode",IDC_STATIC,7,73,239,172
-    LTEXT           "increases/decreases the size of the drawing brush",IDC_STATIC,66,86,180,9
-    LTEXT           "Right/Left",IDC_STATIC,16,97,50,8
-    LTEXT           "Control",IDC_STATIC,16,107,50,8
-    LTEXT           "Shift",IDC_STATIC,16,117,50,8
-    LTEXT           "right mouse",IDC_STATIC,16,127,50,8
-    LTEXT           "cycles through the available brush colors",IDC_STATIC,66,95,180,8
-    LTEXT           "drawing straight lines",IDC_STATIC,66,107,180,8
-    LTEXT           "forces horizontal/vertical drawing",IDC_STATIC,66,117,180,8
-    LTEXT           "draws arrow lines",IDC_STATIC,66,127,180,8
-    LTEXT           "escape",IDC_STATIC,16,137,50,8
-    LTEXT           "quits drawing mode",IDC_STATIC,66,137,180,8
-    LTEXT           "backspace",IDC_STATIC,16,147,50,8
-    LTEXT           "T",IDC_STATIC,16,196,50,8
-    LTEXT           "M",IDC_STATIC,16,186,50,8
-    LTEXT           "E",IDC_STATIC,16,176,50,8
-    LTEXT           "removes the last line drawn",IDC_STATIC,66,147,180,8
-    LTEXT           "removes all drawn lines",IDC_STATIC,66,176,180,8
-    LTEXT           "toggles the marker on/off",IDC_STATIC,66,186,180,8
-    LTEXT           "Z",IDC_STATIC,16,206,50,8
-    LTEXT           "toggles between solid and merged drawing",IDC_STATIC,66,196,180,8
-    LTEXT           "select a rectangle to zoom in",IDC_STATIC,66,206,180,8
-    LTEXT           "C",IDC_STATIC,16,216,50,8
-    LTEXT           "clear the screen with the window color",IDC_STATIC,66,216,180,8
-    LTEXT           "1-8",IDC_STATIC,16,226,50,8
-    LTEXT           "choose the brush color",IDC_STATIC,66,226,180,8
-    LTEXT           "delete",IDC_STATIC,16,157,50,8
-    LTEXT           "removes the first line drawn",IDC_STATIC,66,157,180,8
+    LTEXT           "increases/decreases the size of the drawing brush",IDC_STATIC,82,86,164,9
+    LTEXT           "Right/Left",IDC_STATIC,16,107,66,8
+    LTEXT           "Control",IDC_STATIC,16,117,66,8
+    LTEXT           "Shift",IDC_STATIC,16,127,66,8
+    LTEXT           "right mouse",IDC_STATIC,16,137,66,8
+    LTEXT           "cycles through the available brush colors",IDC_STATIC,82,105,164,8
+    LTEXT           "drawing straight lines",IDC_STATIC,82,117,164,8
+    LTEXT           "forces horizontal/vertical drawing",IDC_STATIC,82,127,164,8
+    LTEXT           "draws arrow lines",IDC_STATIC,82,137,164,8
+    LTEXT           "escape",IDC_STATIC,16,147,66,8
+    LTEXT           "quits drawing mode",IDC_STATIC,82,147,164,8
+    LTEXT           "backspace",IDC_STATIC,16,157,66,8
+    LTEXT           "T",IDC_STATIC,16,206,66,8
+    LTEXT           "M",IDC_STATIC,16,196,66,8
+    LTEXT           "E",IDC_STATIC,16,186,66,8
+    LTEXT           "removes the last line drawn",IDC_STATIC,82,157,164,8
+    LTEXT           "removes all drawn lines",IDC_STATIC,82,186,164,8
+    LTEXT           "toggles the marker on/off",IDC_STATIC,82,196,164,8
+    LTEXT           "Z",IDC_STATIC,16,216,66,8
+    LTEXT           "toggles between solid and alpha drawing",IDC_STATIC,82,206,164,8
+    LTEXT           "select a rectangle to zoom in",IDC_STATIC,82,216,164,8
+    LTEXT           "C",IDC_STATIC,16,226,66,8
+    LTEXT           "clear the screen with the window color",IDC_STATIC,82,226,164,8
+    LTEXT           "1-8",IDC_STATIC,16,236,66,8
+    LTEXT           "choose the brush color",IDC_STATIC,82,236,164,8
+    LTEXT           "delete",IDC_STATIC,16,167,66,8
+    LTEXT           "removes the first line drawn",IDC_STATIC,82,167,164,8
 END
 
 
@@ -181,7 +186,7 @@ BEGIN
         VERTGUIDE, 94
         VERTGUIDE, 219
         TOPMARGIN, 7
-        BOTTOMMARGIN, 251
+        BOTTOMMARGIN, 253
     END
 
     IDD_HELPDIALOG, DIALOG
@@ -189,7 +194,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 256
         VERTGUIDE, 16
-        VERTGUIDE, 66
+        VERTGUIDE, 82
         VERTGUIDE, 246
         TOPMARGIN, 7
         BOTTOMMARGIN, 269

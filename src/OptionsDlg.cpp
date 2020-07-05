@@ -22,7 +22,7 @@
 #include "MainWindow.h"
 #include "IniSettings.h"
 
-BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM /*lParam*/)
+BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
@@ -32,10 +32,13 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
             auto draw        = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232);
             auto allmonitors = CIniSettings::Instance().GetInt64(L"Misc", L"allmonitors", 0);
             auto fadeseconds = CIniSettings::Instance().GetInt64(L"Draw", L"fadeseconds", 0);
+            auto keyhook     = CIniSettings::Instance().GetInt64(L"Hooks", L"keyboard", 1);
+            auto mousehook   = CIniSettings::Instance().GetInt64(L"Hooks", L"mouse", 1);
             SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_SETHOTKEY, (WPARAM)zoom, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_SETHOTKEY, (WPARAM)draw, 0);
             CheckRadioButton(hwndDlg, IDC_CURRENTMONITOR, IDC_ALLMONITORS, allmonitors ? IDC_ALLMONITORS : IDC_CURRENTMONITOR);
-
+            CheckDlgButton(hwndDlg, IDC_KEYHOOK, keyhook ? BST_CHECKED : BST_UNCHECKED);
+            CheckDlgButton(hwndDlg, IDC_MOUSEHOOK, mousehook ? BST_CHECKED : BST_UNCHECKED);
             TCHAR buffer[128] = {0};
             LoadString(g_hInstance, IDS_WEBLINK, buffer, _countof(buffer));
             _stprintf_s(buffer, _countof(buffer), _T("%ld"), (DWORD)fadeseconds);
@@ -71,11 +74,32 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
                     GetWindowText(GetDlgItem(hwndDlg, IDC_FADESECONDS), buffer, _countof(buffer));
                     CIniSettings::Instance().SetString(L"Draw", L"fadeseconds", buffer);
                     CIniSettings::Instance().SetInt64(L"Misc", L"allmonitors", IsDlgButtonChecked(hwndDlg, IDC_ALLMONITORS) ? 1 : 0);
+                    CIniSettings::Instance().SetInt64(L"Hooks", L"keyboard", IsDlgButtonChecked(hwndDlg, IDC_KEYHOOK) ? 1 : 0);
+                    CIniSettings::Instance().SetInt64(L"Hooks", L"mouse", IsDlgButtonChecked(hwndDlg, IDC_MOUSEHOOK) ? 1 : 0);
                 }
                     // Fall through.
                 case IDCANCEL:
                     EndDialog(hwndDlg, wParam);
                     return TRUE;
+            }
+            break;
+        case WM_NOTIFY:
+
+            switch (((LPNMHDR)lParam)->code)
+            {
+                case NM_CLICK: // Fall through to the next case.
+                case NM_RETURN:
+                {
+                    PNMLINK pNMLink = (PNMLINK)lParam;
+                    LITEM   item    = pNMLink->item;
+
+                    if ((((LPNMHDR)lParam)->hwndFrom == GetDlgItem(hwndDlg, IDC_SYSLINK1)) && (item.iLink == 0))
+                    {
+                        ShellExecute(NULL, L"open", item.szUrl, NULL, NULL, SW_SHOW);
+                    }
+
+                    break;
+                }
             }
     }
     return FALSE;

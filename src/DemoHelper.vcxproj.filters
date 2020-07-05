@@ -66,6 +66,9 @@
     <ClInclude Include="..\sktoolslib\Registry.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="KeyboardOverlay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DemoHelper.ico">
@@ -144,6 +147,9 @@
     </ClCompile>
     <ClCompile Include="..\sktoolslib\Registry.cpp">
       <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyboardOverlay.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

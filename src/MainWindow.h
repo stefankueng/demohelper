@@ -24,6 +24,7 @@
 #include "hyperlink.h"
 #include "MemDC.h"
 #include "AnimationManager.h"
+#include "KeyboardOverlay.h"
 #include <shellapi.h>
 #include <shlwapi.h>
 #include <commctrl.h>
@@ -129,6 +130,8 @@ protected:
     static WORD          HotKeyControl2HotKey(WORD hk);
     static WORD          HotKey2HotKeyControl(WORD hk);
     static BOOL CALLBACK HelpDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
+    static LRESULT       LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
+    static LRESULT       LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam);
 
     void RegisterHotKeys();
     bool UpdateCursor();
@@ -167,4 +170,12 @@ protected:
     RECT                    m_rcScreen;
     IUIAnimationVariablePtr m_AnimVarZoom;
     std::deque<DrawLine>    m_drawLines;
+
+    static HHOOK               m_hKeyboardHook;
+    static HHOOK               m_hMouseHook;
+    static DWORD               m_lastHookTime;
+    static POINT               m_lastHookPoint;
+    static WPARAM              m_lastHookMsg;
+    static RECT                m_lastOverlayPos;
+    static CKeyboardOverlayWnd m_keyboardOverlay;
 };

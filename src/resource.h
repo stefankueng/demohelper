@@ -21,6 +21,9 @@
 #define IDC_FADESECONDS                 1006
 #define IDC_CURRENTMONITOR              1008
 #define IDC_ALLMONITORS                 1009
+#define IDC_KEYHOOK                     1010
+#define IDC_MOUSEHOOK                   1011
+#define IDC_SYSLINK1                    1012
 #define ID_TRAYCONTEXT_OPTIONS          32771
 #define ID_TRAYCONTEXT_ABOUT            32772
 #define ID_TRAYCONTEXT_ZOOM             32773
@@ -58,7 +61,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        131
 #define _APS_NEXT_COMMAND_VALUE         32806
-#define _APS_NEXT_CONTROL_VALUE         1009
+#define _APS_NEXT_CONTROL_VALUE         1013
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
