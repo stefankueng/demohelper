@@ -53,7 +53,7 @@ bool CKeyboardOverlayWnd::RegisterAndCreateWindow()
     wcx.hIconSm       = NULL;
     if (RegisterWindow(&wcx))
     {
-        if (CreateEx(WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE, WS_POPUP | WS_DISABLED, NULL))
+        if (CreateEx(WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOPMOST, WS_POPUP | WS_DISABLED, NULL))
         {
             // Make the window fully transparent.
             return SetLayeredWindowAttributes(*this, 0, 255, LWA_COLORKEY);
