@@ -176,6 +176,5 @@ protected:
     static DWORD               m_lastHookTime;
     static POINT               m_lastHookPoint;
     static WPARAM              m_lastHookMsg;
-    static RECT                m_lastOverlayPos;
     static CKeyboardOverlayWnd m_keyboardOverlay;
 };

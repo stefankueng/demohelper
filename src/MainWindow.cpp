@@ -34,7 +34,6 @@ HHOOK               CMainWindow::m_hMouseHook      = 0;
 DWORD               CMainWindow::m_lastHookTime    = 0;
 POINT               CMainWindow::m_lastHookPoint   = {0};
 WPARAM              CMainWindow::m_lastHookMsg     = 0;
-RECT                CMainWindow::m_lastOverlayPos  = {0};
 CKeyboardOverlayWnd CMainWindow::m_keyboardOverlay = CKeyboardOverlayWnd(g_hInstance, nullptr);
 
 LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -52,6 +51,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
             text += L"Alt +\r\n";
         if (bShift)
             text += L"Shift +\r\n";
+        bool hasClick = false;
         switch (wParam)
         {
             case WM_LBUTTONDOWN:
@@ -74,6 +74,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 m_lastHookMsg   = wParam;
                 m_lastHookPoint = phs->pt;
                 m_lastHookTime  = phs->time;
+                hasClick        = true;
             }
             break;
             case WM_RBUTTONDOWN:
@@ -96,6 +97,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 m_lastHookMsg   = wParam;
                 m_lastHookPoint = phs->pt;
                 m_lastHookTime  = phs->time;
+                hasClick        = true;
             }
             break;
             case WM_MBUTTONDOWN:
@@ -118,12 +120,13 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 m_lastHookMsg   = wParam;
                 m_lastHookPoint = phs->pt;
                 m_lastHookTime  = phs->time;
+                hasClick        = true;
             }
             break;
             default:
                 break;
         }
-        if (!text.empty())
+        if (!text.empty() && hasClick)
         {
             m_keyboardOverlay.Show(text);
 
@@ -133,14 +136,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
             GetMonitorInfo(hMonitor, &mi);
             const long width  = CDPIAware::Instance().Scale(nullptr, 180);
             const long height = CDPIAware::Instance().Scale(nullptr, 100);
-            if ((m_lastOverlayPos.left == mi.rcWork.left) &&
-                (m_lastOverlayPos.top == mi.rcWork.top) &&
-                (m_lastOverlayPos.right == mi.rcWork.right) &&
-                (m_lastOverlayPos.bottom == mi.rcWork.bottom))
-                ShowWindow(m_keyboardOverlay, SW_SHOWNOACTIVATE);
-            else
-                SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, mi.rcWork.right - width, mi.rcWork.bottom - height, width, height, SWP_SHOWWINDOW);
-            m_lastOverlayPos = mi.rcWork;
+            SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, mi.rcWork.right - width, mi.rcWork.bottom - height, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
         }
     }
     return CallNextHookEx(m_hMouseHook, nCode, wParam, lParam);
@@ -197,14 +193,7 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                         GetMonitorInfo(hMonitor, &mi);
                         const long width  = CDPIAware::Instance().Scale(hFocus, 180);
                         const long height = CDPIAware::Instance().Scale(hFocus, 100);
-                        if ((m_lastOverlayPos.left == mi.rcWork.left) &&
-                            (m_lastOverlayPos.top == mi.rcWork.top) &&
-                            (m_lastOverlayPos.right == mi.rcWork.right) &&
-                            (m_lastOverlayPos.bottom == mi.rcWork.bottom))
-                            ShowWindow(m_keyboardOverlay, SW_SHOWNOACTIVATE);
-                        else
-                            SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, mi.rcWork.right - width, mi.rcWork.bottom - height, width, height, SWP_SHOWWINDOW);
-                        m_lastOverlayPos = mi.rcWork;
+                        SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, mi.rcWork.right - width, mi.rcWork.bottom - height, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
                     }
                     break;
             }
@@ -269,8 +258,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         {
             m_hwnd = hwnd;
             RegisterHotKeys();
-            m_hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, g_hInstance, 0);
-            m_hMouseHook    = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, g_hInstance, 0);
+            if (CIniSettings::Instance().GetInt64(L"Hooks", L"mouse", 1))
+                m_hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, g_hInstance, 0);
+            if (CIniSettings::Instance().GetInt64(L"Hooks", L"keyboard", 1))
+                m_hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, g_hInstance, 0);
         }
         break;
         case WM_COMMAND:
