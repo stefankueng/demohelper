@@ -1,4 +1,4 @@
-//{{NO_DEPENDENCIES}}
+﻿//{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
 // Used by DemoHelper.rc
 //
@@ -16,12 +16,9 @@
 #define IDD_HELPDIALOG                  130
 #define IDC_WEBLINK                     1002
 #define IDC_HOTKEY_ZOOMMODE             1003
-#define IDC_HOTKEY2                     1004
 #define IDC_HOTKEY_DRAWMODE             1004
-#define IDC_CHECK1                      1005
 #define IDC_CURSORCHECK                 1005
 #define IDC_FADESECONDS                 1006
-#define IDC_RADIO1                      1008
 #define IDC_CURRENTMONITOR              1008
 #define IDC_ALLMONITORS                 1009
 #define ID_TRAYCONTEXT_OPTIONS          32771
