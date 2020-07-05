@@ -45,6 +45,9 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
         auto            bControl = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
         auto            bAlt     = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
         auto            bShift   = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+        auto            bWindows = (GetAsyncKeyState(VK_LWIN) & 0x8000) != 0;
+        if ((bWindows))
+            text += L"Win +\r\n";
         if ((bControl))
             text += L"Ctrl +\r\n";
         if (bAlt)
@@ -161,6 +164,9 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
             auto bControl = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
             auto bAlt     = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
             auto bShift   = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+            auto bWindows = (GetAsyncKeyState(VK_LWIN) & 0x8000) != 0;
+            if ((bWindows))
+                text += L"Win +\r\n";
             if ((bControl))
                 text += L"Ctrl +\r\n";
             if (bAlt)
