@@ -199,6 +199,12 @@ LRESULT CMainWindow::DoCommand(int id)
             break;
         case IDM_EXIT:
             Shell_NotifyIcon(NIM_DELETE, &niData);
+            if (m_hKeyboardHook)
+                UnhookWindowsHookEx(m_hKeyboardHook);
+            if (m_hMouseHook)
+                UnhookWindowsHookEx(m_hMouseHook);
+            m_hKeyboardHook = nullptr;
+            m_hMouseHook = nullptr;
             ::PostQuitMessage(0);
             return 0;
             break;
