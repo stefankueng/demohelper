@@ -22,6 +22,7 @@
 #include "MainWindow.h"
 #include "IniSettings.h"
 #include "PathUtils.h"
+#include "SmartHandle.h"
 
 // Global Variables:
 HINSTANCE g_hInstance; // current instance
@@ -49,8 +50,19 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     g_hResource = hInstance;
     g_hInstance = hInstance;
 
-    CIniSettings::Instance().SetIniPath(CPathUtils::GetModuleDir() + L"\\DemoHelper.ini");
-
+    auto iniFilePath = CPathUtils::GetModuleDir() + L"\\DemoHelper.ini";
+    {
+        CAutoFile hFile = CreateFile(iniFilePath.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_ALWAYS, 0, nullptr);
+        if (!hFile)
+        {
+            auto appDataPath = CPathUtils::GetAppDataPath() + L"\\DemoHelper";
+            CreateDirectory(appDataPath.c_str(), nullptr);
+            MessageBox(nullptr, appDataPath.c_str(), L"DemoHelper", MB_ICONINFORMATION);
+            iniFilePath = appDataPath + L"\\DemoHelper.ini";
+        }
+    }
+    CIniSettings::Instance().SetIniPath(iniFilePath);
+    OnOutOfScope(CIniSettings::Instance().Save());
     ULONG_PTR                    gdiplusToken;
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
@@ -70,7 +82,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                 DispatchMessage(&msg);
             }
         }
-        CIniSettings::Instance().Save();
         return (int)msg.wParam;
     }
     return 1;
