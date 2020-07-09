@@ -69,6 +69,9 @@
     <ClInclude Include="KeyboardOverlay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MagnifierWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DemoHelper.ico">
@@ -149,6 +152,9 @@
       <Filter>sktoolslib</Filter>
     </ClCompile>
     <ClCompile Include="KeyboardOverlay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MagnifierWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

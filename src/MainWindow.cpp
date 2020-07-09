@@ -264,6 +264,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         {
             m_hwnd = hwnd;
             RegisterHotKeys();
+            m_magnifierWindow.Create(g_hInstance, *this, FALSE);
             if (CIniSettings::Instance().GetInt64(L"Hooks", L"mouse", 1))
                 m_hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, g_hInstance, 0);
             if (CIniSettings::Instance().GetInt64(L"Hooks", L"keyboard", 1))
@@ -279,6 +280,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             key       = HotKey2HotKeyControl(key);
             WORD zoom = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231);
             WORD draw = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232);
+            WORD lens = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"lens", 0x233);
             if (key == zoom)
             {
                 m_bZooming = true;
@@ -287,6 +289,22 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             else if (key == draw)
             {
                 StartPresentationMode();
+            }
+            else if (key == lens)
+            {
+                if (m_bLensMode)
+                {
+                    SetWindowLong(*this, GWL_EXSTYLE, 0);
+                    ShowWindow(m_magnifierWindow, SW_HIDE);
+                    EndPresentationMode();
+                    m_bLensMode = false;
+                }
+                else
+                {
+                    StartPresentationMode();
+                    m_bLensMode = true;
+                    StartInlineZoom();
+                }
             }
         }
         break;
@@ -395,15 +413,31 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 auto nScreenWidth  = m_rcScreen.right - m_rcScreen.left;
                 auto nScreenHeight = m_rcScreen.bottom - m_rcScreen.top;
 
-                StretchBlt(hDesktopCompatibleDC,
-                           m_rcScreen.left, m_rcScreen.top,
-                           nScreenWidth, nScreenHeight,
-                           hDesktopCompatibleDC,
-                           m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y,
-                           abs(m_ptInlineZoomStartPoint.x - m_ptInlineZoomEndPoint.x), abs(m_ptInlineZoomStartPoint.y - m_ptInlineZoomEndPoint.y),
-                           SRCCOPY);
-                UpdateCursor();
-                InvalidateRect(*this, nullptr, false);
+                if (m_bLensMode)
+                {
+                    SetWindowLong(*this, GWL_EXSTYLE, WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT);
+                    SetLayeredWindowAttributes(*this, 0, 255, LWA_ALPHA);
+                    RECT rc = {0};
+                    GetClientRect(*this, &rc);
+                    SetWindowPos(m_magnifierWindow, HWND_TOP, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
+                                 SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE);
+                    RECT sourceRect = {m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y, m_ptInlineZoomEndPoint.x, m_ptInlineZoomEndPoint.y};
+                    m_magnifierWindow.SetSourceRect(sourceRect);
+                    ::SetTimer(*this, TIMER_ID_LENS, 20, NULL);
+                    SetWindowPos(*this, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+                }
+                else
+                {
+                    StretchBlt(hDesktopCompatibleDC,
+                               m_rcScreen.left, m_rcScreen.top,
+                               nScreenWidth, nScreenHeight,
+                               hDesktopCompatibleDC,
+                               m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y,
+                               abs(m_ptInlineZoomStartPoint.x - m_ptInlineZoomEndPoint.x), abs(m_ptInlineZoomStartPoint.y - m_ptInlineZoomEndPoint.y),
+                               SRCCOPY);
+                    UpdateCursor();
+                    InvalidateRect(*this, nullptr, false);
+                }
             }
             else
             {
@@ -425,6 +459,16 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     Rectangle(hDC, m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y, m_ptInlineZoomEndPoint.x, m_ptInlineZoomEndPoint.y);
                     m_ptInlineZoomEndPoint.x = GET_X_LPARAM(lParam);
                     m_ptInlineZoomEndPoint.y = GET_Y_LPARAM(lParam);
+                    if (m_bLensMode)
+                    {
+                        // ensure the rectangle ratio is the same as the current monitor/virtual screen
+                        RECT rc = {0};
+                        GetClientRect(*this, &rc);
+                        auto ratio               = float(rc.right - rc.left) / float(rc.bottom - rc.top);
+                        auto widthF              = float(m_ptInlineZoomEndPoint.x - m_ptInlineZoomStartPoint.x);
+                        auto heightF             = float(m_ptInlineZoomEndPoint.y - m_ptInlineZoomStartPoint.y);
+                        m_ptInlineZoomEndPoint.x = LONG(m_ptInlineZoomStartPoint.x + heightF * ratio);
+                    }
                     Rectangle(hDC, m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y, m_ptInlineZoomEndPoint.x, m_ptInlineZoomEndPoint.y);
                     ReleaseDC(*this, hDC);
                 }
@@ -661,6 +705,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 if (doRedraw)
                     InvalidateRect(*this, nullptr, false);
             }
+            else if (wParam == TIMER_ID_LENS)
+            {
+                m_magnifierWindow.UpdateMagnifier();
+                SetWindowPos(*this, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+            }
             break;
         case WM_DESTROY:
             Shell_NotifyIcon(NIM_DELETE, &niData);
@@ -735,6 +784,12 @@ bool CMainWindow::StartPresentationMode()
         ReleaseDC(nullptr, hDesktopDC);
     else
         DeleteDC(hDesktopDC);
+    if (m_bLensMode)
+    {
+        SetWindowLong(*this, GWL_EXSTYLE, 0);
+        ShowWindow(m_magnifierWindow, SW_HIDE);
+        m_bLensMode = false;
+    }
     if (!m_bZooming)
     {
         if (m_hCursor)
@@ -782,11 +837,14 @@ void CMainWindow::RegisterHotKeys()
 {
     WORD zoom = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231);
     WORD draw = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232);
+    WORD lens = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"lens", 0x233);
     zoom      = HotKeyControl2HotKey(zoom);
     draw      = HotKeyControl2HotKey(draw);
+    lens      = HotKeyControl2HotKey(lens);
 
     RegisterHotKey(*this, DRAW_HOTKEY, HIBYTE(draw), LOBYTE(draw));
     RegisterHotKey(*this, ZOOM_HOTKEY, HIBYTE(zoom), LOBYTE(zoom));
+    RegisterHotKey(*this, LENS_HOTKEY, HIBYTE(lens), LOBYTE(lens));
 }
 
 bool CMainWindow::StartZoomingMode()

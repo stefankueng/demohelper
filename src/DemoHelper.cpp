@@ -47,6 +47,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
         return -1;
     OnOutOfScope(CoUninitialize());
 
+    MagInitialize();
+    OnOutOfScope(MagUninitialize());
+
     g_hResource = hInstance;
     g_hInstance = hInstance;
 

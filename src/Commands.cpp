@@ -213,6 +213,7 @@ LRESULT CMainWindow::DoCommand(int id)
             // deregister our hotkeys
             UnregisterHotKey(*this, DRAW_HOTKEY);
             UnregisterHotKey(*this, ZOOM_HOTKEY);
+            UnregisterHotKey(*this, LENS_HOTKEY);
             // remove hooks
             if (m_hKeyboardHook)
                 UnhookWindowsHookEx(m_hKeyboardHook);

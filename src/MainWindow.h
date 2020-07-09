@@ -25,6 +25,7 @@
 #include "MemDC.h"
 #include "AnimationManager.h"
 #include "KeyboardOverlay.h"
+#include "MagnifierWindow.h"
 #include <shellapi.h>
 #include <shlwapi.h>
 #include <commctrl.h>
@@ -33,10 +34,12 @@
 
 #define DRAW_HOTKEY 100
 #define ZOOM_HOTKEY 101
+#define LENS_HOTKEY 102
 
 #define TIMER_ID_DRAW 101
 #define TIMER_ID_ZOOM 102
 #define TIMER_ID_FADE 103
+#define TIMER_ID_LENS 104
 
 #define LINE_ALPHA 100
 
@@ -83,6 +86,7 @@ public:
         , m_currentalpha(LINE_ALPHA)
         , m_bMarker(false)
         , m_bInlineZoom(false)
+        , m_bLensMode(false)
         , m_fadeseconds(0)
         , m_hPreviousCursor(nullptr)
         , m_lineStartShiftPoint({})
@@ -163,9 +167,11 @@ protected:
     int  m_oldcolorindex;
     BYTE m_oldalpha;
 
-    bool  m_bInlineZoom;
-    POINT m_ptInlineZoomStartPoint;
-    POINT m_ptInlineZoomEndPoint;
+    bool             m_bInlineZoom;
+    bool             m_bLensMode;
+    POINT            m_ptInlineZoomStartPoint;
+    POINT            m_ptInlineZoomEndPoint;
+    CMagnifierWindow m_magnifierWindow;
 
     RECT                    m_rcScreen;
     IUIAnimationVariablePtr m_AnimVarZoom;
