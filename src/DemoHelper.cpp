@@ -57,7 +57,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
         {
             auto appDataPath = CPathUtils::GetAppDataPath() + L"\\DemoHelper";
             CreateDirectory(appDataPath.c_str(), nullptr);
-            MessageBox(nullptr, appDataPath.c_str(), L"DemoHelper", MB_ICONINFORMATION);
             iniFilePath = appDataPath + L"\\DemoHelper.ini";
         }
     }
