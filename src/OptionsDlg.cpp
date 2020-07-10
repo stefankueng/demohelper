@@ -30,12 +30,14 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
         {
             auto zoom        = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231);
             auto draw        = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232);
+            auto lens        = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"lens", 0x233);
             auto allmonitors = CIniSettings::Instance().GetInt64(L"Misc", L"allmonitors", 0);
             auto fadeseconds = CIniSettings::Instance().GetInt64(L"Draw", L"fadeseconds", 0);
             auto keyhook     = CIniSettings::Instance().GetInt64(L"Hooks", L"keyboard", 1);
             auto mousehook   = CIniSettings::Instance().GetInt64(L"Hooks", L"mouse", 1);
             SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_SETHOTKEY, (WPARAM)zoom, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_SETHOTKEY, (WPARAM)draw, 0);
+            SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_LENSMODE), HKM_SETHOTKEY, (WPARAM)lens, 0);
             CheckRadioButton(hwndDlg, IDC_CURRENTMONITOR, IDC_ALLMONITORS, allmonitors ? IDC_ALLMONITORS : IDC_CURRENTMONITOR);
             CheckDlgButton(hwndDlg, IDC_KEYHOOK, keyhook ? BST_CHECKED : BST_UNCHECKED);
             CheckDlgButton(hwndDlg, IDC_MOUSEHOOK, mousehook ? BST_CHECKED : BST_UNCHECKED);
@@ -70,6 +72,8 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
                     CIniSettings::Instance().SetInt64(L"HotKeys", L"draw", res);
                     res = SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_GETHOTKEY, 0, 0);
                     CIniSettings::Instance().SetInt64(L"HotKeys", L"zoom", res);
+                    res = SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_LENSMODE), HKM_GETHOTKEY, 0, 0);
+                    CIniSettings::Instance().SetInt64(L"HotKeys", L"lens", res);
                     TCHAR buffer[128];
                     GetWindowText(GetDlgItem(hwndDlg, IDC_FADESECONDS), buffer, _countof(buffer));
                     CIniSettings::Instance().SetString(L"Draw", L"fadeseconds", buffer);

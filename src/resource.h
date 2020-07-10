@@ -18,6 +18,7 @@
 #define IDC_HOTKEY_ZOOMMODE             1003
 #define IDC_HOTKEY_DRAWMODE             1004
 #define IDC_CURSORCHECK                 1005
+#define IDC_HOTKEY_LENSMODE             1005
 #define IDC_FADESECONDS                 1006
 #define IDC_CURRENTMONITOR              1008
 #define IDC_ALLMONITORS                 1009
