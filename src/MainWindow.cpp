@@ -492,16 +492,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     Rectangle(hDC, m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y, m_ptInlineZoomEndPoint.x, m_ptInlineZoomEndPoint.y);
                     m_ptInlineZoomEndPoint.x = GET_X_LPARAM(lParam);
                     m_ptInlineZoomEndPoint.y = GET_Y_LPARAM(lParam);
-                    if (m_bLensMode)
-                    {
-                        // ensure the rectangle ratio is the same as the current monitor/virtual screen
-                        RECT rc = {0};
-                        GetClientRect(*this, &rc);
-                        auto ratio               = float(rc.right - rc.left) / float(rc.bottom - rc.top);
-                        auto widthF              = float(m_ptInlineZoomEndPoint.x - m_ptInlineZoomStartPoint.x);
-                        auto heightF             = float(m_ptInlineZoomEndPoint.y - m_ptInlineZoomStartPoint.y);
-                        m_ptInlineZoomEndPoint.x = LONG(m_ptInlineZoomStartPoint.x + heightF * ratio);
-                    }
                     Rectangle(hDC, m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y, m_ptInlineZoomEndPoint.x, m_ptInlineZoomEndPoint.y);
                     ReleaseDC(*this, hDC);
                 }
