@@ -49,6 +49,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
     MagInitialize();
     OnOutOfScope(MagUninitialize());
+    OnOutOfScope(Animator::Instance().ShutDown());
 
     g_hResource = hInstance;
     g_hInstance = hInstance;
