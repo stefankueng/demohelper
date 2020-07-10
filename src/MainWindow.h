@@ -86,7 +86,6 @@ public:
         , m_currentalpha(LINE_ALPHA)
         , m_bMarker(false)
         , m_bInlineZoom(false)
-        , m_bLensMode(false)
         , m_fadeseconds(0)
         , m_hPreviousCursor(nullptr)
         , m_lineStartShiftPoint({})
@@ -167,11 +166,9 @@ protected:
     int  m_oldcolorindex;
     BYTE m_oldalpha;
 
-    bool             m_bInlineZoom;
-    bool             m_bLensMode;
-    POINT            m_ptInlineZoomStartPoint;
-    POINT            m_ptInlineZoomEndPoint;
-    CMagnifierWindow m_magnifierWindow;
+    bool  m_bInlineZoom;
+    POINT m_ptInlineZoomStartPoint;
+    POINT m_ptInlineZoomEndPoint;
 
     RECT                    m_rcScreen;
     IUIAnimationVariablePtr m_AnimVarZoom;
@@ -183,4 +180,6 @@ protected:
     static POINT               m_lastHookPoint;
     static WPARAM              m_lastHookMsg;
     static CKeyboardOverlayWnd m_keyboardOverlay;
+    static CMagnifierWindow    m_magnifierWindow;
+    static bool                m_bLensMode;
 };

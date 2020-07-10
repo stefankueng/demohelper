@@ -29,12 +29,17 @@
 extern HINSTANCE g_hInstance; // current instance
 extern HINSTANCE g_hResource; // the resource dll
 
+constexpr int overlayWidth  = 220;
+constexpr int overlayHeight = 140;
+
 HHOOK               CMainWindow::m_hKeyboardHook   = 0;
 HHOOK               CMainWindow::m_hMouseHook      = 0;
 DWORD               CMainWindow::m_lastHookTime    = 0;
 POINT               CMainWindow::m_lastHookPoint   = {0};
 WPARAM              CMainWindow::m_lastHookMsg     = 0;
 CKeyboardOverlayWnd CMainWindow::m_keyboardOverlay = CKeyboardOverlayWnd(g_hInstance, nullptr);
+CMagnifierWindow    CMainWindow::m_magnifierWindow = CMagnifierWindow();
+bool                CMainWindow::m_bLensMode       = false;
 
 LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -57,6 +62,38 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
         bool hasClick = false;
         switch (wParam)
         {
+            case WM_MOUSEMOVE:
+            {
+                if (m_bLensMode && bWindows && bShift)
+                {
+                    m_magnifierWindow.SetMagnification(phs->pt, m_magnifierWindow.GetMagnification());
+                }
+            }
+            break;
+            case WM_MOUSEWHEEL:
+            {
+                if (m_bLensMode && bWindows && bShift)
+                {
+                    auto zDelta     = GET_WHEEL_DELTA_WPARAM(phs->mouseData);
+                    auto zoomfactor = m_magnifierWindow.GetMagnification();
+                    if (zDelta > 0)
+                    {
+                        zoomfactor += 0.2f;
+                        if (zoomfactor > 4.0f)
+                            zoomfactor = 4.0f;
+                    }
+                    else
+                    {
+                        zoomfactor -= 0.2f;
+                        if (zoomfactor < 1.0f)
+                            zoomfactor = 1.0f;
+                    }
+
+                    m_magnifierWindow.SetMagnification(phs->pt, zoomfactor);
+                    return TRUE;
+                }
+            }
+            break;
             case WM_LBUTTONDOWN:
             {
                 bool dbl = false;
@@ -137,8 +174,8 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
             MONITORINFOEX mi       = {};
             mi.cbSize              = sizeof(MONITORINFOEX);
             GetMonitorInfo(hMonitor, &mi);
-            const long width  = CDPIAware::Instance().Scale(nullptr, 180);
-            const long height = CDPIAware::Instance().Scale(nullptr, 100);
+            const long width  = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth);
+            const long height = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight);
             SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, mi.rcWork.right - width, mi.rcWork.bottom - height, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
         }
     }
@@ -184,6 +221,7 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                 case VK_RCONTROL:
                 case VK_LMENU:
                 case VK_RMENU:
+                case VK_LWIN:
                     break;
                 default:
                     GetKeyNameText((LONG)dwMsg, buffer, sizeof(buffer));
@@ -197,8 +235,8 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                         MONITORINFOEX mi       = {};
                         mi.cbSize              = sizeof(MONITORINFOEX);
                         GetMonitorInfo(hMonitor, &mi);
-                        const long width  = CDPIAware::Instance().Scale(hFocus, 180);
-                        const long height = CDPIAware::Instance().Scale(hFocus, 100);
+                        const long width  = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth);
+                        const long height = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight);
                         SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, mi.rcWork.right - width, mi.rcWork.bottom - height, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
                     }
                     break;
@@ -295,6 +333,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 if (m_bLensMode)
                 {
                     SetWindowLong(*this, GWL_EXSTYLE, 0);
+                    m_magnifierWindow.Reset();
                     ShowWindow(m_magnifierWindow, SW_HIDE);
                     EndPresentationMode();
                     m_bLensMode = false;
@@ -303,7 +342,17 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 {
                     StartPresentationMode();
                     m_bLensMode = true;
-                    StartInlineZoom();
+                    SetWindowLong(*this, GWL_EXSTYLE, WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT);
+                    SetLayeredWindowAttributes(*this, 0, 255, LWA_ALPHA);
+                    RECT rc = {0};
+                    GetClientRect(*this, &rc);
+                    SetWindowPos(m_magnifierWindow, HWND_TOP, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
+                                 SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE);
+                    POINT pt = {0};
+                    GetCursorPos(&pt);
+                    m_magnifierWindow.SetMagnification(pt, 2.0f);
+                    ::SetTimer(*this, TIMER_ID_LENS, 20, NULL);
+                    SetWindowPos(*this, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
                 }
             }
         }
@@ -413,31 +462,15 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 auto nScreenWidth  = m_rcScreen.right - m_rcScreen.left;
                 auto nScreenHeight = m_rcScreen.bottom - m_rcScreen.top;
 
-                if (m_bLensMode)
-                {
-                    SetWindowLong(*this, GWL_EXSTYLE, WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT);
-                    SetLayeredWindowAttributes(*this, 0, 255, LWA_ALPHA);
-                    RECT rc = {0};
-                    GetClientRect(*this, &rc);
-                    SetWindowPos(m_magnifierWindow, HWND_TOP, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
-                                 SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE);
-                    RECT sourceRect = {m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y, m_ptInlineZoomEndPoint.x, m_ptInlineZoomEndPoint.y};
-                    m_magnifierWindow.SetSourceRect(sourceRect);
-                    ::SetTimer(*this, TIMER_ID_LENS, 20, NULL);
-                    SetWindowPos(*this, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
-                }
-                else
-                {
-                    StretchBlt(hDesktopCompatibleDC,
-                               m_rcScreen.left, m_rcScreen.top,
-                               nScreenWidth, nScreenHeight,
-                               hDesktopCompatibleDC,
-                               m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y,
-                               abs(m_ptInlineZoomStartPoint.x - m_ptInlineZoomEndPoint.x), abs(m_ptInlineZoomStartPoint.y - m_ptInlineZoomEndPoint.y),
-                               SRCCOPY);
-                    UpdateCursor();
-                    InvalidateRect(*this, nullptr, false);
-                }
+                StretchBlt(hDesktopCompatibleDC,
+                           m_rcScreen.left, m_rcScreen.top,
+                           nScreenWidth, nScreenHeight,
+                           hDesktopCompatibleDC,
+                           m_ptInlineZoomStartPoint.x, m_ptInlineZoomStartPoint.y,
+                           abs(m_ptInlineZoomStartPoint.x - m_ptInlineZoomEndPoint.x), abs(m_ptInlineZoomStartPoint.y - m_ptInlineZoomEndPoint.y),
+                           SRCCOPY);
+                UpdateCursor();
+                InvalidateRect(*this, nullptr, false);
             }
             else
             {

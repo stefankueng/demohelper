@@ -16,8 +16,11 @@ public:
 
     BOOL Create(HINSTANCE hInst, HWND hwndHost, BOOL visible);
 
-    BOOL SetSourceRect(RECT rc);
-    BOOL UpdateMagnifier();
+    BOOL  SetMagnification(POINT mousePt, float magnification);
+    BOOL  SetSourceRect(RECT rc);
+    BOOL  UpdateMagnifier();
+    float GetMagnification() const { return m_magFactor; }
+    BOOL  Reset();
 
     operator HWND() { return m_hWnd; }
     operator HWND() const { return m_hWnd; }
