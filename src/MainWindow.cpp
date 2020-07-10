@@ -78,13 +78,13 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                     auto zoomfactor = m_magnifierWindow.GetMagnification();
                     if (zDelta > 0)
                     {
-                        zoomfactor += 0.2f;
+                        zoomfactor += 0.1f;
                         if (zoomfactor > 4.0f)
                             zoomfactor = 4.0f;
                     }
                     else
                     {
-                        zoomfactor -= 0.2f;
+                        zoomfactor -= 0.1f;
                         if (zoomfactor < 1.0f)
                             zoomfactor = 1.0f;
                     }
@@ -350,7 +350,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                  SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE);
                     POINT pt = {0};
                     GetCursorPos(&pt);
-                    m_magnifierWindow.SetMagnification(pt, 2.0f);
+                    m_magnifierWindow.SetMagnification(pt, 1.2f);
                     ::SetTimer(*this, TIMER_ID_LENS, 20, NULL);
                     SetWindowPos(*this, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
                 }
@@ -742,6 +742,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             {
                 m_magnifierWindow.UpdateMagnifier();
                 SetWindowPos(*this, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+                SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
             }
             break;
         case WM_DESTROY:
