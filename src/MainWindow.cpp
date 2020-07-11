@@ -784,7 +784,7 @@ bool CMainWindow::StartPresentationMode()
         nScreenHeight = m_rcScreen.bottom - m_rcScreen.top;
         devName       = mi.szDevice;
     }
-
+    ShowWindow(m_keyboardOverlay, SW_HIDE);
     HDC hDesktopDC = nullptr;
     if (allMonitors)
         hDesktopDC = GetDC(nullptr);
