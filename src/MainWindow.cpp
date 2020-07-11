@@ -811,6 +811,7 @@ bool CMainWindow::StartPresentationMode()
     if (m_bLensMode)
     {
         SetWindowLong(*this, GWL_EXSTYLE, 0);
+        m_magnifierWindow.Reset();
         ShowWindow(m_magnifierWindow, SW_HIDE);
         m_bLensMode = false;
     }
