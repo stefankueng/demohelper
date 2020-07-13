@@ -56,7 +56,7 @@ bool CKeyboardOverlayWnd::RegisterAndCreateWindow()
         if (CreateEx(WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOPMOST, WS_POPUP | WS_DISABLED, NULL))
         {
             // Make the window fully transparent.
-            return SetLayeredWindowAttributes(*this, 0, 255, LWA_COLORKEY);
+            return SetLayeredWindowAttributes(*this, 0, 255, LWA_COLORKEY | LWA_ALPHA);
         }
     }
     return false;
@@ -68,7 +68,7 @@ void CKeyboardOverlayWnd::Show(const std::wstring& text)
     InvalidateRect(*this, nullptr, false);
     SetTimer(*this, FADE_TIMER, 100, nullptr);
     m_fadingCounter = 255;
-    SetLayeredWindowAttributes(*this, 0, 255, LWA_COLORKEY);
+    SetLayeredWindowAttributes(*this, 0, (BYTE)m_fadingCounter, LWA_COLORKEY | LWA_ALPHA);
 }
 
 LRESULT CALLBACK CKeyboardOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -92,7 +92,7 @@ LRESULT CALLBACK CKeyboardOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM
                 PAINTSTRUCT ps;
                 HDC         hdc = BeginPaint(hwnd, &ps);
                 {
-                    CMemDC      memdc(hdc);
+                    CMemDC memdc(hdc);
                     OnPaint(memdc, &rect);
                 }
                 EndPaint(hwnd, &ps);
@@ -105,7 +105,10 @@ LRESULT CALLBACK CKeyboardOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM
             if (m_fadingCounter < 0)
                 m_fadingCounter = 0;
             if (m_fadingCounter)
+            {
+                SetLayeredWindowAttributes(*this, 0, (BYTE)m_fadingCounter, LWA_COLORKEY | LWA_ALPHA);
                 InvalidateRect(*this, nullptr, false);
+            }
             else
                 ShowWindow(*this, SW_HIDE);
         }
