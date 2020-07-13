@@ -35,9 +35,12 @@ LRESULT CMainWindow::DoCommand(int id)
                 m_currentalpha = 255;
             break;
         case ID_CMD_QUITMODE:
-            m_bZooming = false;
-            EndPresentationMode();
-            UpdateCursor();
+            if (!m_bLensMode)
+            {
+                m_bZooming = false;
+                EndPresentationMode();
+                UpdateCursor();
+            }
             break;
         case ID_CMD_UNDOLINE:
             m_bDrawing = false;
