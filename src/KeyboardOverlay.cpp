@@ -91,8 +91,10 @@ LRESULT CALLBACK CKeyboardOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM
                 ::GetClientRect(*this, &rect);
                 PAINTSTRUCT ps;
                 HDC         hdc = BeginPaint(hwnd, &ps);
-                CMemDC      memdc(hdc);
-                OnPaint(memdc, &rect);
+                {
+                    CMemDC      memdc(hdc);
+                    OnPaint(memdc, &rect);
+                }
                 EndPaint(hwnd, &ps);
             }
         }
