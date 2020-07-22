@@ -112,7 +112,7 @@ BEGIN
     LTEXT           "Remove lines after",IDC_STATIC,14,210,61,8
     EDITTEXT        IDC_FADESECONDS,94,207,40,14,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "seconds",IDC_STATIC,139,210,27,8
-    DEFPUSHBUTTON   "OK",IDOK,115,253,50,14
+    DEFPUSHBUTTON   "OK",IDOK,182,253,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,240,253,50,14
     LTEXT           "Whether to capture only the monitor where the cursor is at, or the whole virtual screen covering all monitors.",IDC_STATIC,14,33,270,19
     GROUPBOX        "Overlays",IDC_STATIC,7,226,283,24
@@ -122,6 +122,7 @@ BEGIN
                     "SysLink",WS_TABSTOP,40,13,244,12
     LTEXT           "Live Zoom Mode:",IDC_STATIC,14,136,73,8
     CONTROL         "",IDC_HOTKEY_LENSMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,133,190,14
+    CONTROL         "Visualize mouseclicks",IDC_MOUSEVISUALS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,179,237,86,10
 END
 
 IDD_HELPDIALOG DIALOGEX 0, 0, 263, 276

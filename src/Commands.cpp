@@ -232,6 +232,7 @@ LRESULT CMainWindow::DoCommand(int id)
                 m_hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, g_hInstance, 0);
             if (CIniSettings::Instance().GetInt64(L"Hooks", L"keyboard", 1))
                 m_hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, g_hInstance, 0);
+            m_bMouseVisuals = CIniSettings::Instance().GetInt64(L"Misc", L"mousevisual", 1) != 0;
         }
         break;
         case ID_TRAYCONTEXT_DRAW:

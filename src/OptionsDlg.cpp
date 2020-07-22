@@ -35,12 +35,14 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
             auto fadeseconds = CIniSettings::Instance().GetInt64(L"Draw", L"fadeseconds", 0);
             auto keyhook     = CIniSettings::Instance().GetInt64(L"Hooks", L"keyboard", 1);
             auto mousehook   = CIniSettings::Instance().GetInt64(L"Hooks", L"mouse", 1);
+            auto mousevisual = CIniSettings::Instance().GetInt64(L"Misc", L"mousevisual", 1);
             SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_SETHOTKEY, (WPARAM)zoom, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_SETHOTKEY, (WPARAM)draw, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_LENSMODE), HKM_SETHOTKEY, (WPARAM)lens, 0);
             CheckRadioButton(hwndDlg, IDC_CURRENTMONITOR, IDC_ALLMONITORS, allmonitors ? IDC_ALLMONITORS : IDC_CURRENTMONITOR);
             CheckDlgButton(hwndDlg, IDC_KEYHOOK, keyhook ? BST_CHECKED : BST_UNCHECKED);
             CheckDlgButton(hwndDlg, IDC_MOUSEHOOK, mousehook ? BST_CHECKED : BST_UNCHECKED);
+            CheckDlgButton(hwndDlg, IDC_MOUSEVISUALS, mousevisual ? BST_CHECKED : BST_UNCHECKED);
             TCHAR buffer[128] = {0};
             LoadString(g_hInstance, IDS_WEBLINK, buffer, _countof(buffer));
             _stprintf_s(buffer, _countof(buffer), _T("%ld"), (DWORD)fadeseconds);
@@ -80,6 +82,7 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
                     CIniSettings::Instance().SetInt64(L"Misc", L"allmonitors", IsDlgButtonChecked(hwndDlg, IDC_ALLMONITORS) ? 1 : 0);
                     CIniSettings::Instance().SetInt64(L"Hooks", L"keyboard", IsDlgButtonChecked(hwndDlg, IDC_KEYHOOK) ? 1 : 0);
                     CIniSettings::Instance().SetInt64(L"Hooks", L"mouse", IsDlgButtonChecked(hwndDlg, IDC_MOUSEHOOK) ? 1 : 0);
+                    CIniSettings::Instance().SetInt64(L"Misc", L"mousevisual", IsDlgButtonChecked(hwndDlg, IDC_MOUSEVISUALS) ? 1 : 0);
                 }
                     // Fall through.
                 case IDCANCEL:

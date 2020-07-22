@@ -184,4 +184,5 @@ protected:
     static CMouseOverlayWnd    m_mouseOverlay;
     static CMagnifierWindow    m_magnifierWindow;
     static bool                m_bLensMode;
+    static bool                m_bMouseVisuals;
 };

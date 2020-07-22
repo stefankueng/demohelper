@@ -25,6 +25,8 @@
 #define IDC_KEYHOOK                     1010
 #define IDC_MOUSEHOOK                   1011
 #define IDC_SYSLINK1                    1012
+#define IDC_MOUSECLICKS                 1013
+#define IDC_MOUSEVISUALS                1013
 #define ID_TRAYCONTEXT_OPTIONS          32771
 #define ID_TRAYCONTEXT_ABOUT            32772
 #define ID_TRAYCONTEXT_ZOOM             32773

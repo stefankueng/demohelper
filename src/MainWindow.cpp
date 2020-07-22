@@ -41,6 +41,7 @@ CKeyboardOverlayWnd CMainWindow::m_keyboardOverlay = CKeyboardOverlayWnd(g_hInst
 CMouseOverlayWnd    CMainWindow::m_mouseOverlay    = CMouseOverlayWnd(g_hInstance, nullptr);
 CMagnifierWindow    CMainWindow::m_magnifierWindow = CMagnifierWindow();
 bool                CMainWindow::m_bLensMode       = false;
+bool                CMainWindow::m_bMouseVisuals   = true;
 
 LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -173,7 +174,8 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
         }
         if (!text.empty() && hasClick)
         {
-            m_mouseOverlay.Show(phs->pt, mouseColor);
+            if (m_bMouseVisuals)
+                m_mouseOverlay.Show(phs->pt, mouseColor);
             m_keyboardOverlay.Show(text);
 
             auto          hMonitor = MonitorFromPoint(phs->pt, MONITOR_DEFAULTTOPRIMARY);
@@ -313,6 +315,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 m_hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, g_hInstance, 0);
             if (CIniSettings::Instance().GetInt64(L"Hooks", L"keyboard", 1))
                 m_hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, g_hInstance, 0);
+            m_bMouseVisuals = CIniSettings::Instance().GetInt64(L"Misc", L"mousevisual", 1) != 0;
         }
         break;
         case WM_COMMAND:
