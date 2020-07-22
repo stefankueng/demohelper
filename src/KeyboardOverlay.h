@@ -19,6 +19,7 @@
 #pragma once
 #include "BaseWindow.h"
 #include "DPIAware.h"
+#include "AnimationManager.h"
 #include <string>
 #include <vector>
 
@@ -27,7 +28,6 @@ class CKeyboardOverlayWnd : public CWindow
 public:
     CKeyboardOverlayWnd(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL)
         : CWindow(hInst, wcx)
-        , m_fadingCounter(0)
     {
         RegisterAndCreateWindow();
     }
@@ -46,6 +46,6 @@ protected:
     LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
-    std::wstring m_text;
-    int          m_fadingCounter;
+    std::wstring            m_text;
+    IUIAnimationVariablePtr m_AnimVar;
 };

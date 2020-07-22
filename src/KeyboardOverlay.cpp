@@ -66,9 +66,20 @@ void CKeyboardOverlayWnd::Show(const std::wstring& text)
 {
     m_text = text;
     InvalidateRect(*this, nullptr, false);
-    SetTimer(*this, FADE_TIMER, 100, nullptr);
-    m_fadingCounter = 255;
-    SetLayeredWindowAttributes(*this, 0, (BYTE)m_fadingCounter, LWA_COLORKEY | LWA_ALPHA);
+    m_AnimVar = Animator::Instance().CreateAnimationVariable(255.0);
+    auto transKeep = Animator::Instance().CreateConstantTransition(2.0);
+    auto transFade = Animator::Instance().CreateSmoothStopTransition(0.8, 0.0);
+    auto storyBoard = Animator::Instance().CreateStoryBoard();
+    storyBoard->AddTransition(m_AnimVar, transKeep);
+    storyBoard->AddTransition(m_AnimVar, transFade);
+    Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+        auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
+        SetLayeredWindowAttributes(*this, 0, animVar, LWA_COLORKEY | LWA_ALPHA);
+        InvalidateRect(*this, nullptr, false);
+        if (animVar == 0)
+            ShowWindow(*this, SW_HIDE);
+        });
+    SetLayeredWindowAttributes(*this, 0, (BYTE)255, LWA_COLORKEY | LWA_ALPHA);
 }
 
 LRESULT CALLBACK CKeyboardOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -99,20 +110,6 @@ LRESULT CALLBACK CKeyboardOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM
             }
         }
         break;
-        case WM_TIMER:
-        {
-            m_fadingCounter -= 5;
-            if (m_fadingCounter < 0)
-                m_fadingCounter = 0;
-            if (m_fadingCounter)
-            {
-                SetLayeredWindowAttributes(*this, 0, (BYTE)m_fadingCounter, LWA_COLORKEY | LWA_ALPHA);
-                InvalidateRect(*this, nullptr, false);
-            }
-            else
-                ShowWindow(*this, SW_HIDE);
-        }
-        break;
         case WM_SETFOCUS:
         {
             if (wParam)
@@ -128,6 +125,7 @@ LRESULT CALLBACK CKeyboardOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM
 
 void CKeyboardOverlayWnd::OnPaint(HDC hDC, LPRECT pRect)
 {
+    auto              animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
     Gdiplus::Rect     rect  = {pRect->left, pRect->top, pRect->right - pRect->left, pRect->bottom - pRect->top};
     Gdiplus::RectF    rectF = {(Gdiplus::REAL)pRect->left,
                             (Gdiplus::REAL)pRect->top,
@@ -138,8 +136,8 @@ void CKeyboardOverlayWnd::OnPaint(HDC hDC, LPRECT pRect)
     graphics.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
 
     Gdiplus::SolidBrush transparentBrush(Gdiplus::Color::MakeARGB(255, 0, 0, 0));
-    Gdiplus::SolidBrush textBrush(Gdiplus::Color::MakeARGB((BYTE)m_fadingCounter, 255, 255, 255));
-    Gdiplus::SolidBrush shadowBrush(Gdiplus::Color::MakeARGB((BYTE)m_fadingCounter, 1, 1, 1));
+    Gdiplus::SolidBrush textBrush(Gdiplus::Color::MakeARGB((BYTE)animVar, 255, 255, 255));
+    Gdiplus::SolidBrush shadowBrush(Gdiplus::Color::MakeARGB((BYTE)animVar, 1, 1, 1));
     graphics.FillRectangle(&transparentBrush, rect);
 
     Gdiplus::StringFormat format;
@@ -154,7 +152,7 @@ void CKeyboardOverlayWnd::OnPaint(HDC hDC, LPRECT pRect)
 
     for (int i = 1; i < 8; ++i)
     {
-        Gdiplus::Pen pen(Gdiplus::Color((BYTE)m_fadingCounter / 8, 192, 20, 20), (Gdiplus::REAL)i);
+        Gdiplus::Pen pen(Gdiplus::Color((BYTE)animVar / 8, 192, 20, 20), (Gdiplus::REAL)i);
         pen.SetLineJoin(Gdiplus::LineJoinRound);
         graphics.DrawPath(&pen, &path);
     }
