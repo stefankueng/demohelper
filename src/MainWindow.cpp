@@ -38,6 +38,7 @@ DWORD               CMainWindow::m_lastHookTime    = 0;
 POINT               CMainWindow::m_lastHookPoint   = {0};
 WPARAM              CMainWindow::m_lastHookMsg     = 0;
 CKeyboardOverlayWnd CMainWindow::m_keyboardOverlay = CKeyboardOverlayWnd(g_hInstance, nullptr);
+CMouseOverlayWnd    CMainWindow::m_mouseOverlay    = CMouseOverlayWnd(g_hInstance, nullptr);
 CMagnifierWindow    CMainWindow::m_magnifierWindow = CMagnifierWindow();
 bool                CMainWindow::m_bLensMode       = false;
 
@@ -59,7 +60,8 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
             text += L"Alt +\r\n";
         if (bShift)
             text += L"Shift +\r\n";
-        bool hasClick = false;
+        bool     hasClick   = false;
+        COLORREF mouseColor = RGB(255, 0, 0);
         switch (wParam)
         {
             case WM_MOUSEMOVE:
@@ -115,6 +117,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 m_lastHookPoint = phs->pt;
                 m_lastHookTime  = phs->time;
                 hasClick        = true;
+                mouseColor      = RGB(255, 0, 0);
             }
             break;
             case WM_RBUTTONDOWN:
@@ -138,6 +141,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 m_lastHookPoint = phs->pt;
                 m_lastHookTime  = phs->time;
                 hasClick        = true;
+                mouseColor      = RGB(0, 255, 0);
             }
             break;
             case WM_MBUTTONDOWN:
@@ -161,6 +165,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 m_lastHookPoint = phs->pt;
                 m_lastHookTime  = phs->time;
                 hasClick        = true;
+                mouseColor      = RGB(0, 0, 255);
             }
             break;
             default:
@@ -168,6 +173,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
         }
         if (!text.empty() && hasClick)
         {
+            m_mouseOverlay.Show(phs->pt, mouseColor);
             m_keyboardOverlay.Show(text);
 
             auto          hMonitor = MonitorFromPoint(phs->pt, MONITOR_DEFAULTTOPRIMARY);

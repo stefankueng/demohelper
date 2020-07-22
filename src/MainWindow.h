@@ -25,6 +25,7 @@
 #include "MemDC.h"
 #include "AnimationManager.h"
 #include "KeyboardOverlay.h"
+#include "MouseOverlay.h"
 #include "MagnifierWindow.h"
 #include <shellapi.h>
 #include <shlwapi.h>
@@ -180,6 +181,7 @@ protected:
     static POINT               m_lastHookPoint;
     static WPARAM              m_lastHookMsg;
     static CKeyboardOverlayWnd m_keyboardOverlay;
+    static CMouseOverlayWnd    m_mouseOverlay;
     static CMagnifierWindow    m_magnifierWindow;
     static bool                m_bLensMode;
 };
