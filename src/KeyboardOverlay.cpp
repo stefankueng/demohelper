@@ -40,13 +40,13 @@ bool CKeyboardOverlayWnd::RegisterAndCreateWindow()
 
     // Fill in the window class structure with default parameters
     wcx.cbSize        = sizeof(WNDCLASSEX);
-    wcx.style         = CS_HREDRAW | CS_VREDRAW | CS_DROPSHADOW | CS_CLASSDC;
+    wcx.style         = CS_HREDRAW | CS_VREDRAW | CS_CLASSDC;
     wcx.lpfnWndProc   = CWindow::stWinMsgHandler;
     wcx.cbClsExtra    = 0;
     wcx.cbWndExtra    = 0;
     wcx.hInstance     = hResource;
     wcx.hCursor       = LoadCursor(NULL, IDC_HAND);
-    wcx.lpszClassName = _T("StatusBarMsgWnd_{BAB03407-CF65-4942-A1D5-063FA1CA8530}");
+    wcx.lpszClassName = L"CKeyboardOverlayWnd_{fda7e16a-f6b2-4be2-a3fc-ea929a07385d}";
     wcx.hIcon         = NULL;
     wcx.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wcx.lpszMenuName  = NULL;
