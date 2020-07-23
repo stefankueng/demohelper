@@ -98,13 +98,18 @@ CAPTION "DemoHelper Options"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON            IDI_DEMOHELPER,IDC_MYICON2,7,7,20,20
+    CONTROL         "DemoHelper: visit our <a href=""https://tools.stefankueng.com/DemoHelper.html"">website</a>",IDC_SYSLINK1,
+                    "SysLink",WS_TABSTOP,40,13,244,12
     GROUPBOX        "Misc",IDC_STATIC,7,25,283,40
+    LTEXT           "Whether to capture only the monitor where the cursor is at, or the whole virtual screen covering all monitors.",IDC_STATIC,14,33,270,19
     CONTROL         "Current Monitor",IDC_CURRENTMONITOR,"Button",BS_AUTORADIOBUTTON,14,51,70,10
     CONTROL         "All Monitors",IDC_ALLMONITORS,"Button",BS_AUTORADIOBUTTON,94,51,80,10
     GROUPBOX        "Zoom",IDC_STATIC,7,66,283,86
     LTEXT           "After enabling the zoom mode, you can zoom in and out using the mouse wheel or the up/down arrow keys. Exit zoom mode with Escape.\nIn Live Zoom Mode, Use Win+Shift+mousewheel to zoom in/out, and hit the hotkey again to exit.",IDC_STATIC,14,76,270,36
     LTEXT           "Zoom Mode:",IDC_STATIC,14,118,54,8
     CONTROL         "",IDC_HOTKEY_ZOOMMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,115,190,14
+    LTEXT           "Live Zoom Mode:",IDC_STATIC,14,136,73,8
+    CONTROL         "",IDC_HOTKEY_LENSMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,133,190,14
     GROUPBOX        "Draw",IDC_STATIC,7,153,283,72
     LTEXT           "After enabling the drawing mode, increase or decrease the pen size with the up/down arrow keys. Cycle through the available colors with the right/left arrow keys. Erase the last line with the Backspace key.",IDC_STATIC,14,162,270,26
     LTEXT           "Draw Mode:",IDC_STATIC,14,193,54,8
@@ -112,17 +117,13 @@ BEGIN
     LTEXT           "Remove lines after",IDC_STATIC,14,210,61,8
     EDITTEXT        IDC_FADESECONDS,94,207,40,14,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "seconds",IDC_STATIC,139,210,27,8
-    DEFPUSHBUTTON   "OK",IDOK,182,253,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,240,253,50,14
-    LTEXT           "Whether to capture only the monitor where the cursor is at, or the whole virtual screen covering all monitors.",IDC_STATIC,14,33,270,19
     GROUPBOX        "Overlays",IDC_STATIC,7,226,283,24
     CONTROL         "Show keystrokes",IDC_KEYHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,237,70,10
     CONTROL         "Show mouseclicks",IDC_MOUSEHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,94,237,75,10
-    CONTROL         "DemoHelper: visit our <a href=""https://tools.stefankueng.com/DemoHelper.html"">website</a>",IDC_SYSLINK1,
-                    "SysLink",WS_TABSTOP,40,13,244,12
-    LTEXT           "Live Zoom Mode:",IDC_STATIC,14,136,73,8
-    CONTROL         "",IDC_HOTKEY_LENSMODE,"msctls_hotkey32",WS_BORDER | WS_TABSTOP,94,133,190,14
     CONTROL         "Visualize mouseclicks",IDC_MOUSEVISUALS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,179,237,86,10
+    PUSHBUTTON      "Configure colors",IDC_CONF_COLORS,15,253,79,14
+    DEFPUSHBUTTON   "OK",IDOK,182,253,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,240,253,50,14
 END
 
 IDD_HELPDIALOG DIALOGEX 0, 0, 263, 276
@@ -172,6 +173,21 @@ BEGIN
     LTEXT           "Win+Shift+Mousewheel",IDC_STATIC,82,22,81,8
     LTEXT           "Win+Shift+Mousewheel",IDC_STATIC,82,32,81,8
     LTEXT           "Hotkey",IDC_STATIC,82,52,24,8
+END
+
+IDD_COLORS DIALOGEX 0, 0, 142, 98
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Colors"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Mouse visual left click:",IDC_STATIC,7,9,84,8
+    PUSHBUTTON      "",IDC_MOUSEVISUAL_LEFT,108,7,27,14
+    LTEXT           "Mouse visual middle click:",IDC_STATIC,7,27,84,8
+    PUSHBUTTON      "",IDC_MOUSEVISUAL_MIDDLE,108,26,27,14
+    LTEXT           "Mouse visual right click:",IDC_STATIC,7,47,84,8
+    PUSHBUTTON      "",IDC_MOUSEVISUAL_RIGHT,108,45,27,14
+    DEFPUSHBUTTON   "OK",IDOK,31,77,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,85,77,50,14
 END
 
 
@@ -225,6 +241,14 @@ BEGIN
         HORZGUIDE, 225
         HORZGUIDE, 235
         HORZGUIDE, 245
+    END
+
+    IDD_COLORS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 135
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 91
     END
 END
 #endif    // APSTUDIO_INVOKED

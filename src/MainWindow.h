@@ -27,6 +27,7 @@
 #include "KeyboardOverlay.h"
 #include "MouseOverlay.h"
 #include "MagnifierWindow.h"
+#include "ColorButton.h"
 #include <shellapi.h>
 #include <shlwapi.h>
 #include <commctrl.h>
@@ -131,6 +132,7 @@ protected:
     HCURSOR CreateDrawCursor(COLORREF color, int penwidth);
 
     static BOOL CALLBACK OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
+    static BOOL CALLBACK ColorDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
     static WORD          HotKeyControl2HotKey(WORD hk);
     static WORD          HotKey2HotKeyControl(WORD hk);
     static BOOL CALLBACK HelpDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
@@ -185,4 +187,7 @@ protected:
     static CMagnifierWindow    m_magnifierWindow;
     static bool                m_bLensMode;
     static bool                m_bMouseVisuals;
+    static COLORREF            m_mvLColor;
+    static COLORREF            m_mvMColor;
+    static COLORREF            m_mvRColor;
 };

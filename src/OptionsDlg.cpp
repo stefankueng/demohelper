@@ -21,6 +21,7 @@
 #include "DemoHelper.h"
 #include "MainWindow.h"
 #include "IniSettings.h"
+#include "ColorDlg.h"
 
 BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -88,6 +89,12 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
                 case IDCANCEL:
                     EndDialog(hwndDlg, wParam);
                     return TRUE;
+                case IDC_CONF_COLORS:
+                {
+                    CColorDlg dlg(hwndDlg);
+                    dlg.DoModal(g_hResource, IDD_COLORS, hwndDlg);
+                }
+                break;
             }
             break;
         case WM_NOTIFY:

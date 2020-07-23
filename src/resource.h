@@ -14,6 +14,7 @@
 #define IDR_MAINFRAME                   128
 #define IDD_OPTIONS                     129
 #define IDD_HELPDIALOG                  130
+#define IDD_COLORS                      131
 #define IDC_WEBLINK                     1002
 #define IDC_HOTKEY_ZOOMMODE             1003
 #define IDC_HOTKEY_DRAWMODE             1004
@@ -25,8 +26,12 @@
 #define IDC_KEYHOOK                     1010
 #define IDC_MOUSEHOOK                   1011
 #define IDC_SYSLINK1                    1012
-#define IDC_MOUSECLICKS                 1013
 #define IDC_MOUSEVISUALS                1013
+#define IDC_MOUSEVISUAL_LEFT            1013
+#define IDC_MOUSEVISUAL_MIDDLE          1014
+#define IDC_BUTTON1                     1014
+#define IDC_CONF_COLORS                 1014
+#define IDC_MOUSEVISUAL_RIGHT           1015
 #define ID_TRAYCONTEXT_OPTIONS          32771
 #define ID_TRAYCONTEXT_ABOUT            32772
 #define ID_TRAYCONTEXT_ZOOM             32773
@@ -62,9 +67,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        131
+#define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         32806
-#define _APS_NEXT_CONTROL_VALUE         1013
+#define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

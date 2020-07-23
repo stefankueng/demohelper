@@ -233,6 +233,9 @@ LRESULT CMainWindow::DoCommand(int id)
             if (CIniSettings::Instance().GetInt64(L"Hooks", L"keyboard", 1))
                 m_hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, g_hInstance, 0);
             m_bMouseVisuals = CIniSettings::Instance().GetInt64(L"Misc", L"mousevisual", 1) != 0;
+            m_mvLColor = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualLcolor", RGB(255, 0, 0));
+            m_mvMColor = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualMcolor", RGB(0, 0, 255));
+            m_mvRColor = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualRcolor", RGB(0, 255, 0));
         }
         break;
         case ID_TRAYCONTEXT_DRAW:

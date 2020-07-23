@@ -199,7 +199,9 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\sktoolslib\AeroGlass.cpp" />
     <ClCompile Include="..\sktoolslib\AnimationManager.cpp" />
+    <ClCompile Include="..\sktoolslib\BaseDialog.cpp" />
     <ClCompile Include="..\sktoolslib\BaseWindow.cpp" />
     <ClCompile Include="..\sktoolslib\DebugOutput.cpp" />
     <ClCompile Include="..\sktoolslib\hyperlink.cpp" />
@@ -207,6 +209,8 @@
     <ClCompile Include="..\sktoolslib\PathUtils.cpp" />
     <ClCompile Include="..\sktoolslib\Registry.cpp" />
     <ClCompile Include="..\sktoolslib\StringUtils.cpp" />
+    <ClCompile Include="ColorButton.cpp" />
+    <ClCompile Include="ColorDlg.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="DemoHelper.cpp" />
     <ClCompile Include="Graphics.cpp" />
@@ -221,7 +225,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\sktoolslib\AeroGlass.h" />
     <ClInclude Include="..\sktoolslib\AnimationManager.h" />
+    <ClInclude Include="..\sktoolslib\BaseDialog.h" />
     <ClInclude Include="..\sktoolslib\BaseWindow.h" />
     <ClInclude Include="..\sktoolslib\DebugOutput.h" />
     <ClInclude Include="..\sktoolslib\DPIAware.h" />
@@ -231,6 +237,8 @@
     <ClInclude Include="..\sktoolslib\Registry.h" />
     <ClInclude Include="..\sktoolslib\SimpleIni.h" />
     <ClInclude Include="..\sktoolslib\StringUtils.h" />
+    <ClInclude Include="ColorButton.h" />
+    <ClInclude Include="ColorDlg.h" />
     <ClInclude Include="DemoHelper.h" />
     <ClInclude Include="KeyboardOverlay.h" />
     <ClInclude Include="MagnifierWindow.h" />

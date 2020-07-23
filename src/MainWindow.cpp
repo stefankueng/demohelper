@@ -42,6 +42,9 @@ CMouseOverlayWnd    CMainWindow::m_mouseOverlay    = CMouseOverlayWnd(g_hInstanc
 CMagnifierWindow    CMainWindow::m_magnifierWindow = CMagnifierWindow();
 bool                CMainWindow::m_bLensMode       = false;
 bool                CMainWindow::m_bMouseVisuals   = true;
+COLORREF            CMainWindow::m_mvLColor        = RGB(255, 0, 0);
+COLORREF            CMainWindow::m_mvMColor        = RGB(0, 0, 255);
+COLORREF            CMainWindow::m_mvRColor        = RGB(0, 255, 0);
 
 LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -62,7 +65,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
         if (bShift)
             text += L"Shift +\r\n";
         bool     hasClick   = false;
-        COLORREF mouseColor = RGB(255, 0, 0);
+        COLORREF mouseColor = m_mvLColor;
         switch (wParam)
         {
             case WM_MOUSEMOVE:
@@ -118,7 +121,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 m_lastHookPoint = phs->pt;
                 m_lastHookTime  = phs->time;
                 hasClick        = true;
-                mouseColor      = RGB(255, 0, 0);
+                mouseColor      = m_mvLColor;
             }
             break;
             case WM_RBUTTONDOWN:
@@ -142,7 +145,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 m_lastHookPoint = phs->pt;
                 m_lastHookTime  = phs->time;
                 hasClick        = true;
-                mouseColor      = RGB(0, 255, 0);
+                mouseColor      = m_mvRColor;
             }
             break;
             case WM_MBUTTONDOWN:
@@ -166,7 +169,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 m_lastHookPoint = phs->pt;
                 m_lastHookTime  = phs->time;
                 hasClick        = true;
-                mouseColor      = RGB(0, 0, 255);
+                mouseColor      = m_mvMColor;
             }
             break;
             default:
@@ -316,6 +319,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             if (CIniSettings::Instance().GetInt64(L"Hooks", L"keyboard", 1))
                 m_hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, g_hInstance, 0);
             m_bMouseVisuals = CIniSettings::Instance().GetInt64(L"Misc", L"mousevisual", 1) != 0;
+            m_mvLColor = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualLcolor", RGB(255, 0, 0));
+            m_mvMColor = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualMcolor", RGB(0, 0, 255));
+            m_mvRColor = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualRcolor", RGB(0, 255, 0));
         }
         break;
         case WM_COMMAND:
