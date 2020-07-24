@@ -236,7 +236,7 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                     break;
                 default:
                     GetKeyNameText((LONG)dwMsg, buffer, sizeof(buffer));
-                    if ((wcslen(buffer) > 1) || bControl || bAlt || bShift)
+                    if ((wcslen(buffer) > 1) || bControl || bAlt || bWindows)
                     {
                         text += buffer;
                         m_keyboardOverlay.Show(text);
