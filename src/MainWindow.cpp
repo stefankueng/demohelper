@@ -57,13 +57,13 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
         auto            bShift   = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
         auto            bWindows = (GetAsyncKeyState(VK_LWIN) & 0x8000) != 0;
         if ((bWindows))
-            text += L"Win +\r\n";
+            text += L"Win + ";
         if ((bControl))
-            text += L"Ctrl +\r\n";
+            text += L"Ctrl + ";
         if (bAlt)
-            text += L"Alt +\r\n";
+            text += L"Alt + ";
         if (bShift)
-            text += L"Shift +\r\n";
+            text += L"Shift + ";
         bool     hasClick   = false;
         COLORREF mouseColor = m_mvLColor;
         switch (wParam)
@@ -214,13 +214,13 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
             auto bShift   = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
             auto bWindows = (GetAsyncKeyState(VK_LWIN) & 0x8000) != 0;
             if ((bWindows))
-                text += L"Win +\r\n";
+                text += L"Win + ";
             if ((bControl))
-                text += L"Ctrl +\r\n";
+                text += L"Ctrl + ";
             if (bAlt)
-                text += L"Alt +\r\n";
+                text += L"Alt + ";
             if (bShift)
-                text += L"Shift +\r\n";
+                text += L"Shift + ";
             switch (keyInfo.vkCode)
             {
                 case VK_CONTROL:
