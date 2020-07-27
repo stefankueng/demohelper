@@ -18,8 +18,8 @@
 //
 #include "stdafx.h"
 #include "ColorButton.h"
-#include <StringUtils.h>
-
+#include "StringUtils.h"
+#include <cassert>
 #include <Commdlg.h>
 #include <wingdi.h>
 
