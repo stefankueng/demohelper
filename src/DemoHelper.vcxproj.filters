@@ -87,6 +87,12 @@
     <ClInclude Include="..\sktoolslib\AeroGlass.h">
       <Filter>sktoolslib</Filter>
     </ClInclude>
+    <ClInclude Include="..\sktoolslib\BaseWindowD2D.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyboardOverlayD2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DemoHelper.ico">
@@ -186,6 +192,12 @@
     </ClCompile>
     <ClCompile Include="..\sktoolslib\AeroGlass.cpp">
       <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sktoolslib\BaseWindowD2D.cpp">
+      <Filter>sktoolslib</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyboardOverlayD2D.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

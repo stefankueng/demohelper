@@ -25,6 +25,7 @@
 #include "MemDC.h"
 #include "AnimationManager.h"
 #include "KeyboardOverlay.h"
+#include "KeyboardOverlayD2D.h"
 #include "MouseOverlay.h"
 #include "MagnifierWindow.h"
 #include "ColorButton.h"
@@ -177,17 +178,18 @@ protected:
     IUIAnimationVariablePtr m_AnimVarZoom;
     std::deque<DrawLine>    m_drawLines;
 
-    static HHOOK               m_hKeyboardHook;
-    static HHOOK               m_hMouseHook;
-    static DWORD               m_lastHookTime;
-    static POINT               m_lastHookPoint;
-    static WPARAM              m_lastHookMsg;
-    static CKeyboardOverlayWnd m_keyboardOverlay;
-    static CMouseOverlayWnd    m_mouseOverlay;
-    static CMagnifierWindow    m_magnifierWindow;
-    static bool                m_bLensMode;
-    static bool                m_bMouseVisuals;
-    static COLORREF            m_mvLColor;
-    static COLORREF            m_mvMColor;
-    static COLORREF            m_mvRColor;
+    static HHOOK                  m_hKeyboardHook;
+    static HHOOK                  m_hMouseHook;
+    static DWORD                  m_lastHookTime;
+    static POINT                  m_lastHookPoint;
+    static WPARAM                 m_lastHookMsg;
+    static CKeyboardOverlayWnd    m_keyboardOverlay;
+    //static CKeyboardOverlayWndD2D m_keyboardOverlayD2D;
+    static CMouseOverlayWnd       m_mouseOverlay;
+    static CMagnifierWindow       m_magnifierWindow;
+    static bool                   m_bLensMode;
+    static bool                   m_bMouseVisuals;
+    static COLORREF               m_mvLColor;
+    static COLORREF               m_mvMColor;
+    static COLORREF               m_mvRColor;
 };
