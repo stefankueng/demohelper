@@ -21,6 +21,7 @@ Use cases include meetings where you have to explain something on the screen or 
     <licenseUrl>http://www.gnu.org/licenses/old-licenses/gpl-2.0.html</licenseUrl>
     <iconUrl>https://github.com/stefankueng/demohelper/raw/main/src/res/demohelper256.png</iconUrl>
     <projectSourceUrl>https://github.com/stefankueng/demohelper</projectSourceUrl>
+    <packageSourceUrl>https://github.com/stefankueng/demohelper/tree/main/choco</packageSourceUrl>
     <bugTrackerUrl>https://github.com/stefankueng/demohelper/issues</bugTrackerUrl>
   </metadata>
   <files>
