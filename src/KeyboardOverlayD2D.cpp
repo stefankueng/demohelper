@@ -122,10 +122,10 @@ HRESULT CKeyboardOverlayWndD2D::OnRender(ID2D1DeviceContext* dc)
 
     ComPtr<ID2D1SolidColorBrush> backgroundBrush;
     hr = m_dc->CreateSolidColorBrush(D2D1::ColorF(RGB(128, 128, 128), animVar / 255.0f / 1.4f), backgroundBrush.GetAddressOf());
-    ComPtr<ID2D1SolidColorBrush> backgroundBorderBrush;
-    hr = m_dc->CreateSolidColorBrush(D2D1::ColorF(RGB(120, 10, 10), animVar / 255.0f), backgroundBorderBrush.GetAddressOf());
     dc->FillRoundedRectangle(roundedRect, backgroundBrush.Get());
-    dc->DrawRoundedRectangle(roundedRect, backgroundBorderBrush.Get(), 5.0f);
+    //ComPtr<ID2D1SolidColorBrush> backgroundBorderBrush;
+    //hr = m_dc->CreateSolidColorBrush(D2D1::ColorF(RGB(120, 10, 10), animVar / 255.0f), backgroundBorderBrush.GetAddressOf());
+    //dc->DrawRoundedRectangle(roundedRect, backgroundBorderBrush.Get(), 5.0f);
 
     D2D1_POINT_2F offset = {7, 7};
     dc->DrawImage(m_gaussianBlurEffect.Get(), &offset);
@@ -142,7 +142,8 @@ HRESULT CKeyboardOverlayWndD2D::CreateDeviceResources()
     if (SUCCEEDED(hr))
         hr = m_writeFactory->CreateTextFormat(L"Arial", nullptr,
                                               DWRITE_FONT_WEIGHT_DEMI_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_CONDENSED,
-                                              72.0, L"", m_TextFormat.GetAddressOf());
+                                              float(CDPIAware::Instance().Scale(*this, 36)),
+                                              L"", m_TextFormat.GetAddressOf());
     if (SUCCEEDED(hr))
         hr = m_TextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 
