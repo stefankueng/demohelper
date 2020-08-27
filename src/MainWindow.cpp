@@ -32,20 +32,21 @@ extern HINSTANCE g_hResource; // the resource dll
 constexpr int overlayWidth  = 220;
 constexpr int overlayHeight = 140;
 
-HHOOK  CMainWindow::m_hKeyboardHook = 0;
-HHOOK  CMainWindow::m_hMouseHook    = 0;
-DWORD  CMainWindow::m_lastHookTime  = 0;
-POINT  CMainWindow::m_lastHookPoint = {0};
-WPARAM CMainWindow::m_lastHookMsg   = 0;
-CKeyboardOverlayWnd    CMainWindow::m_keyboardOverlay    = CKeyboardOverlayWnd(g_hInstance, nullptr);
+HHOOK               CMainWindow::m_hKeyboardHook   = 0;
+HHOOK               CMainWindow::m_hMouseHook      = 0;
+DWORD               CMainWindow::m_lastHookTime    = 0;
+POINT               CMainWindow::m_lastHookPoint   = {0};
+WPARAM              CMainWindow::m_lastHookMsg     = 0;
+CKeyboardOverlayWnd CMainWindow::m_keyboardOverlay = CKeyboardOverlayWnd(g_hInstance, nullptr);
 //CKeyboardOverlayWndD2D CMainWindow::m_keyboardOverlayD2D = CKeyboardOverlayWndD2D(g_hInstance, nullptr);
-CMouseOverlayWnd       CMainWindow::m_mouseOverlay       = CMouseOverlayWnd(g_hInstance, nullptr);
-CMagnifierWindow       CMainWindow::m_magnifierWindow    = CMagnifierWindow();
-bool                   CMainWindow::m_bLensMode          = false;
-bool                   CMainWindow::m_bMouseVisuals      = true;
-COLORREF               CMainWindow::m_mvLColor           = RGB(255, 0, 0);
-COLORREF               CMainWindow::m_mvMColor           = RGB(0, 0, 255);
-COLORREF               CMainWindow::m_mvRColor           = RGB(0, 255, 0);
+CMouseOverlayWnd CMainWindow::m_mouseOverlay    = CMouseOverlayWnd(g_hInstance, nullptr);
+CMagnifierWindow CMainWindow::m_magnifierWindow = CMagnifierWindow();
+bool             CMainWindow::m_bLensMode       = false;
+bool             CMainWindow::m_bMouseVisuals   = true;
+bool             CMainWindow::m_bMouseClicks    = true;
+COLORREF         CMainWindow::m_mvLColor        = RGB(255, 0, 0);
+COLORREF         CMainWindow::m_mvMColor        = RGB(0, 0, 255);
+COLORREF         CMainWindow::m_mvRColor        = RGB(0, 255, 0);
 
 LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -180,15 +181,18 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
         {
             if (m_bMouseVisuals)
                 m_mouseOverlay.Show(phs->pt, mouseColor);
-            m_keyboardOverlay.Show(text);
+            if (m_bMouseClicks)
+            {
+                m_keyboardOverlay.Show(text);
 
-            auto          hMonitor = MonitorFromPoint(phs->pt, MONITOR_DEFAULTTOPRIMARY);
-            MONITORINFOEX mi       = {};
-            mi.cbSize              = sizeof(MONITORINFOEX);
-            GetMonitorInfo(hMonitor, &mi);
-            const long width  = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth);
-            const long height = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight);
-            SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, mi.rcWork.right - width, mi.rcWork.bottom - height, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+                auto          hMonitor = MonitorFromPoint(phs->pt, MONITOR_DEFAULTTOPRIMARY);
+                MONITORINFOEX mi       = {};
+                mi.cbSize              = sizeof(MONITORINFOEX);
+                GetMonitorInfo(hMonitor, &mi);
+                const long width  = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth);
+                const long height = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight);
+                SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, mi.rcWork.right - width, mi.rcWork.bottom - height, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+            }
         }
     }
     return CallNextHookEx(m_hMouseHook, nCode, wParam, lParam);
@@ -315,11 +319,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             m_hwnd = hwnd;
             RegisterHotKeys();
             m_magnifierWindow.Create(g_hInstance, *this, FALSE);
-            if (CIniSettings::Instance().GetInt64(L"Hooks", L"mouse", 1))
-                m_hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, g_hInstance, 0);
+            m_hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, g_hInstance, 0);
             if (CIniSettings::Instance().GetInt64(L"Hooks", L"keyboard", 1))
                 m_hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, g_hInstance, 0);
             m_bMouseVisuals = CIniSettings::Instance().GetInt64(L"Misc", L"mousevisual", 1) != 0;
+            m_bMouseClicks  = CIniSettings::Instance().GetInt64(L"Hooks", L"mouse", 1) != 0;
             m_mvLColor      = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualLcolor", RGB(255, 0, 0));
             m_mvMColor      = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualMcolor", RGB(0, 0, 255));
             m_mvRColor      = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualRcolor", RGB(0, 255, 0));

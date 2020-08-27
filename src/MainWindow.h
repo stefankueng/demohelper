@@ -189,6 +189,7 @@ protected:
     static CMagnifierWindow       m_magnifierWindow;
     static bool                   m_bLensMode;
     static bool                   m_bMouseVisuals;
+    static bool                   m_bMouseClicks;
     static COLORREF               m_mvLColor;
     static COLORREF               m_mvMColor;
     static COLORREF               m_mvRColor;
