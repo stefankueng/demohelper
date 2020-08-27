@@ -76,6 +76,21 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 {
                     m_magnifierWindow.SetMagnification(phs->pt, m_magnifierWindow.GetMagnification());
                 }
+                if ((GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0)
+                {
+                    hasClick   = true;
+                    mouseColor = m_mvLColor;
+                }
+                if ((GetAsyncKeyState(VK_RBUTTON) & 0x8000) != 0)
+                {
+                    hasClick   = true;
+                    mouseColor = m_mvRColor;
+                }
+                if ((GetAsyncKeyState(VK_MBUTTON) & 0x8000) != 0)
+                {
+                    hasClick   = true;
+                    mouseColor = m_mvMColor;
+                }
             }
             break;
             case WM_MOUSEWHEEL:
@@ -177,7 +192,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
             default:
                 break;
         }
-        if (!text.empty() && hasClick)
+        if (!text.empty() || hasClick)
         {
             if (m_bMouseVisuals)
                 m_mouseOverlay.Show(phs->pt, mouseColor);
