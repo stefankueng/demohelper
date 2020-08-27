@@ -67,6 +67,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
         if (bShift)
             text += L"Shift + ";
         bool     hasClick   = false;
+        bool     doFade     = false;
         COLORREF mouseColor = m_mvLColor;
         switch (wParam)
         {
@@ -76,21 +77,14 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 {
                     m_magnifierWindow.SetMagnification(phs->pt, m_magnifierWindow.GetMagnification());
                 }
-                if ((GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0)
+                if (((GetAsyncKeyState(VK_LBUTTON) & 0x8000) == 0) &&
+                    ((GetAsyncKeyState(VK_MBUTTON) & 0x8000) == 0) &&
+                    ((GetAsyncKeyState(VK_RBUTTON) & 0x8000) == 0))
                 {
-                    hasClick   = true;
-                    mouseColor = m_mvLColor;
+                    doFade = true;
                 }
-                if ((GetAsyncKeyState(VK_RBUTTON) & 0x8000) != 0)
-                {
-                    hasClick   = true;
-                    mouseColor = m_mvRColor;
-                }
-                if ((GetAsyncKeyState(VK_MBUTTON) & 0x8000) != 0)
-                {
-                    hasClick   = true;
-                    mouseColor = m_mvMColor;
-                }
+                else
+                    m_mouseOverlay.UpdatePos(phs->pt);
             }
             break;
             case WM_MOUSEWHEEL:
@@ -117,6 +111,15 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 }
             }
             break;
+            case WM_LBUTTONUP:
+                doFade = true;
+                break;
+            case WM_MBUTTONUP:
+                doFade = true;
+                break;
+            case WM_RBUTTONUP:
+                doFade = true;
+                break;
             case WM_LBUTTONDOWN:
             {
                 bool dbl = false;
@@ -192,11 +195,16 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
             default:
                 break;
         }
-        if (!text.empty() || hasClick)
+        if (!text.empty() || hasClick || doFade)
         {
             if (m_bMouseVisuals)
-                m_mouseOverlay.Show(phs->pt, mouseColor);
-            if (m_bMouseClicks)
+            {
+                if (doFade)
+                    m_mouseOverlay.Fade();
+                else
+                    m_mouseOverlay.Show(phs->pt, mouseColor, 220.0);
+            }
+            if (m_bMouseClicks && !text.empty() || hasClick)
             {
                 m_keyboardOverlay.Show(text);
 

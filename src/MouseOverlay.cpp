@@ -63,13 +63,13 @@ bool CMouseOverlayWnd::RegisterAndCreateWindow()
     return false;
 }
 
-void CMouseOverlayWnd::Show(POINT screenPos, COLORREF color)
+void CMouseOverlayWnd::Show(POINT screenPos, COLORREF color, double fadeTo)
 {
     m_color = color;
     SetWindowPos(*this, HWND_TOPMOST, screenPos.x - winHalfWidth, screenPos.y - winHalfHeight, 2 * winHalfWidth, 2 * winHalfHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
     InvalidateRect(*this, nullptr, false);
     m_AnimVar       = Animator::Instance().CreateAnimationVariable(255.0);
-    auto transFade  = Animator::Instance().CreateSmoothStopTransition(1.0, 0.0);
+    auto transFade  = Animator::Instance().CreateSmoothStopTransition(1.0 * ((255.0 - fadeTo) / 255.0), fadeTo);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
     storyBoard->AddTransition(m_AnimVar, transFade);
     Animator::Instance().RunStoryBoard(storyBoard, [this]() {
@@ -81,6 +81,37 @@ void CMouseOverlayWnd::Show(POINT screenPos, COLORREF color)
     });
 
     SetLayeredWindowAttributes(*this, 0, (BYTE)128, LWA_COLORKEY | LWA_ALPHA);
+}
+
+void CMouseOverlayWnd::UpdatePos(POINT screenPos)
+{
+    if (m_AnimVar)
+    {
+        auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
+        if (animVar)
+            SetWindowPos(*this, HWND_TOPMOST, screenPos.x - winHalfWidth, screenPos.y - winHalfHeight, 2 * winHalfWidth, 2 * winHalfHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+    }
+}
+
+void CMouseOverlayWnd::Fade()
+{
+    if (m_AnimVar)
+    {
+        auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
+        if (animVar)
+        {
+            auto transFade  = Animator::Instance().CreateSmoothStopTransition(1.0, 0.0);
+            auto storyBoard = Animator::Instance().CreateStoryBoard();
+            storyBoard->AddTransition(m_AnimVar, transFade);
+            Animator::Instance().RunStoryBoard(storyBoard, [this]() {
+                auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
+                SetLayeredWindowAttributes(*this, 0, animVar / 2, LWA_COLORKEY | LWA_ALPHA);
+                InvalidateRect(*this, nullptr, false);
+                if (animVar == 0)
+                    ShowWindow(*this, SW_HIDE);
+            });
+        }
+    }
 }
 
 LRESULT CALLBACK CMouseOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

@@ -34,7 +34,9 @@ public:
     }
     ~CMouseOverlayWnd(void);
 
-    void Show(POINT screenPos, COLORREF color);
+    void Show(POINT screenPos, COLORREF color, double fadeTo);
+    void UpdatePos(POINT screenPos);
+    void Fade();
 
 private:
 protected:
