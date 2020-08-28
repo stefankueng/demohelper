@@ -33,6 +33,7 @@ public:
     }
     ~CKeyboardOverlayWndD2D(void);
 
+    int GetRequiredHeight(const std::wstring& text);
     void Show(const std::wstring& text);
 
 private:

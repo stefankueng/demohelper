@@ -325,6 +325,7 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                         }
                         text += buffer;
                         m_keySequence.push_back(buffer);
+                        auto reqHeight = m_keyboardOverlay.GetRequiredHeight(text);
                         m_keyboardOverlay.Show(text);
 
                         auto          hFocus   = GetFocus();
@@ -333,9 +334,10 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                         mi.cbSize              = sizeof(MONITORINFOEX);
                         GetMonitorInfo(hMonitor, &mi);
                         const long width   = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth);
-                        const long height  = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight);
+                        const long height  = std::max(reqHeight, CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight));
                         auto       posLeft = mi.rcWork.right - width;
                         auto       posTop  = mi.rcWork.bottom - height;
+
                         SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, posLeft, posTop, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
                         InvalidateRect(m_keyboardOverlay, nullptr, false);
                     }

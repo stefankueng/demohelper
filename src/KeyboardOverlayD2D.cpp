@@ -55,6 +55,23 @@ bool CKeyboardOverlayWndD2D::RegisterAndCreateWindow()
     return false;
 }
 
+int CKeyboardOverlayWndD2D::GetRequiredHeight(const std::wstring& text)
+{
+    RECT rc;
+    GetClientRect(*this, &rc);
+    ComPtr<IDWriteTextLayout> textLayout;
+    if (SUCCEEDED(m_writeFactory->CreateTextLayout(text.c_str(),
+                                                   (UINT32)text.length(), m_TextFormat.Get(),
+                                                   (float)rc.right, (float)rc.bottom,
+                                                   textLayout.GetAddressOf())))
+    {
+        DWRITE_TEXT_METRICS textMetrics = {};
+        if (SUCCEEDED(textLayout->GetMetrics(&textMetrics)))
+            return (int)textMetrics.height;
+    }
+    return 0;
+}
+
 void CKeyboardOverlayWndD2D::Show(const std::wstring& text)
 {
     m_text = text;
