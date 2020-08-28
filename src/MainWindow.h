@@ -183,8 +183,8 @@ protected:
     static DWORD                  m_lastHookTime;
     static POINT                  m_lastHookPoint;
     static WPARAM                 m_lastHookMsg;
-    static CKeyboardOverlayWnd    m_keyboardOverlay;
-    //static CKeyboardOverlayWndD2D m_keyboardOverlayD2D;
+    //static CKeyboardOverlayWnd    m_keyboardOverlay;
+    static CKeyboardOverlayWndD2D m_keyboardOverlay;
     static CMouseOverlayWnd       m_mouseOverlay;
     static CMagnifierWindow       m_magnifierWindow;
     static bool                   m_bLensMode;

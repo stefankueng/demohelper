@@ -32,21 +32,21 @@ extern HINSTANCE g_hResource; // the resource dll
 constexpr int overlayWidth  = 220;
 constexpr int overlayHeight = 140;
 
-HHOOK               CMainWindow::m_hKeyboardHook   = 0;
-HHOOK               CMainWindow::m_hMouseHook      = 0;
-DWORD               CMainWindow::m_lastHookTime    = 0;
-POINT               CMainWindow::m_lastHookPoint   = {0};
-WPARAM              CMainWindow::m_lastHookMsg     = 0;
-CKeyboardOverlayWnd CMainWindow::m_keyboardOverlay = CKeyboardOverlayWnd(g_hInstance, nullptr);
-//CKeyboardOverlayWndD2D CMainWindow::m_keyboardOverlayD2D = CKeyboardOverlayWndD2D(g_hInstance, nullptr);
-CMouseOverlayWnd CMainWindow::m_mouseOverlay    = CMouseOverlayWnd(g_hInstance, nullptr);
-CMagnifierWindow CMainWindow::m_magnifierWindow = CMagnifierWindow();
-bool             CMainWindow::m_bLensMode       = false;
-bool             CMainWindow::m_bMouseVisuals   = true;
-bool             CMainWindow::m_bMouseClicks    = true;
-COLORREF         CMainWindow::m_mvLColor        = RGB(255, 0, 0);
-COLORREF         CMainWindow::m_mvMColor        = RGB(0, 0, 255);
-COLORREF         CMainWindow::m_mvRColor        = RGB(0, 255, 0);
+HHOOK  CMainWindow::m_hKeyboardHook = 0;
+HHOOK  CMainWindow::m_hMouseHook    = 0;
+DWORD  CMainWindow::m_lastHookTime  = 0;
+POINT  CMainWindow::m_lastHookPoint = {0};
+WPARAM CMainWindow::m_lastHookMsg   = 0;
+//CKeyboardOverlayWnd CMainWindow::m_keyboardOverlay = CKeyboardOverlayWnd(g_hInstance, nullptr);
+CKeyboardOverlayWndD2D CMainWindow::m_keyboardOverlay = CKeyboardOverlayWndD2D(g_hInstance, nullptr);
+CMouseOverlayWnd       CMainWindow::m_mouseOverlay    = CMouseOverlayWnd(g_hInstance, nullptr);
+CMagnifierWindow       CMainWindow::m_magnifierWindow = CMagnifierWindow();
+bool                   CMainWindow::m_bLensMode       = false;
+bool                   CMainWindow::m_bMouseVisuals   = true;
+bool                   CMainWindow::m_bMouseClicks    = true;
+COLORREF               CMainWindow::m_mvLColor        = RGB(255, 0, 0);
+COLORREF               CMainWindow::m_mvMColor        = RGB(0, 0, 255);
+COLORREF               CMainWindow::m_mvRColor        = RGB(0, 255, 0);
 
 LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
