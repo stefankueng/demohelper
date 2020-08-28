@@ -212,9 +212,19 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 MONITORINFOEX mi       = {};
                 mi.cbSize              = sizeof(MONITORINFOEX);
                 GetMonitorInfo(hMonitor, &mi);
-                const long width  = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth);
-                const long height = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight);
-                SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, mi.rcWork.right - width, mi.rcWork.bottom - height, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+                const long width   = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth);
+                const long height  = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight);
+                auto       posLeft = mi.rcWork.right - width;
+                auto       posTop  = mi.rcWork.bottom - height;
+                if (wParam == WM_RBUTTONDOWN || wParam == WM_RBUTTONUP)
+                {
+                    RECT ovlRC = { posLeft, posTop, posLeft + width, posTop + height };
+                    if (PtInRect(&ovlRC, phs->pt))
+                    {
+                        posTop = phs->pt.y - height - 20;
+                    }
+                }
+                SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, posLeft, posTop, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
             }
         }
     }
@@ -274,9 +284,11 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                         MONITORINFOEX mi       = {};
                         mi.cbSize              = sizeof(MONITORINFOEX);
                         GetMonitorInfo(hMonitor, &mi);
-                        const long width  = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth);
-                        const long height = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight);
-                        SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, mi.rcWork.right - width, mi.rcWork.bottom - height, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+                        const long width   = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth);
+                        const long height  = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight);
+                        auto       posLeft = mi.rcWork.right - width;
+                        auto       posTop  = mi.rcWork.bottom - height;
+                        SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, posLeft, posTop, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
                     }
                     break;
             }
