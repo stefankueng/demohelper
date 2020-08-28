@@ -101,8 +101,8 @@ HRESULT CKeyboardOverlayWndD2D::OnRender(ID2D1DeviceContext* dc)
 {
     HRESULT hr          = S_OK;
     auto    size        = dc->GetSize();
-    auto    roundRadius = CDPIAware::Instance().Scale(*this, 15);
-    auto    textOffset  = CDPIAware::Instance().Scale(*this, 3);
+    auto    roundRadius = (float)CDPIAware::Instance().Scale(*this, 15);
+    auto    textOffset  = (float)CDPIAware::Instance().Scale(*this, 3);
     auto    roundedRect = D2D1::RoundedRect(D2D1::RectF(0, 0, size.width, size.height), roundRadius, roundRadius);
 
     auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
