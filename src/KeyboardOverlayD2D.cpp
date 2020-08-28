@@ -49,7 +49,7 @@ bool CKeyboardOverlayWndD2D::RegisterAndCreateWindow()
     wcx.hIconSm       = NULL;
     if (RegisterWindow(&wcx))
     {
-        auto ret = CreateEx(WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOOLWINDOW | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOPMOST, WS_POPUP | WS_DISABLED, NULL);
+        auto ret = CreateEx(WS_EX_NOREDIRECTIONBITMAP | WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_NOACTIVATE | WS_EX_TOPMOST, WS_POPUP | WS_DISABLED, NULL);
         return ret;
     }
     return false;
@@ -80,12 +80,17 @@ LRESULT CKeyboardOverlayWndD2D::WinMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
         case WM_CREATE:
             m_hwnd = hwnd;
             break;
+        case WM_LBUTTONUP:
+            // user clicked on the popup window
+            break;
         case WM_SETFOCUS:
         {
             if (wParam)
                 SetFocus((HWND)wParam); // return the focus, we don't want it
         }
         break;
+        case WM_NCHITTEST:
+            return HTTRANSPARENT;
         default:
             return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
@@ -96,7 +101,9 @@ HRESULT CKeyboardOverlayWndD2D::OnRender(ID2D1DeviceContext* dc)
 {
     HRESULT hr          = S_OK;
     auto    size        = dc->GetSize();
-    auto    roundedRect = D2D1::RoundedRect(D2D1::RectF(0, 0, size.width, size.height), 30.f, 30.f);
+    auto    roundRadius = CDPIAware::Instance().Scale(*this, 15);
+    auto    textOffset  = CDPIAware::Instance().Scale(*this, 3);
+    auto    roundedRect = D2D1::RoundedRect(D2D1::RectF(0, 0, size.width, size.height), roundRadius, roundRadius);
 
     auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
 
@@ -110,7 +117,7 @@ HRESULT CKeyboardOverlayWndD2D::OnRender(ID2D1DeviceContext* dc)
 
     m_dc->SetTarget(bmp.Get());
 
-    auto                         textRect = D2D1::RectF(5, 5, size.width - 10, size.height - 10);
+    auto                         textRect = D2D1::RectF(textOffset, textOffset, size.width - textOffset - textOffset, size.height - textOffset - textOffset);
     ComPtr<ID2D1SolidColorBrush> shadowBrush;
     hr = m_dc->CreateSolidColorBrush(D2D1::ColorF(RGB(10, 10, 10), animVar / 255.0f), shadowBrush.GetAddressOf());
     dc->DrawText(m_text.c_str(), (UINT32)m_text.size(), m_TextFormat.Get(), textRect, shadowBrush.Get());
