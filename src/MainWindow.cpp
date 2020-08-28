@@ -225,6 +225,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                     }
                 }
                 SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, posLeft, posTop, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+                InvalidateRect(m_keyboardOverlay, nullptr, false);
             }
         }
     }
@@ -289,6 +290,7 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                         auto       posLeft = mi.rcWork.right - width;
                         auto       posTop  = mi.rcWork.bottom - height;
                         SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, posLeft, posTop, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+                        InvalidateRect(m_keyboardOverlay, nullptr, false);
                     }
                     break;
             }
