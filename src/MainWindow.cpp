@@ -207,14 +207,15 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
             }
             if (m_bMouseClicks && !text.empty() || hasClick)
             {
+                auto reqHeight = m_keyboardOverlay.GetRequiredHeight(text);
                 m_keyboardOverlay.Show(text);
 
                 auto          hMonitor = MonitorFromPoint(phs->pt, MONITOR_DEFAULTTOPRIMARY);
                 MONITORINFOEX mi       = {};
                 mi.cbSize              = sizeof(MONITORINFOEX);
                 GetMonitorInfo(hMonitor, &mi);
-                const long width   = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth);
-                const long height  = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight);
+                const long width   = std::max(reqHeight.cx, (long)CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth));
+                const long height  = std::max(reqHeight.cy, (long)CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight));
                 auto       posLeft = mi.rcWork.right - width;
                 auto       posTop  = mi.rcWork.bottom - height;
                 if (wParam == WM_RBUTTONDOWN || wParam == WM_RBUTTONUP)
@@ -333,8 +334,8 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                         MONITORINFOEX mi       = {};
                         mi.cbSize              = sizeof(MONITORINFOEX);
                         GetMonitorInfo(hMonitor, &mi);
-                        const long width   = CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth);
-                        const long height  = std::max(reqHeight, CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight));
+                        const long width   = std::max(reqHeight.cx, (long)CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth));
+                        const long height  = std::max(reqHeight.cy, (long)CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight));
                         auto       posLeft = mi.rcWork.right - width;
                         auto       posTop  = mi.rcWork.bottom - height;
 
