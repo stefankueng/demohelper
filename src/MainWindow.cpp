@@ -38,15 +38,16 @@ DWORD  CMainWindow::m_lastHookTime  = 0;
 POINT  CMainWindow::m_lastHookPoint = {0};
 WPARAM CMainWindow::m_lastHookMsg   = 0;
 //CKeyboardOverlayWnd CMainWindow::m_keyboardOverlay = CKeyboardOverlayWnd(g_hInstance, nullptr);
-CKeyboardOverlayWndD2D CMainWindow::m_keyboardOverlay = CKeyboardOverlayWndD2D(g_hInstance, nullptr);
-CMouseOverlayWnd       CMainWindow::m_mouseOverlay    = CMouseOverlayWnd(g_hInstance, nullptr);
-CMagnifierWindow       CMainWindow::m_magnifierWindow = CMagnifierWindow();
-bool                   CMainWindow::m_bLensMode       = false;
-bool                   CMainWindow::m_bMouseVisuals   = true;
-bool                   CMainWindow::m_bMouseClicks    = true;
-COLORREF               CMainWindow::m_mvLColor        = RGB(255, 0, 0);
-COLORREF               CMainWindow::m_mvMColor        = RGB(0, 0, 255);
-COLORREF               CMainWindow::m_mvRColor        = RGB(0, 255, 0);
+CKeyboardOverlayWndD2D    CMainWindow::m_keyboardOverlay = CKeyboardOverlayWndD2D(g_hInstance, nullptr);
+CMouseOverlayWnd          CMainWindow::m_mouseOverlay    = CMouseOverlayWnd(g_hInstance, nullptr);
+CMagnifierWindow          CMainWindow::m_magnifierWindow = CMagnifierWindow();
+bool                      CMainWindow::m_bLensMode       = false;
+bool                      CMainWindow::m_bMouseVisuals   = true;
+bool                      CMainWindow::m_bMouseClicks    = true;
+COLORREF                  CMainWindow::m_mvLColor        = RGB(255, 0, 0);
+COLORREF                  CMainWindow::m_mvMColor        = RGB(0, 0, 255);
+COLORREF                  CMainWindow::m_mvRColor        = RGB(0, 255, 0);
+std::vector<std::wstring> CMainWindow::m_keySequence;
 
 LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -218,7 +219,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 auto       posTop  = mi.rcWork.bottom - height;
                 if (wParam == WM_RBUTTONDOWN || wParam == WM_RBUTTONUP)
                 {
-                    RECT ovlRC = { posLeft, posTop, posLeft + width, posTop + height };
+                    RECT ovlRC = {posLeft, posTop, posLeft + width, posTop + height};
                     if (PtInRect(&ovlRC, phs->pt))
                     {
                         posTop = phs->pt.y - height - 20;
@@ -231,6 +232,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
     }
     return CallNextHookEx(m_hMouseHook, nCode, wParam, lParam);
 }
+
 LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     // lParam is cast as KBDLLHOOKSTRUCT
@@ -240,7 +242,46 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
     // This parameter can be one of the following messages: WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, or WM_SYSKEYUP.
     switch (wParam)
     {
+        case WM_KEYUP:
+        {
+            switch (keyInfo.vkCode)
+            {
+                case VK_CONTROL:
+                case VK_SHIFT:
+                case VK_MENU:
+                case VK_LSHIFT:
+                case VK_RSHIFT:
+                case VK_LCONTROL:
+                case VK_RCONTROL:
+                case VK_LMENU:
+                case VK_RMENU:
+                case VK_LWIN:
+                    m_keySequence.clear();
+                default:
+                    break;
+            }
+        }
+        break;
+
         case WM_KEYDOWN:
+        {
+            switch (keyInfo.vkCode)
+            {
+                case VK_CONTROL:
+                case VK_SHIFT:
+                case VK_MENU:
+                case VK_LSHIFT:
+                case VK_RSHIFT:
+                case VK_LCONTROL:
+                case VK_RCONTROL:
+                case VK_LMENU:
+                case VK_RMENU:
+                case VK_LWIN:
+                    m_keySequence.clear();
+                default:
+                    break;
+            }
+
             wchar_t buffer[1024] = {};
             DWORD   dwMsg        = 1;
             dwMsg += keyInfo.scanCode << 16;
@@ -277,7 +318,13 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                     GetKeyNameText((LONG)dwMsg, buffer, sizeof(buffer));
                     if ((wcslen(buffer) > 1) || bControl || bAlt || bWindows)
                     {
+                        for (const auto& key : m_keySequence)
+                        {
+                            text += key;
+                            text += L", ";
+                        }
                         text += buffer;
+                        m_keySequence.push_back(buffer);
                         m_keyboardOverlay.Show(text);
 
                         auto          hFocus   = GetFocus();
@@ -294,8 +341,8 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                     }
                     break;
             }
-
-            break;
+        }
+        break;
     }
     // Passes the hook information to the next hook procedure. So other hooks can work
     return CallNextHookEx(m_hKeyboardHook, nCode, wParam, lParam);
