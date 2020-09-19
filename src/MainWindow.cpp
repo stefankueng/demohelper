@@ -205,7 +205,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 else
                     m_mouseOverlay.Show(phs->pt, mouseColor, 220.0);
             }
-            if (m_bMouseClicks && !text.empty() || hasClick)
+            if (m_bMouseClicks && !text.empty() && hasClick)
             {
                 auto reqHeight = m_keyboardOverlay.GetRequiredHeight(text);
                 m_keyboardOverlay.Show(text);
@@ -258,6 +258,7 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                 case VK_RMENU:
                 case VK_LWIN:
                     m_keySequence.clear();
+                    break;
                 default:
                     break;
             }
@@ -279,6 +280,7 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                 case VK_RMENU:
                 case VK_LWIN:
                     m_keySequence.clear();
+                    break;
                 default:
                     break;
             }
