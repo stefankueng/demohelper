@@ -509,11 +509,40 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         }
                         else
                         {
-                            if (line.lineType == LineType::arrow)
-                                pen.SetEndCap(Gdiplus::LineCap::LineCapArrowAnchor);
-                            if ((line.lineStartPoint.X >= 0) && (line.lineStartPoint.Y >= 0) && (line.lineEndPoint.X >= 0) && (line.lineEndPoint.Y >= 0))
+                            switch (line.lineType)
                             {
-                                graphics.DrawLine(&pen, line.lineStartPoint, line.lineEndPoint);
+                                case LineType::arrow:
+                                    pen.SetEndCap(Gdiplus::LineCap::LineCapArrowAnchor);
+                                    [[fallthrough]];
+                                case LineType::hand:
+                                case LineType::straight:
+                                    if ((line.lineStartPoint.X >= 0) && (line.lineStartPoint.Y >= 0) && (line.lineEndPoint.X >= 0) && (line.lineEndPoint.Y >= 0))
+                                    {
+                                        graphics.DrawLine(&pen, line.lineStartPoint, line.lineEndPoint);
+                                    }
+                                    break;
+                                case LineType::rectangle:
+                                    if ((line.lineStartPoint.X >= 0) && (line.lineStartPoint.Y >= 0) && (line.lineEndPoint.X >= 0) && (line.lineEndPoint.Y >= 0))
+                                    {
+                                        Gdiplus::Point startPt;
+                                        startPt.X   = std::min(line.lineStartPoint.X, line.lineEndPoint.X);
+                                        startPt.Y   = std::min(line.lineStartPoint.Y, line.lineEndPoint.Y);
+                                        auto width  = std::abs(line.lineEndPoint.X - line.lineStartPoint.X);
+                                        auto height = std::abs(line.lineEndPoint.Y - line.lineStartPoint.Y);
+                                        graphics.DrawRectangle(&pen, startPt.X, startPt.Y, width, height);
+                                    }
+                                    break;
+                                case LineType::ellipse:
+                                    if ((line.lineStartPoint.X >= 0) && (line.lineStartPoint.Y >= 0) && (line.lineEndPoint.X >= 0) && (line.lineEndPoint.Y >= 0))
+                                    {
+                                        Gdiplus::Point startPt;
+                                        startPt.X   = std::min(line.lineStartPoint.X, line.lineEndPoint.X);
+                                        startPt.Y   = std::min(line.lineStartPoint.Y, line.lineEndPoint.Y);
+                                        auto width  = std::abs(line.lineEndPoint.X - line.lineStartPoint.X);
+                                        auto height = std::abs(line.lineEndPoint.Y - line.lineStartPoint.Y);
+                                        graphics.DrawEllipse(&pen, startPt.X, startPt.Y, width, height);
+                                    }
+                                    break;
                             }
                         }
                     }
@@ -613,37 +642,20 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 int yPos = GET_Y_LPARAM(lParam);
                 if (wParam & MK_LBUTTON)
                 {
-                    if (wParam & MK_SHIFT)
+                    m_lineStartShiftPoint.x = -1;
+                    m_lineStartShiftPoint.y = -1;
+                    if ((wParam & MK_CONTROL) || (wParam & MK_SHIFT))
                     {
-                        if (m_lineStartShiftPoint.x > 0 && m_lineStartShiftPoint.y > 0)
+                        auto& line = m_drawLines.back();
+                        if (wParam & MK_SHIFT)
                         {
-                            // if shift is pressed, the user want's to draw straight lines
-                            if (abs(xPos - m_lineStartShiftPoint.x) > abs(yPos - m_lineStartShiftPoint.y))
-                            {
-                                // straight line horizontally
-                                yPos = m_lineStartShiftPoint.y;
-                            }
+                            if (wParam & MK_CONTROL)
+                                line.lineType = LineType::ellipse;
                             else
-                            {
-                                // straight line vertically
-                                xPos = m_lineStartShiftPoint.x;
-                            }
+                                line.lineType = LineType::rectangle;
                         }
                         else
-                        {
-                            m_lineStartShiftPoint.x = xPos;
-                            m_lineStartShiftPoint.y = yPos;
-                        }
-                    }
-                    else
-                    {
-                        m_lineStartShiftPoint.x = -1;
-                        m_lineStartShiftPoint.y = -1;
-                    }
-                    if (wParam & MK_CONTROL)
-                    {
-                        auto& line    = m_drawLines.back();
-                        line.lineType = LineType::straight;
+                            line.lineType = LineType::straight;
 
                         RECT invalidRect;
                         invalidRect.left   = std::min(line.lineStartPoint.X, xPos);

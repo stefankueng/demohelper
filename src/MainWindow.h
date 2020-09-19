@@ -51,6 +51,8 @@ enum class LineType
     hand,
     straight,
     arrow,
+    rectangle,
+    ellipse
 };
 
 class DrawLine
