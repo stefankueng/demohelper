@@ -38,16 +38,17 @@ DWORD  CMainWindow::m_lastHookTime  = 0;
 POINT  CMainWindow::m_lastHookPoint = {0};
 WPARAM CMainWindow::m_lastHookMsg   = 0;
 //CKeyboardOverlayWnd CMainWindow::m_keyboardOverlay = CKeyboardOverlayWnd(g_hInstance, nullptr);
-CKeyboardOverlayWndD2D    CMainWindow::m_keyboardOverlay = CKeyboardOverlayWndD2D(g_hInstance, nullptr);
-CMouseOverlayWnd          CMainWindow::m_mouseOverlay    = CMouseOverlayWnd(g_hInstance, nullptr);
-CMagnifierWindow          CMainWindow::m_magnifierWindow = CMagnifierWindow();
-bool                      CMainWindow::m_bLensMode       = false;
-bool                      CMainWindow::m_bMouseVisuals   = true;
-bool                      CMainWindow::m_bMouseClicks    = true;
-COLORREF                  CMainWindow::m_mvLColor        = RGB(255, 0, 0);
-COLORREF                  CMainWindow::m_mvMColor        = RGB(0, 0, 255);
-COLORREF                  CMainWindow::m_mvRColor        = RGB(0, 255, 0);
-std::vector<std::wstring> CMainWindow::m_keySequence;
+std::unique_ptr<CKeyboardOverlayWndD2D>             CMainWindow::m_keyboardOverlay = std::make_unique<CKeyboardOverlayWndD2D>(g_hInstance, nullptr);
+CMouseOverlayWnd                                    CMainWindow::m_mouseOverlay    = CMouseOverlayWnd(g_hInstance, nullptr);
+CMagnifierWindow                                    CMainWindow::m_magnifierWindow = CMagnifierWindow();
+bool                                                CMainWindow::m_bLensMode       = false;
+bool                                                CMainWindow::m_bMouseVisuals   = true;
+bool                                                CMainWindow::m_bMouseClicks    = true;
+COLORREF                                            CMainWindow::m_mvLColor        = RGB(255, 0, 0);
+COLORREF                                            CMainWindow::m_mvMColor        = RGB(0, 0, 255);
+COLORREF                                            CMainWindow::m_mvRColor        = RGB(0, 255, 0);
+std::vector<std::wstring>                           CMainWindow::m_keySequence;
+std::deque<std::unique_ptr<CKeyboardOverlayWndD2D>> CMainWindow::m_overlayWnds;
 
 LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -69,6 +70,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
             text += L"Shift + ";
         bool     hasClick   = false;
         bool     doFade     = false;
+        bool     dbl        = false;
         COLORREF mouseColor = m_mvLColor;
         switch (wParam)
         {
@@ -123,7 +125,6 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 break;
             case WM_LBUTTONDOWN:
             {
-                bool dbl = false;
                 if (m_lastHookMsg == wParam)
                 {
                     if (m_lastHookTime + GetDoubleClickTime() > phs->time)
@@ -147,7 +148,6 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
             break;
             case WM_RBUTTONDOWN:
             {
-                bool dbl = false;
                 if (m_lastHookMsg == wParam)
                 {
                     if (m_lastHookTime + GetDoubleClickTime() > phs->time)
@@ -171,7 +171,6 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
             break;
             case WM_MBUTTONDOWN:
             {
-                bool dbl = false;
                 if (m_lastHookMsg == wParam)
                 {
                     if (m_lastHookTime + GetDoubleClickTime() > phs->time)
@@ -207,17 +206,32 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
             }
             if (m_bMouseClicks && !text.empty() && hasClick)
             {
-                auto reqHeight = m_keyboardOverlay.GetRequiredHeight(text);
-                m_keyboardOverlay.Show(text);
+                auto       reqHeight = m_keyboardOverlay->GetRequiredHeight(text);
+                const long width     = std::max(reqHeight.cx, (long)CDPIAware::Instance().Scale(*m_keyboardOverlay, overlayWidth));
+                const long height    = std::max(reqHeight.cy, (long)CDPIAware::Instance().Scale(*m_keyboardOverlay, overlayHeight));
+                if (!dbl && IsWindowVisible(*m_keyboardOverlay))
+                {
+                    m_overlayWnds.push_back(std::move(m_keyboardOverlay));
+                    m_keyboardOverlay = std::make_unique<CKeyboardOverlayWndD2D>(g_hInstance, nullptr);
+                    // move previous windows upwards
+                    for (auto& overlayWnd : m_overlayWnds)
+                    {
+                        RECT prevrc{};
+                        GetWindowRect(*overlayWnd, &prevrc);
+                        prevrc.top -= (height + 10);
+                        prevrc.bottom -= (height + 10);
+                        SetWindowPos(*overlayWnd, HWND_TOPMOST, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+                    }
+                }
+                ClearOutdatedPopupWindows();
+                m_keyboardOverlay->Show(text);
 
                 auto          hMonitor = MonitorFromPoint(phs->pt, MONITOR_DEFAULTTOPRIMARY);
                 MONITORINFOEX mi       = {};
                 mi.cbSize              = sizeof(MONITORINFOEX);
                 GetMonitorInfo(hMonitor, &mi);
-                const long width   = std::max(reqHeight.cx, (long)CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth));
-                const long height  = std::max(reqHeight.cy, (long)CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight));
-                auto       posLeft = mi.rcWork.right - width;
-                auto       posTop  = mi.rcWork.bottom - height;
+                auto posLeft = mi.rcWork.right - width;
+                auto posTop  = mi.rcWork.bottom - height;
                 if (wParam == WM_RBUTTONDOWN || wParam == WM_RBUTTONUP)
                 {
                     RECT ovlRC = {posLeft, posTop, posLeft + width, posTop + height};
@@ -226,8 +240,8 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                         posTop = phs->pt.y - height - 20;
                     }
                 }
-                SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, posLeft, posTop, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
-                InvalidateRect(m_keyboardOverlay, nullptr, false);
+                SetWindowPos(*m_keyboardOverlay, HWND_TOPMOST, posLeft, posTop, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+                InvalidateRect(*m_keyboardOverlay, nullptr, false);
             }
         }
     }
@@ -237,8 +251,8 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     // lParam is cast as KBDLLHOOKSTRUCT
-    KBDLLHOOKSTRUCT keyInfo = *((KBDLLHOOKSTRUCT*)lParam);
-
+    KBDLLHOOKSTRUCT keyInfo             = *((KBDLLHOOKSTRUCT*)lParam);
+    static bool     movePreviousWindows = false;
     // wParam is the The identifier of the keyboard message.
     // This parameter can be one of the following messages: WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, or WM_SYSKEYUP.
     switch (wParam)
@@ -258,6 +272,12 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                 case VK_RMENU:
                 case VK_LWIN:
                     m_keySequence.clear();
+                    if (IsWindowVisible(*m_keyboardOverlay))
+                    {
+                        m_overlayWnds.push_back(std::move(m_keyboardOverlay));
+                        m_keyboardOverlay   = std::make_unique<CKeyboardOverlayWndD2D>(g_hInstance, nullptr);
+                        movePreviousWindows = true;
+                    }
                     break;
                 default:
                     break;
@@ -280,6 +300,12 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                 case VK_RMENU:
                 case VK_LWIN:
                     m_keySequence.clear();
+                    if (IsWindowVisible(*m_keyboardOverlay))
+                    {
+                        m_overlayWnds.push_back(std::move(m_keyboardOverlay));
+                        m_keyboardOverlay   = std::make_unique<CKeyboardOverlayWndD2D>(g_hInstance, nullptr);
+                        movePreviousWindows = true;
+                    }
                     break;
                 default:
                     break;
@@ -328,21 +354,35 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                         }
                         text += buffer;
                         m_keySequence.push_back(buffer);
-                        auto reqHeight = m_keyboardOverlay.GetRequiredHeight(text);
-                        m_keyboardOverlay.Show(text);
+                        auto       reqHeight = m_keyboardOverlay->GetRequiredHeight(text);
+                        const long width     = std::max(reqHeight.cx, (long)CDPIAware::Instance().Scale(*m_keyboardOverlay, overlayWidth));
+                        const long height    = std::max(reqHeight.cy, (long)CDPIAware::Instance().Scale(*m_keyboardOverlay, overlayHeight));
+                        ClearOutdatedPopupWindows();
+                        if (movePreviousWindows)
+                        {
+                            // move previous windows upwards
+                            for (auto& overlayWnd : m_overlayWnds)
+                            {
+                                RECT prevrc{};
+                                GetWindowRect(*overlayWnd, &prevrc);
+                                prevrc.top -= (height + 10);
+                                prevrc.bottom -= (height + 10);
+                                SetWindowPos(*overlayWnd, HWND_TOPMOST, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+                            }
+                            movePreviousWindows = false;
+                        }
+                        m_keyboardOverlay->Show(text);
 
                         auto          hFocus   = GetFocus();
                         auto          hMonitor = MonitorFromWindow(hFocus, MONITOR_DEFAULTTOPRIMARY);
                         MONITORINFOEX mi       = {};
                         mi.cbSize              = sizeof(MONITORINFOEX);
                         GetMonitorInfo(hMonitor, &mi);
-                        const long width   = std::max(reqHeight.cx, (long)CDPIAware::Instance().Scale(m_keyboardOverlay, overlayWidth));
-                        const long height  = std::max(reqHeight.cy, (long)CDPIAware::Instance().Scale(m_keyboardOverlay, overlayHeight));
-                        auto       posLeft = mi.rcWork.right - width;
-                        auto       posTop  = mi.rcWork.bottom - height;
+                        auto posLeft = mi.rcWork.right - width;
+                        auto posTop  = mi.rcWork.bottom - height;
 
-                        SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, posLeft, posTop, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
-                        InvalidateRect(m_keyboardOverlay, nullptr, false);
+                        SetWindowPos(*m_keyboardOverlay, HWND_TOPMOST, posLeft, posTop, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+                        InvalidateRect(*m_keyboardOverlay, nullptr, false);
                     }
                     break;
             }
@@ -853,7 +893,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             {
                 m_magnifierWindow.UpdateMagnifier();
                 SetWindowPos(*this, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
-                SetWindowPos(m_keyboardOverlay, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+                SetWindowPos(*m_keyboardOverlay, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
             }
             break;
         case WM_DESTROY:
@@ -905,7 +945,9 @@ bool CMainWindow::StartPresentationMode()
         nScreenHeight = m_rcScreen.bottom - m_rcScreen.top;
         devName       = mi.szDevice;
     }
-    ShowWindow(m_keyboardOverlay, SW_HIDE);
+    ShowWindow(*m_keyboardOverlay, SW_HIDE);
+    for (auto& overlayWnd : m_overlayWnds)
+        ShowWindow(*overlayWnd, SW_HIDE);
     HDC hDesktopDC = nullptr;
     if (allMonitors)
         hDesktopDC = GetDC(nullptr);
@@ -1049,6 +1091,22 @@ bool CMainWindow::UpdateCursor()
         return true;
     }
     return false;
+}
+
+void CMainWindow::ClearOutdatedPopupWindows()
+{
+    for (auto wndIt = m_overlayWnds.cbegin(); wndIt != m_overlayWnds.cend();)
+    {
+        if (wndIt->get()->IsAnimationFinished())
+        {
+            ShowWindow(*wndIt->get(), SW_HIDE);
+            CloseWindow(*wndIt->get());
+            DestroyWindow(*wndIt->get());
+            wndIt = m_overlayWnds.erase(wndIt);
+        }
+        else
+            ++wndIt;
+    }
 }
 
 bool CMainWindow::StartInlineZoom()

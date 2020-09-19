@@ -28,6 +28,12 @@ constexpr int FADE_TIMER = 101;
 CKeyboardOverlayWndD2D::~CKeyboardOverlayWndD2D()
 {
     DiscardDeviceResources();
+    ComPtr<IUIAnimationStoryboard> storyBoard;
+    if (SUCCEEDED(m_AnimVar->GetCurrentStoryboard(storyBoard.GetAddressOf())))
+    {
+        if (storyBoard)
+            storyBoard->Abandon();
+    }
 }
 
 bool CKeyboardOverlayWndD2D::RegisterAndCreateWindow()
@@ -90,6 +96,12 @@ void CKeyboardOverlayWndD2D::Show(const std::wstring& text)
     });
 }
 
+bool CKeyboardOverlayWndD2D::IsAnimationFinished() const
+{
+    auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
+    return (animVar == 0);
+}
+
 LRESULT CKeyboardOverlayWndD2D::WinMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
@@ -137,7 +149,8 @@ HRESULT CKeyboardOverlayWndD2D::OnRender(ID2D1DeviceContext* dc)
     auto                         textRect = D2D1::RectF(textOffset, textOffset, size.width - textOffset - textOffset, size.height - textOffset - textOffset);
     ComPtr<ID2D1SolidColorBrush> shadowBrush;
     hr = m_dc->CreateSolidColorBrush(D2D1::ColorF(RGB(10, 10, 10), animVar / 255.0f), shadowBrush.GetAddressOf());
-    dc->DrawText(m_text.c_str(), (UINT32)m_text.size(), m_TextFormat.Get(), textRect, shadowBrush.Get());
+    if (m_TextFormat)
+        dc->DrawText(m_text.c_str(), (UINT32)m_text.size(), m_TextFormat.Get(), textRect, shadowBrush.Get());
 
     m_gaussianBlurEffect->SetInput(0, bmp.Get());
     m_gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 5.0f);
@@ -156,7 +169,8 @@ HRESULT CKeyboardOverlayWndD2D::OnRender(ID2D1DeviceContext* dc)
 
     ComPtr<ID2D1SolidColorBrush> textBrush;
     hr = m_dc->CreateSolidColorBrush(D2D1::ColorF(RGB(120, 120, 255), animVar / 255.0f / 1.1f), textBrush.GetAddressOf());
-    dc->DrawText(m_text.c_str(), (UINT32)m_text.size(), m_TextFormat.Get(), textRect, textBrush.Get());
+    if (m_TextFormat)
+        dc->DrawText(m_text.c_str(), (UINT32)m_text.size(), m_TextFormat.Get(), textRect, textBrush.Get());
     return hr;
 }
 

@@ -144,6 +144,7 @@ protected:
 
     void RegisterHotKeys();
     bool UpdateCursor();
+    static void ClearOutdatedPopupWindows();
 
 protected:
     NOTIFYICONDATA niData;
@@ -180,20 +181,21 @@ protected:
     IUIAnimationVariablePtr m_AnimVarZoom;
     std::deque<DrawLine>    m_drawLines;
 
-    static HHOOK                     m_hKeyboardHook;
-    static HHOOK                     m_hMouseHook;
-    static DWORD                     m_lastHookTime;
-    static POINT                     m_lastHookPoint;
-    static WPARAM                    m_lastHookMsg;
+    static HHOOK  m_hKeyboardHook;
+    static HHOOK  m_hMouseHook;
+    static DWORD  m_lastHookTime;
+    static POINT  m_lastHookPoint;
+    static WPARAM m_lastHookMsg;
     //static CKeyboardOverlayWnd       m_keyboardOverlay;
-    static CKeyboardOverlayWndD2D    m_keyboardOverlay;
-    static CMouseOverlayWnd          m_mouseOverlay;
-    static CMagnifierWindow          m_magnifierWindow;
-    static bool                      m_bLensMode;
-    static bool                      m_bMouseVisuals;
-    static bool                      m_bMouseClicks;
-    static COLORREF                  m_mvLColor;
-    static COLORREF                  m_mvMColor;
-    static COLORREF                  m_mvRColor;
-    static std::vector<std::wstring> m_keySequence;
+    static std::unique_ptr<CKeyboardOverlayWndD2D>             m_keyboardOverlay;
+    static CMouseOverlayWnd                                    m_mouseOverlay;
+    static CMagnifierWindow                                    m_magnifierWindow;
+    static bool                                                m_bLensMode;
+    static bool                                                m_bMouseVisuals;
+    static bool                                                m_bMouseClicks;
+    static COLORREF                                            m_mvLColor;
+    static COLORREF                                            m_mvMColor;
+    static COLORREF                                            m_mvRColor;
+    static std::vector<std::wstring>                           m_keySequence;
+    static std::deque<std::unique_ptr<CKeyboardOverlayWndD2D>> m_overlayWnds;
 };

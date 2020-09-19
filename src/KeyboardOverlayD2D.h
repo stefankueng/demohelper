@@ -35,6 +35,7 @@ public:
 
     SIZE GetRequiredHeight(const std::wstring& text);
     void Show(const std::wstring& text);
+    bool IsAnimationFinished() const;
 
 private:
 protected:
