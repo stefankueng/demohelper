@@ -142,8 +142,8 @@ protected:
     static LRESULT       LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
     static LRESULT       LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam);
 
-    void RegisterHotKeys();
-    bool UpdateCursor();
+    void        RegisterHotKeys();
+    bool        UpdateCursor();
     static void ClearOutdatedPopupWindows();
 
 protected:
@@ -186,8 +186,8 @@ protected:
     static DWORD  m_lastHookTime;
     static POINT  m_lastHookPoint;
     static WPARAM m_lastHookMsg;
-    //static CKeyboardOverlayWnd       m_keyboardOverlay;
-    static std::unique_ptr<CKeyboardOverlayWndD2D>             m_keyboardOverlay;
+    //static CKeyboardOverlayWnd       m_infoOverlay;
+    static std::unique_ptr<CKeyboardOverlayWndD2D>             m_infoOverlay;
     static CMouseOverlayWnd                                    m_mouseOverlay;
     static CMagnifierWindow                                    m_magnifierWindow;
     static bool                                                m_bLensMode;
