@@ -213,6 +213,9 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 {
                     m_overlayWnds.push_back(std::move(m_keyboardOverlay));
                     m_keyboardOverlay = std::make_unique<CKeyboardOverlayWndD2D>(g_hInstance, nullptr);
+                }
+                if (!m_keyboardOverlay->HasWindowBeenShown())
+                {
                     // move previous windows upwards
                     for (auto& overlayWnd : m_overlayWnds)
                     {
@@ -252,7 +255,6 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
 {
     // lParam is cast as KBDLLHOOKSTRUCT
     KBDLLHOOKSTRUCT keyInfo             = *((KBDLLHOOKSTRUCT*)lParam);
-    static bool     movePreviousWindows = false;
     // wParam is the The identifier of the keyboard message.
     // This parameter can be one of the following messages: WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, or WM_SYSKEYUP.
     switch (wParam)
@@ -276,7 +278,6 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                     {
                         m_overlayWnds.push_back(std::move(m_keyboardOverlay));
                         m_keyboardOverlay   = std::make_unique<CKeyboardOverlayWndD2D>(g_hInstance, nullptr);
-                        movePreviousWindows = true;
                     }
                     break;
                 default:
@@ -304,7 +305,6 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                     {
                         m_overlayWnds.push_back(std::move(m_keyboardOverlay));
                         m_keyboardOverlay   = std::make_unique<CKeyboardOverlayWndD2D>(g_hInstance, nullptr);
-                        movePreviousWindows = true;
                     }
                     break;
                 default:
@@ -358,7 +358,7 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                         const long width     = std::max(reqHeight.cx, (long)CDPIAware::Instance().Scale(*m_keyboardOverlay, overlayWidth));
                         const long height    = std::max(reqHeight.cy, (long)CDPIAware::Instance().Scale(*m_keyboardOverlay, overlayHeight));
                         ClearOutdatedPopupWindows();
-                        if (movePreviousWindows)
+                        if (!m_keyboardOverlay->HasWindowBeenShown())
                         {
                             // move previous windows upwards
                             for (auto& overlayWnd : m_overlayWnds)
@@ -369,7 +369,6 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                                 prevrc.bottom -= (height + 10);
                                 SetWindowPos(*overlayWnd, HWND_TOPMOST, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
                             }
-                            movePreviousWindows = false;
                         }
                         m_keyboardOverlay->Show(text);
 

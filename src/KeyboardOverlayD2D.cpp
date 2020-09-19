@@ -94,12 +94,18 @@ void CKeyboardOverlayWndD2D::Show(const std::wstring& text)
         if (animVar == 0)
             ShowWindow(*this, SW_HIDE);
     });
+    m_bShown = true;
 }
 
 bool CKeyboardOverlayWndD2D::IsAnimationFinished() const
 {
     auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
     return (animVar == 0);
+}
+
+bool CKeyboardOverlayWndD2D::HasWindowBeenShown() const
+{
+    return m_bShown;
 }
 
 LRESULT CKeyboardOverlayWndD2D::WinMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

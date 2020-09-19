@@ -28,6 +28,7 @@ class CKeyboardOverlayWndD2D : public CWindowD2D
 public:
     CKeyboardOverlayWndD2D(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL)
         : CWindowD2D(hInst, wcx)
+        , m_bShown(false)
     {
         RegisterAndCreateWindow();
     }
@@ -36,6 +37,7 @@ public:
     SIZE GetRequiredHeight(const std::wstring& text);
     void Show(const std::wstring& text);
     bool IsAnimationFinished() const;
+    bool HasWindowBeenShown() const;
 
 private:
 protected:
@@ -56,4 +58,5 @@ private:
 
     ComPtr<IDWriteTextFormat> m_TextFormat;
     ComPtr<ID2D1Effect>       m_gaussianBlurEffect;
+    bool                      m_bShown;
 };
