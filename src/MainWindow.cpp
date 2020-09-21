@@ -861,7 +861,6 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     GetCursorPos(&pt);
                     HMENU hMenu    = LoadMenu(hResource, MAKEINTRESOURCE(IDC_DEMOHELPER));
                     HMENU hPopMenu = GetSubMenu(hMenu, 0);
-                    SetForegroundWindow(*this);
                     TrackPopupMenu(hPopMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, 0, *this, NULL);
                     DestroyMenu(hMenu);
                 }
