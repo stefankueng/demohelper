@@ -49,6 +49,7 @@ COLORREF                                            CMainWindow::m_mvMColor     
 COLORREF                                            CMainWindow::m_mvRColor        = RGB(0, 255, 0);
 std::vector<std::wstring>                           CMainWindow::m_keySequence;
 std::deque<std::unique_ptr<CKeyboardOverlayWndD2D>> CMainWindow::m_overlayWnds;
+OverlayPosition                                     CMainWindow::m_overlayPosition = OverlayPosition::BottomRight;
 
 LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -221,8 +222,19 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                     {
                         RECT prevrc{};
                         GetWindowRect(*overlayWnd, &prevrc);
-                        prevrc.top -= (height + 10);
-                        prevrc.bottom -= (height + 10);
+                        switch (m_overlayPosition)
+                        {
+                            case OverlayPosition::BottomLeft:
+                            case OverlayPosition::BottomRight:
+                                prevrc.top -= (height + 10);
+                                prevrc.bottom -= (height + 10);
+                                break;
+                            case OverlayPosition::TopLeft:
+                            case OverlayPosition::TopRight:
+                                prevrc.top += (height + 10);
+                                prevrc.bottom += (height + 10);
+                                break;
+                        }
                         SetWindowPos(*overlayWnd, HWND_TOPMOST, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
                     }
                 }
@@ -235,6 +247,26 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 GetMonitorInfo(hMonitor, &mi);
                 auto posLeft = mi.rcWork.right - width;
                 auto posTop  = mi.rcWork.bottom - height;
+                switch (m_overlayPosition)
+                {
+                    case OverlayPosition::BottomLeft:
+                        posLeft = mi.rcWork.left;
+                        posTop  = mi.rcWork.bottom - height;
+                        break;
+                    case OverlayPosition::BottomRight:
+                        posLeft = mi.rcWork.right - width;
+                        posTop  = mi.rcWork.bottom - height;
+                        break;
+                    case OverlayPosition::TopLeft:
+                        posLeft = mi.rcWork.left;
+                        posTop  = mi.rcWork.top;
+                        break;
+                    case OverlayPosition::TopRight:
+                        posLeft = mi.rcWork.right - width;
+                        posTop  = mi.rcWork.top;
+                        break;
+                }
+
                 if (wParam == WM_RBUTTONDOWN || wParam == WM_RBUTTONUP)
                 {
                     RECT ovlRC = {posLeft, posTop, posLeft + width, posTop + height};
@@ -365,8 +397,19 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                             {
                                 RECT prevrc{};
                                 GetWindowRect(*overlayWnd, &prevrc);
-                                prevrc.top -= (height + 10);
-                                prevrc.bottom -= (height + 10);
+                                switch (m_overlayPosition)
+                                {
+                                    case OverlayPosition::BottomLeft:
+                                    case OverlayPosition::BottomRight:
+                                        prevrc.top -= (height + 10);
+                                        prevrc.bottom -= (height + 10);
+                                        break;
+                                    case OverlayPosition::TopLeft:
+                                    case OverlayPosition::TopRight:
+                                        prevrc.top += (height + 10);
+                                        prevrc.bottom += (height + 10);
+                                        break;
+                                }
                                 SetWindowPos(*overlayWnd, HWND_TOPMOST, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
                             }
                         }
@@ -379,6 +422,25 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                         GetMonitorInfo(hMonitor, &mi);
                         auto posLeft = mi.rcWork.right - width;
                         auto posTop  = mi.rcWork.bottom - height;
+                        switch (m_overlayPosition)
+                        {
+                            case OverlayPosition::BottomLeft:
+                                posLeft = mi.rcWork.left;
+                                posTop  = mi.rcWork.bottom - height;
+                                break;
+                            case OverlayPosition::BottomRight:
+                                posLeft = mi.rcWork.right - width;
+                                posTop  = mi.rcWork.bottom - height;
+                                break;
+                            case OverlayPosition::TopLeft:
+                                posLeft = mi.rcWork.left;
+                                posTop  = mi.rcWork.top;
+                                break;
+                            case OverlayPosition::TopRight:
+                                posLeft = mi.rcWork.right - width;
+                                posTop  = mi.rcWork.top;
+                                break;
+                        }
 
                         SetWindowPos(*m_infoOverlay, HWND_TOPMOST, posLeft, posTop, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
                         InvalidateRect(*m_infoOverlay, nullptr, false);
@@ -450,11 +512,12 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             m_hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, g_hInstance, 0);
             if (CIniSettings::Instance().GetInt64(L"Hooks", L"keyboard", 1))
                 m_hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, g_hInstance, 0);
-            m_bMouseVisuals = CIniSettings::Instance().GetInt64(L"Misc", L"mousevisual", 1) != 0;
-            m_bMouseClicks  = CIniSettings::Instance().GetInt64(L"Hooks", L"mouse", 1) != 0;
-            m_mvLColor      = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualLcolor", RGB(255, 0, 0));
-            m_mvMColor      = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualMcolor", RGB(0, 0, 255));
-            m_mvRColor      = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualRcolor", RGB(0, 255, 0));
+            m_bMouseVisuals   = CIniSettings::Instance().GetInt64(L"Misc", L"mousevisual", 1) != 0;
+            m_bMouseClicks    = CIniSettings::Instance().GetInt64(L"Hooks", L"mouse", 1) != 0;
+            m_mvLColor        = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualLcolor", RGB(255, 0, 0));
+            m_mvMColor        = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualMcolor", RGB(0, 0, 255));
+            m_mvRColor        = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualRcolor", RGB(0, 255, 0));
+            m_overlayPosition = (OverlayPosition)CIniSettings::Instance().GetInt64(L"Misc", L"OvlPosition", (int64_t)OverlayPosition::BottomRight);
         }
         break;
         case WM_COMMAND:

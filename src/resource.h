@@ -32,6 +32,10 @@
 #define IDC_BUTTON1                     1014
 #define IDC_CONF_COLORS                 1014
 #define IDC_MOUSEVISUAL_RIGHT           1015
+#define IDC_POS_TOPLEFT                 1015
+#define IDC_POS_TOPRIGHT                1016
+#define IDC_POS_BOTTOMLEFT              1017
+#define IDC_POS_BOTTOMRIGHT             1018
 #define ID_TRAYCONTEXT_OPTIONS          32771
 #define ID_TRAYCONTEXT_ABOUT            32772
 #define ID_TRAYCONTEXT_ZOOM             32773
@@ -69,7 +73,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         32806
-#define _APS_NEXT_CONTROL_VALUE         1015
+#define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

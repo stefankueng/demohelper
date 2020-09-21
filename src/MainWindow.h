@@ -55,6 +55,14 @@ enum class LineType
     ellipse
 };
 
+enum class OverlayPosition
+{
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    BottomRight
+};
+
 class DrawLine
 {
 public:
@@ -198,4 +206,5 @@ protected:
     static COLORREF                                            m_mvRColor;
     static std::vector<std::wstring>                           m_keySequence;
     static std::deque<std::unique_ptr<CKeyboardOverlayWndD2D>> m_overlayWnds;
+    static OverlayPosition                                     m_overlayPosition;
 };
