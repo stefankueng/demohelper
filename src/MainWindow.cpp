@@ -364,6 +364,19 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                     }
                     break;
                 default:
+                    for (const auto& key : m_keySequence)
+                    {
+                        if (key.size() > 1)
+                        {
+                            m_keySequence.clear();
+                            if (IsWindowVisible(*m_infoOverlay))
+                            {
+                                m_overlayWnds.push_back(std::move(m_infoOverlay));
+                                m_infoOverlay = std::make_unique<CKeyboardOverlayWndD2D>(g_hInstance, nullptr);
+                            }
+                            break;
+                        }
+                    }
                     break;
             }
 
@@ -1163,8 +1176,8 @@ bool CMainWindow::EndPresentationMode()
         DestroyCursor(m_hCursor);
         m_hCursor = NULL;
     }
-    m_bInlineZoom     = false;
-    m_zoomfactor      = 1.2f;
+    m_bInlineZoom = false;
+    m_zoomfactor  = 1.2f;
     CIniSettings::Instance().SetInt64(L"Draw", L"colorindex", m_colorindex);
     CIniSettings::Instance().SetInt64(L"Draw", L"currentpenwidth", m_currentpenwidth);
     return true;
