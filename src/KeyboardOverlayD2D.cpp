@@ -70,10 +70,11 @@ SIZE CKeyboardOverlayWndD2D::GetRequiredHeight(const std::wstring& text)
 {
     RECT rc;
     GetClientRect(*this, &rc);
+    auto                      textOffset = (float)CDPIAware::Instance().Scale(*this, 3);
     ComPtr<IDWriteTextLayout> textLayout;
     if (SUCCEEDED(m_writeFactory->CreateTextLayout(text.c_str(),
                                                    (UINT32)text.length(), m_TextFormat.Get(),
-                                                   (float)rc.right, (float)rc.bottom,
+                                                   (float)rc.right - textOffset - textOffset, (float)rc.bottom,
                                                    textLayout.GetAddressOf())))
     {
         DWRITE_TEXT_METRICS textMetrics = {};
