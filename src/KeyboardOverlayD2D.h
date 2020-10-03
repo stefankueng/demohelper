@@ -29,6 +29,7 @@ public:
     CKeyboardOverlayWndD2D(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL)
         : CWindowD2D(hInst, wcx)
         , m_bShown(false)
+        , m_AnimVar(nullptr)
     {
         RegisterAndCreateWindow();
     }
