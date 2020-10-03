@@ -322,7 +322,22 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                     }
                     break;
                 default:
-                    break;
+                {
+                    auto bControl = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+                    auto bAlt     = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
+                    auto bShift   = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+                    auto bWindows = (GetAsyncKeyState(VK_LWIN) & 0x8000) != 0;
+                    if (!bControl && !bAlt && !bShift && !bWindows)
+                    {
+                        m_keySequence.clear();
+                        if (IsWindowVisible(*m_infoOverlay))
+                        {
+                            m_overlayWnds.push_back(std::move(m_infoOverlay));
+                            m_infoOverlay = std::make_unique<CKeyboardOverlayWndD2D>(g_hInstance, nullptr);
+                        }
+                    }
+                }
+                break;
             }
         }
         break;
@@ -564,7 +579,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 }
                 else
                 {
-                    m_bLensMode = true;
+                    m_bLensMode      = true;
                     auto allMonitors = CIniSettings::Instance().GetInt64(L"Misc", L"allmonitors", 0) != 0;
                     if (allMonitors)
                     {
