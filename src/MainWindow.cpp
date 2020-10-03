@@ -25,7 +25,9 @@
 
 #include <algorithm>
 
-#define TRAY_WM_MESSAGE WM_APP + 1
+#define TRAY_WM_MESSAGE          (WM_APP + 1)
+#define WM_POSITION_OVERLAY_WNDS (WM_APP + 2)
+
 extern HINSTANCE g_hInstance; // current instance
 extern HINSTANCE g_hResource; // the resource dll
 
@@ -50,6 +52,8 @@ COLORREF                                            CMainWindow::m_mvRColor     
 std::vector<std::wstring>                           CMainWindow::m_keySequence;
 std::deque<std::unique_ptr<CKeyboardOverlayWndD2D>> CMainWindow::m_overlayWnds;
 OverlayPosition                                     CMainWindow::m_overlayPosition = OverlayPosition::BottomRight;
+HWND                                                CMainWindow::m_mainWnd         = nullptr;
+std::vector<WndPositions>                           CMainWindow::m_wndPositions;
 
 LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -215,6 +219,8 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                     m_overlayWnds.push_back(std::move(m_infoOverlay));
                     m_infoOverlay = std::make_unique<CKeyboardOverlayWndD2D>(g_hInstance, nullptr);
                 }
+                m_wndPositions.clear();
+                ClearOutdatedPopupWindows();
                 if (!m_infoOverlay->HasWindowBeenShown())
                 {
                     // move previous windows upwards
@@ -235,10 +241,10 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                                 prevrc.bottom += (height + 10);
                                 break;
                         }
-                        SetWindowPos(*overlayWnd, HWND_TOPMOST, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+                        m_wndPositions.emplace_back(*overlayWnd, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top);
+                        //SetWindowPos(*overlayWnd, HWND_TOPMOST, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
                     }
                 }
-                ClearOutdatedPopupWindows();
                 m_infoOverlay->Show(text);
 
                 auto          hMonitor = MonitorFromPoint(phs->pt, MONITOR_DEFAULTTOPRIMARY);
@@ -275,8 +281,10 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                         posTop = phs->pt.y - height - 20;
                     }
                 }
-                SetWindowPos(*m_infoOverlay, HWND_TOPMOST, posLeft, posTop, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
-                InvalidateRect(*m_infoOverlay, nullptr, false);
+                m_wndPositions.emplace_back(*m_infoOverlay, posLeft, posTop, width, height);
+                PostMessage(m_mainWnd, WM_POSITION_OVERLAY_WNDS, 0, 0);
+                //SetWindowPos(*m_infoOverlay, HWND_TOPMOST, posLeft, posTop, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+                //InvalidateRect(*m_infoOverlay, nullptr, false);
             }
         }
     }
@@ -389,6 +397,7 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                         auto       reqHeight = m_infoOverlay->GetRequiredHeight(text);
                         const long width     = std::max(reqHeight.cx, (long)CDPIAware::Instance().Scale(*m_infoOverlay, overlayWidth));
                         const long height    = std::max(reqHeight.cy, (long)CDPIAware::Instance().Scale(*m_infoOverlay, overlayHeight));
+                        m_wndPositions.clear();
                         ClearOutdatedPopupWindows();
                         if (!m_infoOverlay->HasWindowBeenShown())
                         {
@@ -410,7 +419,8 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                                         prevrc.bottom += (height + 10);
                                         break;
                                 }
-                                SetWindowPos(*overlayWnd, HWND_TOPMOST, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+                                m_wndPositions.emplace_back(*overlayWnd, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top);
+                                //SetWindowPos(*overlayWnd, HWND_TOPMOST, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
                             }
                         }
                         m_infoOverlay->Show(text);
@@ -442,8 +452,10 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                                 break;
                         }
 
-                        SetWindowPos(*m_infoOverlay, HWND_TOPMOST, posLeft, posTop, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
-                        InvalidateRect(*m_infoOverlay, nullptr, false);
+                        m_wndPositions.emplace_back(*m_infoOverlay, posLeft, posTop, width, height);
+                        PostMessage(m_mainWnd, WM_POSITION_OVERLAY_WNDS, 0, 0);
+                        //SetWindowPos(*m_infoOverlay, HWND_TOPMOST, posLeft, posTop, width, height, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+                        //InvalidateRect(*m_infoOverlay, nullptr, false);
                     }
                     break;
             }
@@ -493,7 +505,7 @@ bool CMainWindow::RegisterAndCreateWindow()
 
             Shell_NotifyIcon(NIM_ADD, &niData);
             DestroyIcon(niData.hIcon);
-
+            m_mainWnd = *this;
             return true;
         }
     }
@@ -868,6 +880,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             }
         }
         break;
+        case WM_POSITION_OVERLAY_WNDS:
+        {
+            SetTimer(*this, TIMER_OVERLAY_POSITIONS, 30, nullptr);
+        }
+        break;
         case WM_MOUSEWHEEL:
         {
             int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
@@ -955,6 +972,15 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 m_magnifierWindow.UpdateMagnifier();
                 SetWindowPos(*this, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
                 SetWindowPos(*m_infoOverlay, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+            }
+            else if (wParam == TIMER_OVERLAY_POSITIONS)
+            {
+                KillTimer(*this, TIMER_OVERLAY_POSITIONS);
+                for (const auto& pos : m_wndPositions)
+                {
+                    SetWindowPos(pos.hWnd, HWND_TOPMOST, pos.x, pos.y, pos.cx, pos.cy, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+                }
+                m_wndPositions.clear();
             }
             break;
         case WM_DESTROY:

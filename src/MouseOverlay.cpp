@@ -66,7 +66,7 @@ bool CMouseOverlayWnd::RegisterAndCreateWindow()
 void CMouseOverlayWnd::Show(POINT screenPos, COLORREF color, double fadeTo)
 {
     m_color = color;
-    SetWindowPos(*this, HWND_TOPMOST, screenPos.x - winHalfWidth, screenPos.y - winHalfHeight, 2 * winHalfWidth, 2 * winHalfHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+    //SetWindowPos(*this, HWND_TOPMOST, screenPos.x - winHalfWidth, screenPos.y - winHalfHeight, 2 * winHalfWidth, 2 * winHalfHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
     InvalidateRect(*this, nullptr, false);
     m_AnimVar       = Animator::Instance().CreateAnimationVariable(255.0);
     auto transFade  = Animator::Instance().CreateSmoothStopTransition(1.0 * ((255.0 - fadeTo) / 255.0), fadeTo);
@@ -88,8 +88,8 @@ void CMouseOverlayWnd::UpdatePos(POINT screenPos)
     if (m_AnimVar)
     {
         auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
-        if (animVar)
-            SetWindowPos(*this, HWND_TOPMOST, screenPos.x - winHalfWidth, screenPos.y - winHalfHeight, 2 * winHalfWidth, 2 * winHalfHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+        //if (animVar)
+        //    SetWindowPos(*this, HWND_TOPMOST, screenPos.x - winHalfWidth, screenPos.y - winHalfHeight, 2 * winHalfWidth, 2 * winHalfHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
     }
 }
 

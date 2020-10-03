@@ -39,10 +39,11 @@
 #define ZOOM_HOTKEY 101
 #define LENS_HOTKEY 102
 
-#define TIMER_ID_DRAW 101
-#define TIMER_ID_ZOOM 102
-#define TIMER_ID_FADE 103
-#define TIMER_ID_LENS 104
+#define TIMER_ID_DRAW           101
+#define TIMER_ID_ZOOM           102
+#define TIMER_ID_FADE           103
+#define TIMER_ID_LENS           104
+#define TIMER_OVERLAY_POSITIONS 105
 
 #define LINE_ALPHA 100
 
@@ -61,6 +62,24 @@ enum class OverlayPosition
     TopRight,
     BottomLeft,
     BottomRight
+};
+
+class WndPositions
+{
+public:
+    WndPositions(HWND hWnd, int x, int y, int cx, int cy)
+        : hWnd(hWnd)
+        , x(x)
+        , y(y)
+        , cx(cx)
+        , cy(cy)
+    {
+    }
+    HWND hWnd = nullptr;
+    int  x    = 0;
+    int  y    = 0;
+    int  cx   = 0;
+    int  cy   = 0;
 };
 
 class DrawLine
@@ -207,4 +226,6 @@ protected:
     static std::vector<std::wstring>                           m_keySequence;
     static std::deque<std::unique_ptr<CKeyboardOverlayWndD2D>> m_overlayWnds;
     static OverlayPosition                                     m_overlayPosition;
+    static HWND                                                m_mainWnd;
+    static std::vector<WndPositions>                           m_wndPositions;
 };
