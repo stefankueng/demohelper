@@ -559,8 +559,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             m_mvMColor        = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualMcolor", RGB(0, 0, 255));
             m_mvRColor        = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualRcolor", RGB(0, 255, 0));
             m_overlayPosition = (OverlayPosition)CIniSettings::Instance().GetInt64(L"Misc", L"OvlPosition", (int64_t)OverlayPosition::BottomRight);
-            m_colorindex      = CIniSettings::Instance().GetInt64(L"Draw", L"colorindex", 1);
-            m_currentpenwidth = CIniSettings::Instance().GetInt64(L"Draw", L"currentpenwidth", 6);
+            m_colorindex      = (int)CIniSettings::Instance().GetInt64(L"Draw", L"colorindex", 1);
+            m_currentpenwidth = (int)CIniSettings::Instance().GetInt64(L"Draw", L"currentpenwidth", 6);
         }
         break;
         case WM_COMMAND:
