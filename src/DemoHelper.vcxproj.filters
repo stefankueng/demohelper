@@ -93,6 +93,9 @@
     <ClInclude Include="KeyboardOverlayD2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RectSelectionWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DemoHelper.ico">
@@ -197,6 +200,9 @@
       <Filter>sktoolslib</Filter>
     </ClCompile>
     <ClCompile Include="KeyboardOverlayD2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RectSelectionWnd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

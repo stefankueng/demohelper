@@ -225,6 +225,7 @@
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MouseOverlay.cpp" />
     <ClCompile Include="OptionsDlg.cpp" />
+    <ClCompile Include="RectSelectionWnd.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -252,6 +253,7 @@
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="MemDC.h" />
     <ClInclude Include="MouseOverlay.h" />
+    <ClInclude Include="RectSelectionWnd.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

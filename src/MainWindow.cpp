@@ -22,6 +22,7 @@
 #include "DPIAware.h"
 #include "DebugOutput.h"
 #include "IniSettings.h"
+#include "RectSelectionWnd.h"
 
 #include <algorithm>
 
@@ -563,19 +564,46 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 }
                 else
                 {
-                    StartPresentationMode();
                     m_bLensMode = true;
-                    SetWindowLong(*this, GWL_EXSTYLE, WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT);
-                    SetLayeredWindowAttributes(*this, 0, 255, LWA_ALPHA);
-                    RECT rc = {0};
-                    GetClientRect(*this, &rc);
-                    SetWindowPos(m_magnifierWindow, HWND_TOP, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
-                                 SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE);
-                    POINT pt = {0};
-                    GetCursorPos(&pt);
-                    m_magnifierWindow.SetMagnification(pt, 1.2f);
-                    ::SetTimer(*this, TIMER_ID_LENS, 20, NULL);
-                    SetWindowPos(*this, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+                    auto allMonitors = CIniSettings::Instance().GetInt64(L"Misc", L"allmonitors", 0) != 0;
+                    if (allMonitors)
+                    {
+                        m_rcScreen.left   = GetSystemMetrics(SM_XVIRTUALSCREEN);
+                        m_rcScreen.top    = GetSystemMetrics(SM_YVIRTUALSCREEN);
+                        m_rcScreen.right  = m_rcScreen.left + GetSystemMetrics(SM_CXVIRTUALSCREEN);
+                        m_rcScreen.bottom = m_rcScreen.top + GetSystemMetrics(SM_CYVIRTUALSCREEN);
+                    }
+                    else
+                    {
+                        POINT pt;
+                        GetCursorPos(&pt);
+                        auto          hMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+                        MONITORINFOEX mi       = {};
+                        mi.cbSize              = sizeof(MONITORINFOEX);
+                        GetMonitorInfo(hMonitor, &mi);
+                        m_rcScreen = mi.rcMonitor;
+                    }
+
+                    CRectSelectionWnd selWnd(g_hInstance);
+                    auto              zoomRect = selWnd.Show(*this, m_rcScreen, float(m_rcScreen.right - m_rcScreen.left) / float(m_rcScreen.bottom - m_rcScreen.top));
+                    CloseWindow(selWnd);
+                    DestroyWindow(selWnd);
+                    if (!IsRectEmpty(&zoomRect))
+                    {
+                        StartPresentationMode();
+                        m_bLensMode = true;
+                        SetWindowLong(*this, GWL_EXSTYLE, WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT);
+                        SetLayeredWindowAttributes(*this, 0, 255, LWA_ALPHA);
+                        SetWindowPos(m_magnifierWindow, HWND_TOP, m_rcScreen.left, m_rcScreen.top, m_rcScreen.right - m_rcScreen.left, m_rcScreen.bottom - m_rcScreen.top,
+                                     SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE);
+                        m_magnifierWindow.SetSourceRect(zoomRect);
+                        ::SetTimer(*this, TIMER_ID_LENS, 20, NULL);
+                        SetWindowPos(*this, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+                    }
+                    else
+                    {
+                        m_bLensMode = false;
+                    }
                 }
             }
         }
@@ -670,6 +698,8 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         case WM_RBUTTONDOWN:
         case WM_LBUTTONDOWN:
         {
+            if (m_bLensMode)
+                break;
             if (m_bInlineZoom)
             {
                 m_ptInlineZoomStartPoint.x = GET_X_LPARAM(lParam);
