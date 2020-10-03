@@ -28,13 +28,15 @@ constexpr int FADE_TIMER = 101;
 CKeyboardOverlayWndD2D::~CKeyboardOverlayWndD2D()
 {
     DiscardDeviceResources();
-    if (m_AnimVar)
+    if (m_AnimVar && Animator::IsInstanceActive())
     {
         ComPtr<IUIAnimationStoryboard> storyBoard;
         if (SUCCEEDED(m_AnimVar->GetCurrentStoryboard(storyBoard.GetAddressOf())))
         {
             if (storyBoard)
+            {
                 storyBoard->Abandon();
+            }
         }
     }
 }

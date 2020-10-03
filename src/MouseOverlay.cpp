@@ -20,6 +20,8 @@
 #include "MouseOverlay.h"
 #include "DPIAware.h"
 #include "MemDC.h"
+#include <wrl.h>
+using namespace Microsoft::WRL;
 #pragma warning(push)
 #pragma warning(disable : 4458) // declaration of 'xxx' hides class member
 #include <gdiplus.h>
@@ -66,7 +68,7 @@ bool CMouseOverlayWnd::RegisterAndCreateWindow()
 void CMouseOverlayWnd::Show(POINT screenPos, COLORREF color, double fadeTo)
 {
     m_color = color;
-    //SetWindowPos(*this, HWND_TOPMOST, screenPos.x - winHalfWidth, screenPos.y - winHalfHeight, 2 * winHalfWidth, 2 * winHalfHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+    SetWindowPos(*this, HWND_TOPMOST, screenPos.x - winHalfWidth, screenPos.y - winHalfHeight, 2 * winHalfWidth, 2 * winHalfHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
     InvalidateRect(*this, nullptr, false);
     m_AnimVar       = Animator::Instance().CreateAnimationVariable(255.0);
     auto transFade  = Animator::Instance().CreateSmoothStopTransition(1.0 * ((255.0 - fadeTo) / 255.0), fadeTo);
@@ -88,8 +90,8 @@ void CMouseOverlayWnd::UpdatePos(POINT screenPos)
     if (m_AnimVar)
     {
         auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
-        //if (animVar)
-        //    SetWindowPos(*this, HWND_TOPMOST, screenPos.x - winHalfWidth, screenPos.y - winHalfHeight, 2 * winHalfWidth, 2 * winHalfHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+        if (animVar)
+            SetWindowPos(*this, HWND_TOPMOST, screenPos.x - winHalfWidth, screenPos.y - winHalfHeight, 2 * winHalfWidth, 2 * winHalfHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
     }
 }
 
@@ -146,6 +148,22 @@ LRESULT CALLBACK CMouseOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wP
         {
             if (wParam)
                 SetFocus((HWND)wParam); // return the focus, we don't want it
+        }
+        break;
+        case WM_DESTROY:
+        {
+            if (m_AnimVar && Animator::IsInstanceActive())
+            {
+                ComPtr<IUIAnimationStoryboard> storyBoard;
+                if (SUCCEEDED(m_AnimVar->GetCurrentStoryboard(storyBoard.GetAddressOf())))
+                {
+                    if (storyBoard)
+                    {
+                        storyBoard->Abandon();
+                    }
+                }
+            }
+            m_AnimVar = nullptr;
         }
         break;
         default:

@@ -208,6 +208,20 @@ LRESULT CMainWindow::DoCommand(int id)
                 UnhookWindowsHookEx(m_hMouseHook);
             m_hKeyboardHook = nullptr;
             m_hMouseHook    = nullptr;
+            for (auto& wnd : m_overlayWnds)
+            {
+                ShowWindow(*wnd.get(), SW_HIDE);
+                CloseWindow(*wnd.get());
+                DestroyWindow(*wnd.get());
+            }
+            ShowWindow(*m_infoOverlay.get(), SW_HIDE);
+            CloseWindow(*m_infoOverlay.get());
+            DestroyWindow(*m_infoOverlay.get());
+            m_overlayWnds.clear();
+            m_infoOverlay.reset(nullptr);
+            ShowWindow(m_mouseOverlay, SW_HIDE);
+            CloseWindow(m_mouseOverlay);
+            DestroyWindow(m_mouseOverlay);
             ::PostQuitMessage(0);
             return 0;
             break;

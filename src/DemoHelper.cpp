@@ -71,21 +71,24 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
 
     OnOutOfScope(Gdiplus::GdiplusShutdown(gdiplusToken));
-    MSG         msg;
-    CMainWindow trayWindow(g_hResource);
-    if (trayWindow.RegisterAndCreateWindow())
+    MSG msg;
+    int ret = 1;
     {
-        HACCEL hAccelTable = LoadAccelerators(g_hResource, MAKEINTRESOURCE(IDR_DEMOHELPER));
-        // Main message loop:
-        while (GetMessage(&msg, NULL, 0, 0))
+        CMainWindow trayWindow(g_hResource);
+        if (trayWindow.RegisterAndCreateWindow())
         {
-            if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+            HACCEL hAccelTable = LoadAccelerators(g_hResource, MAKEINTRESOURCE(IDR_DEMOHELPER));
+            // Main message loop:
+            while (GetMessage(&msg, NULL, 0, 0))
             {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
+                if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+                {
+                    TranslateMessage(&msg);
+                    DispatchMessage(&msg);
+                }
             }
+            ret = (int)msg.wParam;
         }
-        return (int)msg.wParam;
     }
     return 1;
 }
