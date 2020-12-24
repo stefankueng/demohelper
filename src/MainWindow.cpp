@@ -1170,6 +1170,7 @@ bool CMainWindow::EndPresentationMode()
     DeleteDC(hDesktopCompatibleDC);
     m_drawLines.clear();
     m_bDrawing = false;
+    m_bZooming = false;
     SetCursor(m_hPreviousCursor);
     if (m_hCursor)
     {
