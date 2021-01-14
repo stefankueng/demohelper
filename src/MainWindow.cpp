@@ -584,12 +584,13 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             }
             else if (key == lens)
             {
+                SetWindowLong(*this, GWL_EXSTYLE, 0);
+                m_magnifierWindow.Reset();
+                ShowWindow(m_magnifierWindow, SW_HIDE);
+                EndPresentationMode();
+
                 if (m_bLensMode)
                 {
-                    SetWindowLong(*this, GWL_EXSTYLE, 0);
-                    m_magnifierWindow.Reset();
-                    ShowWindow(m_magnifierWindow, SW_HIDE);
-                    EndPresentationMode();
                     m_bLensMode = false;
                 }
                 else
@@ -632,6 +633,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     }
                     else
                     {
+                        SetWindowLong(*this, GWL_EXSTYLE, 0);
+                        m_magnifierWindow.Reset();
+                        ShowWindow(m_magnifierWindow, SW_HIDE);
+                        EndPresentationMode();
                         m_bLensMode = false;
                     }
                 }
