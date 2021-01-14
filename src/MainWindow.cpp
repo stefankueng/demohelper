@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008, 2012-2013, 2015, 2020 - Stefan Kueng
+// Copyright (C) 2007-2008, 2012-2013, 2015, 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -962,9 +962,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     if (m_zoomfactor < 1.0f)
                         m_zoomfactor = 1.0f;
                 }
-                auto transZoom  = Animator::Instance().CreateLinearTransition(0.3, m_zoomfactor);
+                auto transZoom  = Animator::Instance().CreateLinearTransition(m_AnimVarZoom, 0.3, m_zoomfactor);
                 auto storyBoard = Animator::Instance().CreateStoryBoard();
-                storyBoard->AddTransition(m_AnimVarZoom, transZoom);
+                storyBoard->AddTransition(m_AnimVarZoom.m_animVar, transZoom);
                 Animator::Instance().RunStoryBoard(storyBoard, [this]() {
                     InvalidateRect(*this, nullptr, false);
                 });
@@ -1202,9 +1202,9 @@ bool CMainWindow::StartZoomingMode()
 {
     m_bZooming      = true;
     m_zoomfactor    = 1.2f;
-    auto transZoom  = Animator::Instance().CreateLinearTransition(0.5, m_zoomfactor);
+    auto transZoom  = Animator::Instance().CreateLinearTransition(m_AnimVarZoom, 0.5, m_zoomfactor);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
-    storyBoard->AddTransition(m_AnimVarZoom, transZoom);
+    storyBoard->AddTransition(m_AnimVarZoom.m_animVar, transZoom);
     Animator::Instance().RunStoryBoard(storyBoard, [this]() {
         InvalidateRect(*this, nullptr, false);
     });

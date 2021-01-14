@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -70,10 +70,10 @@ void CMouseOverlayWnd::Show(POINT screenPos, COLORREF color, double fadeTo)
     m_color = color;
     SetWindowPos(*this, HWND_TOPMOST, screenPos.x - winHalfWidth, screenPos.y - winHalfHeight, 2 * winHalfWidth, 2 * winHalfHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
     InvalidateRect(*this, nullptr, false);
-    m_AnimVar       = Animator::Instance().CreateAnimationVariable(255.0);
-    auto transFade  = Animator::Instance().CreateSmoothStopTransition(1.0 * ((255.0 - fadeTo) / 255.0), fadeTo);
+    m_AnimVar       = Animator::Instance().CreateAnimationVariable(255.0, fadeTo);
+    auto transFade  = Animator::Instance().CreateSmoothStopTransition(m_AnimVar, 1.0 * ((255.0 - fadeTo) / 255.0), fadeTo);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
-    storyBoard->AddTransition(m_AnimVar, transFade);
+    storyBoard->AddTransition(m_AnimVar.m_animVar, transFade);
     Animator::Instance().RunStoryBoard(storyBoard, [this]() {
         auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
         SetLayeredWindowAttributes(*this, 0, animVar / 2, LWA_COLORKEY | LWA_ALPHA);
@@ -87,7 +87,7 @@ void CMouseOverlayWnd::Show(POINT screenPos, COLORREF color, double fadeTo)
 
 void CMouseOverlayWnd::UpdatePos(POINT screenPos)
 {
-    if (m_AnimVar)
+    if (m_AnimVar.m_animVar)
     {
         auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
         if (animVar)
@@ -97,14 +97,14 @@ void CMouseOverlayWnd::UpdatePos(POINT screenPos)
 
 void CMouseOverlayWnd::Fade()
 {
-    if (m_AnimVar)
+    if (m_AnimVar.m_animVar)
     {
         auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
         if (animVar)
         {
-            auto transFade  = Animator::Instance().CreateSmoothStopTransition(1.0, 0.0);
+            auto transFade  = Animator::Instance().CreateSmoothStopTransition(m_AnimVar, 1.0, 0.0);
             auto storyBoard = Animator::Instance().CreateStoryBoard();
-            storyBoard->AddTransition(m_AnimVar, transFade);
+            storyBoard->AddTransition(m_AnimVar.m_animVar, transFade);
             Animator::Instance().RunStoryBoard(storyBoard, [this]() {
                 auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
                 SetLayeredWindowAttributes(*this, 0, animVar / 2, LWA_COLORKEY | LWA_ALPHA);
@@ -152,10 +152,10 @@ LRESULT CALLBACK CMouseOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wP
         break;
         case WM_DESTROY:
         {
-            if (m_AnimVar && Animator::IsInstanceActive())
+            if (m_AnimVar.m_animVar && Animator::IsInstanceActive())
             {
                 ComPtr<IUIAnimationStoryboard> storyBoard;
-                if (SUCCEEDED(m_AnimVar->GetCurrentStoryboard(storyBoard.GetAddressOf())))
+                if (SUCCEEDED(m_AnimVar.m_animVar->GetCurrentStoryboard(storyBoard.GetAddressOf())))
                 {
                     if (storyBoard)
                     {
@@ -163,7 +163,7 @@ LRESULT CALLBACK CMouseOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wP
                     }
                 }
             }
-            m_AnimVar = nullptr;
+            m_AnimVar.m_animVar = nullptr;
         }
         break;
         default:

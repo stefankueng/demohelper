@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008, 2012, 2020 - Stefan Kueng
+// Copyright (C) 2007-2008, 2012, 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -140,7 +140,7 @@ public:
         m_colors[7]   = RGB(0, 0, 0);
         m_colors[8]   = RGB(150, 150, 150);
         m_colors[9]   = RGB(0, 255, 255);
-        m_AnimVarZoom = Animator::Instance().CreateAnimationVariable(1.2);
+        m_AnimVarZoom = Animator::Instance().CreateAnimationVariable(1.2, 1.2);
     };
     ~CMainWindow(void){};
 
@@ -204,9 +204,9 @@ protected:
     POINT m_ptInlineZoomStartPoint;
     POINT m_ptInlineZoomEndPoint;
 
-    RECT                    m_rcScreen;
-    IUIAnimationVariablePtr m_AnimVarZoom;
-    std::deque<DrawLine>    m_drawLines;
+    RECT                 m_rcScreen;
+    AnimationVariable    m_AnimVarZoom;
+    std::deque<DrawLine> m_drawLines;
 
     static HHOOK  m_hKeyboardHook;
     static HHOOK  m_hMouseHook;

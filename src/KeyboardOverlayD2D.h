@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -37,7 +37,7 @@ public:
 
     SIZE GetRequiredHeight(const std::wstring& text);
     void Show(const std::wstring& text);
-    bool IsAnimationFinished() const;
+    bool IsAnimationFinished();
     bool HasWindowBeenShown() const;
 
 private:
@@ -49,7 +49,7 @@ protected:
 
 private:
     std::wstring            m_text;
-    IUIAnimationVariablePtr m_AnimVar;
+    AnimationVariable       m_AnimVar;
 
     // Inherited via CWindowD2D
     virtual LRESULT WinMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;

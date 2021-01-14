@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -66,12 +66,12 @@ void CKeyboardOverlayWnd::Show(const std::wstring& text)
 {
     m_text = text;
     InvalidateRect(*this, nullptr, false);
-    m_AnimVar = Animator::Instance().CreateAnimationVariable(255.0);
+    m_AnimVar = Animator::Instance().CreateAnimationVariable(255.0, 255.0);
     auto transKeep = Animator::Instance().CreateConstantTransition(2.0);
-    auto transFade = Animator::Instance().CreateSmoothStopTransition(0.8, 0.0);
+    auto transFade = Animator::Instance().CreateSmoothStopTransition(m_AnimVar, 0.8, 0.0);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
-    storyBoard->AddTransition(m_AnimVar, transKeep);
-    storyBoard->AddTransition(m_AnimVar, transFade);
+    storyBoard->AddTransition(m_AnimVar.m_animVar, transKeep);
+    storyBoard->AddTransition(m_AnimVar.m_animVar, transFade);
     Animator::Instance().RunStoryBoard(storyBoard, [this]() {
         auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
         SetLayeredWindowAttributes(*this, 0, animVar, LWA_COLORKEY | LWA_ALPHA);

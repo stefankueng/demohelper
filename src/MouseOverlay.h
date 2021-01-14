@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -49,6 +49,6 @@ protected:
     LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
-    IUIAnimationVariablePtr m_AnimVar;
-    COLORREF                m_color;
+    AnimationVariable m_AnimVar;
+    COLORREF          m_color;
 };
