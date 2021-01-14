@@ -676,10 +676,18 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         Gdiplus::Color color;
                         color.SetValue(Gdiplus::Color::MakeARGB(line.alpha, GetRValue(m_colors[line.colorIndex]), GetGValue(m_colors[line.colorIndex]), GetBValue(m_colors[line.colorIndex])));
                         Gdiplus::Pen pen(color, (Gdiplus::REAL)line.penWidth);
+                        pen.SetLineCap(Gdiplus::LineCap::LineCapRound, Gdiplus::LineCap::LineCapRound, Gdiplus::DashCap::DashCapRound);
 
                         if (line.lineType == LineType::hand)
                         {
-                            graphics.DrawLines(&pen, line.points.data(), (int)line.points.size());
+                            if (line.points.size() == 1)
+                            {
+                                auto                halfPenWidth = line.penWidth / 2;
+                                Gdiplus::SolidBrush brush(color);
+                                graphics.FillEllipse(&brush, line.points[0].X - halfPenWidth, line.points[0].Y - halfPenWidth, line.penWidth, line.penWidth);
+                            }
+                            else
+                                graphics.DrawLines(&pen, line.points.data(), (int)line.points.size());
                         }
                         else
                         {
@@ -764,6 +772,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             drawLine.colorIndex = m_colorindex;
             drawLine.penWidth   = m_currentpenwidth;
             m_drawLines.push_back(std::move(drawLine));
+
+            RECT invalidRect = {drawLine.lineStartPoint.X, drawLine.lineStartPoint.Y, drawLine.lineStartPoint.X, drawLine.lineStartPoint.Y};
+            InflateRect(&invalidRect, 2 * m_currentpenwidth, 2 * m_currentpenwidth);
+            InvalidateRect(*this, &invalidRect, FALSE);
         }
         break;
         case WM_RBUTTONUP:
@@ -857,19 +869,13 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
 
                         RECT           invalidRect = {0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)};
                         Gdiplus::Point pt          = {xPos, yPos};
-                        line.points.push_back(pt);
-                        line.lineType = LineType::hand;
-                        for (const auto& linept : line.points)
+                        auto           prevPt      = line.points.back();
+                        if (sqrt((pt.X - prevPt.X) * (pt.X - prevPt.X) + (pt.Y - prevPt.Y) * (pt.Y - prevPt.Y)) > 1)
                         {
-                            invalidRect.left   = std::min(linept.X, (int)invalidRect.left);
-                            invalidRect.top    = std::min(linept.Y, (int)invalidRect.top);
-                            invalidRect.right  = std::max(linept.X, (int)invalidRect.right);
-                            invalidRect.bottom = std::max(linept.Y, (int)invalidRect.bottom);
+                            line.points.push_back(pt);
+                            line.lineType = LineType::hand;
+                            InvalidateRect(*this, &invalidRect, FALSE);
                         }
-                        InflateRect(&invalidRect, 2 * m_currentpenwidth, 2 * m_currentpenwidth);
-                        invalidRect.left = std::max(0L, invalidRect.left);
-                        invalidRect.top  = std::max(0L, invalidRect.top);
-                        InvalidateRect(*this, &invalidRect, FALSE);
                     }
                 }
                 else if (wParam & MK_RBUTTON)
