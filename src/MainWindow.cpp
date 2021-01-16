@@ -580,7 +580,10 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             }
             else if (key == draw)
             {
-                StartPresentationMode();
+                if (IsWindowVisible(*this))
+                    EndPresentationMode();
+                else
+                    StartPresentationMode();
             }
             else if (key == lens)
             {
