@@ -126,7 +126,9 @@
     <None Include="DemoHelper.rc2">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\DemoHelperHelp.rtf" />
+    <None Include="res\DemoHelperHelp.rtf">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DemoHelper.rc">
