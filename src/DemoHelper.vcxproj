@@ -209,6 +209,7 @@
     <ClCompile Include="..\sktoolslib\BaseWindowD2D.cpp" />
     <ClCompile Include="..\sktoolslib\DebugOutput.cpp" />
     <ClCompile Include="..\sktoolslib\hyperlink.cpp" />
+    <ClCompile Include="..\sktoolslib\InfoRtfDialog.cpp" />
     <ClCompile Include="..\sktoolslib\IniSettings.cpp" />
     <ClCompile Include="..\sktoolslib\PathUtils.cpp" />
     <ClCompile Include="..\sktoolslib\Registry.cpp" />
@@ -218,7 +219,6 @@
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="DemoHelper.cpp" />
     <ClCompile Include="Graphics.cpp" />
-    <ClCompile Include="HelpDlg.cpp" />
     <ClCompile Include="KeyboardOverlay.cpp" />
     <ClCompile Include="KeyboardOverlayD2D.cpp" />
     <ClCompile Include="MagnifierWindow.cpp" />
@@ -239,6 +239,7 @@
     <ClInclude Include="..\sktoolslib\DebugOutput.h" />
     <ClInclude Include="..\sktoolslib\DPIAware.h" />
     <ClInclude Include="..\sktoolslib\hyperlink.h" />
+    <ClInclude Include="..\sktoolslib\InfoRtfDialog.h" />
     <ClInclude Include="..\sktoolslib\IniSettings.h" />
     <ClInclude Include="..\sktoolslib\PathUtils.h" />
     <ClInclude Include="..\sktoolslib\Registry.h" />
@@ -266,6 +267,7 @@
     <None Include="DemoHelper.ico" />
     <None Include="DemoHelper.rc2" />
     <None Include="ReadMe.txt" />
+    <None Include="res\DemoHelperHelp.rtf" />
     <None Include="version.in" />
   </ItemGroup>
   <ItemGroup>

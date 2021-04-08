@@ -130,57 +130,6 @@ BEGIN
     CONTROL         "Bottom right",IDC_POS_BOTTOMRIGHT,"Button",BS_AUTORADIOBUTTON,94,259,58,10
 END
 
-IDD_HELPDIALOG DIALOGEX 0, 0, 263, 283
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "DemoHelper Help"
-FONT 9, "Segoe UI", 400, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,206,262,50,14
-    GROUPBOX        "Zooming Mode          Live Zoom Mode",IDC_STATIC,7,7,249,61
-    LTEXT           "Up/Mousewheel",IDC_STATIC,16,22,59,8
-    LTEXT           "Down/Mousewheel",IDC_STATIC,16,32,63,8
-    LTEXT           "Enter/Click",IDC_STATIC,16,42,66,8
-    LTEXT           "Escape",IDC_STATIC,16,52,66,8
-    LTEXT           "Up/Down or\nCtrl+MouseWheel",IDC_STATIC,16,83,66,18
-    LTEXT           "zoom in",IDC_STATIC,167,22,79,8
-    LTEXT           "zoom out",IDC_STATIC,167,32,79,8
-    LTEXT           "activates drawing of the zoomed area",IDC_STATIC,167,42,82,8
-    LTEXT           "cancels zooming mode",IDC_STATIC,167,52,82,8
-    GROUPBOX        "Drawing Mode",IDC_STATIC,7,73,249,187
-    LTEXT           "increases/decreases the size of the drawing brush",IDC_STATIC,82,86,164,9
-    LTEXT           "Right/Left",IDC_STATIC,16,107,66,8
-    LTEXT           "Control",IDC_STATIC,16,117,66,8
-    LTEXT           "Shift",IDC_STATIC,16,127,66,8
-    LTEXT           "right mouse",IDC_STATIC,16,147,66,8
-    LTEXT           "cycles through the available brush colors",IDC_STATIC,82,107,164,8
-    LTEXT           "drawing straight lines",IDC_STATIC,82,117,164,8
-    LTEXT           "draws a rectangle",IDC_STATIC,82,127,164,8
-    LTEXT           "draws arrow lines",IDC_STATIC,82,147,164,8
-    LTEXT           "escape",IDC_STATIC,16,157,66,8
-    LTEXT           "quits drawing mode",IDC_STATIC,82,157,164,8
-    LTEXT           "backspace",IDC_STATIC,16,167,66,8
-    LTEXT           "T",IDC_STATIC,16,216,66,8
-    LTEXT           "M",IDC_STATIC,16,206,66,8
-    LTEXT           "E",IDC_STATIC,16,196,66,8
-    LTEXT           "removes the last line drawn",IDC_STATIC,82,167,164,8
-    LTEXT           "removes all drawn lines",IDC_STATIC,82,196,164,8
-    LTEXT           "toggles the marker on/off",IDC_STATIC,82,206,164,8
-    LTEXT           "Z",IDC_STATIC,16,226,66,8
-    LTEXT           "toggles between solid and alpha drawing",IDC_STATIC,82,216,164,8
-    LTEXT           "select a rectangle to zoom in",IDC_STATIC,82,226,164,8
-    LTEXT           "C",IDC_STATIC,16,236,66,8
-    LTEXT           "clear the screen with the window color",IDC_STATIC,82,236,164,8
-    LTEXT           "1-8",IDC_STATIC,16,246,66,8
-    LTEXT           "choose the brush color",IDC_STATIC,82,246,164,8
-    LTEXT           "delete",IDC_STATIC,16,177,66,8
-    LTEXT           "removes the first line drawn",IDC_STATIC,82,177,164,8
-    LTEXT           "Win+Shift+Mousewheel",IDC_STATIC,82,22,81,8
-    LTEXT           "Win+Shift+Mousewheel",IDC_STATIC,82,32,81,8
-    LTEXT           "Hotkey",IDC_STATIC,82,52,24,8
-    LTEXT           "Ctrl+Shift",IDC_STATIC,16,137,57,8
-    LTEXT           "draws an ellipse",IDC_STATIC,82,137,164,8
-END
-
 IDD_COLORS DIALOGEX 0, 0, 142, 98
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Colors"
@@ -215,39 +164,6 @@ BEGIN
         VERTGUIDE, 284
         TOPMARGIN, 7
         BOTTOMMARGIN, 292
-    END
-
-    IDD_HELPDIALOG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 256
-        VERTGUIDE, 16
-        VERTGUIDE, 82
-        VERTGUIDE, 167
-        VERTGUIDE, 246
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 276
-        HORZGUIDE, 30
-        HORZGUIDE, 40
-        HORZGUIDE, 50
-        HORZGUIDE, 60
-        HORZGUIDE, 95
-        HORZGUIDE, 105
-        HORZGUIDE, 115
-        HORZGUIDE, 125
-        HORZGUIDE, 135
-        HORZGUIDE, 145
-        HORZGUIDE, 155
-        HORZGUIDE, 165
-        HORZGUIDE, 175
-        HORZGUIDE, 185
-        HORZGUIDE, 195
-        HORZGUIDE, 205
-        HORZGUIDE, 215
-        HORZGUIDE, 225
-        HORZGUIDE, 235
-        HORZGUIDE, 245
-        HORZGUIDE, 254
     END
 
     IDD_COLORS, DIALOG
@@ -287,6 +203,14 @@ BEGIN
 END
 
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RTF
+//
+
+IDR_HELP                RTF                     "res\\DemoHelperHelp.rtf"
 
 
 /////////////////////////////////////////////////////////////////////////////

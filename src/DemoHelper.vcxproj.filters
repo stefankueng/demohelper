@@ -96,6 +96,9 @@
     <ClInclude Include="RectSelectionWnd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\sktoolslib\InfoRtfDialog.h">
+      <Filter>sktoolslib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DemoHelper.ico">
@@ -123,6 +126,7 @@
     <None Include="DemoHelper.rc2">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\DemoHelperHelp.rtf" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DemoHelper.rc">
@@ -143,9 +147,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Graphics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HelpDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MainWindow.cpp">
@@ -204,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="RectSelectionWnd.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sktoolslib\InfoRtfDialog.cpp">
+      <Filter>sktoolslib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

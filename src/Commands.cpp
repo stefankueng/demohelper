@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008, 2020 - Stefan Kueng
+// Copyright (C) 2007-2008, 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@
 #include "stdafx.h"
 #include "MainWindow.h"
 #include "IniSettings.h"
+#include "InfoRtfDialog.h"
 
 extern HINSTANCE g_hInstance; // current instance
 extern HINSTANCE g_hResource; // the resource dll
@@ -279,8 +280,17 @@ LRESULT CMainWindow::DoCommand(int id)
         }
         break;
         case IDHELP:
-            DialogBox(hResource, MAKEINTRESOURCE(IDD_HELPDIALOG), *this, (DLGPROC)HelpDlgProc);
-            break;
+        {
+            CInfoRtfDialog dlg;
+            RECT           rcOwner;
+            auto           hwndOwner = GetDesktopWindow();
+            GetWindowRect(hwndOwner, &rcOwner);
+            const int width  = 470;
+            const int height = 430;
+            dlg.DoModal(hResource, hwndOwner, "DemoHelper help", IDR_HELP, L"RTF", IDI_DEMOHELPER,
+                        rcOwner.right - width, rcOwner.bottom - height, width, height);
+        }
+        break;
         default:
             break;
     };

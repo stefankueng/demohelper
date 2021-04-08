@@ -165,7 +165,6 @@ protected:
     static BOOL CALLBACK ColorDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
     static WORD          HotKeyControl2HotKey(WORD hk);
     static WORD          HotKey2HotKeyControl(WORD hk);
-    static BOOL CALLBACK HelpDlgProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
     static LRESULT       LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
     static LRESULT       LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam);
 
