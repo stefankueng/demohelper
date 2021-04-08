@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 //////////////////////////////////////////////////
 // CMemDC - memory DC
@@ -133,44 +133,44 @@ public:
     CMemDC(HDC hDC, bool bTempOnly = false, int nOffset = 0)
     {
         UNREFERENCED_PARAMETER(nOffset);
-        m_hDC = hDC;
-        m_hOldBitmap = NULL;
-        m_bTempOnly = bTempOnly;
+        m_hDC        = hDC;
+        m_hOldBitmap = nullptr;
+        m_bTempOnly  = bTempOnly;
 
         GetClipBox(m_hDC, &m_rect);
         m_hMemDC = ::CreateCompatibleDC(m_hDC);
         m_hBitmap = CreateCompatibleBitmap(m_hDC, m_rect.right - m_rect.left, m_rect.bottom - m_rect.top);
-        m_hOldBitmap = (HBITMAP)SelectObject(m_hMemDC, m_hBitmap);
-        SetWindowOrgEx(m_hMemDC, m_rect.left, m_rect.top, NULL);
+        m_hOldBitmap = static_cast<HBITMAP>(SelectObject(m_hMemDC, m_hBitmap));
+        SetWindowOrgEx(m_hMemDC, m_rect.left, m_rect.top, nullptr);
     }
 
     CMemDC(HDC hDC, const RECT& rect)
     {
-        m_hDC = hDC;
-        m_hOldBitmap = NULL;
-        m_bTempOnly = false;
+        m_hDC        = hDC;
+        m_hOldBitmap = nullptr;
+        m_bTempOnly  = false;
 
         m_rect = rect;
 
-        LPtoDP(m_hDC, (LPPOINT)&m_rect, 2);
+        LPtoDP(m_hDC, reinterpret_cast<LPPOINT>(&m_rect), 2);
 
         //GetClipBox(m_hDC, &m_rect);
         m_hMemDC = ::CreateCompatibleDC(m_hDC);
         m_hBitmap = CreateCompatibleBitmap(m_hDC, m_rect.right - m_rect.left, m_rect.bottom - m_rect.top);
-        m_hOldBitmap = (HBITMAP)SelectObject(m_hMemDC, m_hBitmap);
+        m_hOldBitmap = static_cast<HBITMAP>(SelectObject(m_hMemDC, m_hBitmap));
 
         SetMapMode(m_hMemDC, GetMapMode(hDC));
 
         SIZE ext;
         GetWindowExtEx(m_hDC, &ext);
-        SetWindowExtEx(m_hMemDC, ext.cx, ext.cy, NULL);
+        SetWindowExtEx(m_hMemDC, ext.cx, ext.cy, nullptr);
 
         GetViewportExtEx(m_hDC, &ext);
-        SetViewportExtEx(m_hMemDC, ext.cx, ext.cy, NULL);
+        SetViewportExtEx(m_hMemDC, ext.cx, ext.cy, nullptr);
 
-        DPtoLP(m_hDC, (LPPOINT)&m_rect, 2);
+        DPtoLP(m_hDC, reinterpret_cast<LPPOINT>(&m_rect), 2);
 
-        SetWindowOrgEx(m_hMemDC, m_rect.left, m_rect.top, NULL);
+        SetWindowOrgEx(m_hMemDC, m_rect.left, m_rect.top, nullptr);
     }
 
     // Destructor copies the contents of the mem DC to the original DC
@@ -191,12 +191,12 @@ public:
             // the CDC that was passed to the constructor.
             DeleteObject(m_hBitmap);
             DeleteDC(m_hMemDC);
-            m_hMemDC = NULL;
+            m_hMemDC = nullptr;
         }
     }
 
     // Allow usage as a pointer
-    operator HDC() {return m_hMemDC;}
+    operator HDC() const {return m_hMemDC;}
 private:
     HBITMAP  m_hBitmap;     // Off screen bitmap
     HBITMAP  m_hOldBitmap;  // bitmap originally found in CMemDC
