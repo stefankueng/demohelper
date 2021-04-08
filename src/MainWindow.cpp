@@ -23,6 +23,7 @@
 #include "DebugOutput.h"
 #include "IniSettings.h"
 #include "RectSelectionWnd.h"
+#include "MemDC.h"
 
 #include <algorithm>
 

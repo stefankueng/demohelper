@@ -22,7 +22,7 @@
 #include "BaseWindow.h"
 #include "resource.h"
 #include "hyperlink.h"
-#include "MemDC.h"
+#include "ResString.h"
 #include "AnimationManager.h"
 #include "KeyboardOverlay.h"
 #include "KeyboardOverlayD2D.h"
