@@ -139,16 +139,16 @@ LRESULT CKeyboardOverlayWndD2D::WinMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
 }
 HRESULT CKeyboardOverlayWndD2D::OnRender(ID2D1DeviceContext* dc)
 {
-    HRESULT hr          = S_OK;
-    auto    size        = dc->GetSize();
-    auto    roundRadius = static_cast<float>(CDPIAware::Instance().Scale(*this, 15));
-    auto    textOffset  = static_cast<float>(CDPIAware::Instance().Scale(*this, 3));
-    auto    roundedRect = D2D1::RoundedRect(D2D1::RectF(0, 0, size.width, size.height), roundRadius, roundRadius);
+    HRESULT hr           = S_OK;
+    auto [width, height] = dc->GetSize();
+    auto roundRadius     = static_cast<float>(CDPIAware::Instance().Scale(*this, 15));
+    auto textOffset      = static_cast<float>(CDPIAware::Instance().Scale(*this, 3));
+    auto roundedRect     = D2D1::RoundedRect(D2D1::RectF(0, 0, width, height), roundRadius, roundRadius);
 
     auto animVar = static_cast<BYTE>(Animator::GetIntegerValue(m_animVar));
 
     ComPtr<ID2D1Bitmap1>    bmp;
-    D2D1_SIZE_U             sizeU      = {static_cast<UINT32>(size.width), static_cast<UINT32>(size.height)};
+    D2D1_SIZE_U             sizeU      = {static_cast<UINT32>(width), static_cast<UINT32>(height)};
     D2D1_BITMAP_PROPERTIES1 properties = {};
     properties.pixelFormat.alphaMode   = D2D1_ALPHA_MODE_PREMULTIPLIED;
     properties.pixelFormat.format      = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -157,7 +157,7 @@ HRESULT CKeyboardOverlayWndD2D::OnRender(ID2D1DeviceContext* dc)
 
     m_dc->SetTarget(bmp.Get());
 
-    auto                         textRect = D2D1::RectF(textOffset, textOffset, size.width - textOffset - textOffset, size.height - textOffset - textOffset);
+    auto                         textRect = D2D1::RectF(textOffset, textOffset, width - textOffset - textOffset, height - textOffset - textOffset);
     ComPtr<ID2D1SolidColorBrush> shadowBrush;
     hr = m_dc->CreateSolidColorBrush(D2D1::ColorF(RGB(10, 10, 10), animVar / 255.0f), shadowBrush.GetAddressOf());
     if (m_textFormat)

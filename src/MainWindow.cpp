@@ -102,21 +102,21 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                 if (m_bLensMode && bWindows && bShift)
                 {
                     auto zDelta     = GET_WHEEL_DELTA_WPARAM(phs->mouseData);
-                    auto zoomfactor = m_magnifierWindow.GetMagnification();
+                    auto zoomFactor = m_magnifierWindow.GetMagnification();
                     if (zDelta > 0)
                     {
-                        zoomfactor += 0.1f;
-                        if (zoomfactor > 4.0f)
-                            zoomfactor = 4.0f;
+                        zoomFactor += 0.1f;
+                        if (zoomFactor > 4.0f)
+                            zoomFactor = 4.0f;
                     }
                     else
                     {
-                        zoomfactor -= 0.1f;
-                        if (zoomfactor < 1.0f)
-                            zoomfactor = 1.0f;
+                        zoomFactor -= 0.1f;
+                        if (zoomFactor < 1.0f)
+                            zoomFactor = 1.0f;
                     }
 
-                    m_magnifierWindow.SetMagnification(phs->pt, zoomfactor);
+                    m_magnifierWindow.SetMagnification(phs->pt, zoomFactor);
                     return TRUE;
                 }
             }
@@ -213,9 +213,9 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
             }
             if (m_bMouseClicks && !text.empty() && hasClick)
             {
-                auto       reqHeight = m_infoOverlay->GetRequiredHeight(text);
-                const long width     = std::max(reqHeight.cx, static_cast<long>(CDPIAware::Instance().Scale(*m_infoOverlay, overlayWidth)));
-                const long height    = std::max(reqHeight.cy, static_cast<long>(CDPIAware::Instance().Scale(*m_infoOverlay, overlayHeight)));
+                auto [reqCx, reqCy] = m_infoOverlay->GetRequiredHeight(text);
+                const long width    = std::max(reqCx, static_cast<long>(CDPIAware::Instance().Scale(*m_infoOverlay, overlayWidth)));
+                const long height   = std::max(reqCy, static_cast<long>(CDPIAware::Instance().Scale(*m_infoOverlay, overlayHeight)));
                 if (!dbl && IsWindowVisible(*m_infoOverlay))
                 {
                     m_overlayWnds.push_back(std::move(m_infoOverlay));
@@ -228,22 +228,22 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
                     // move previous windows upwards
                     for (auto& overlayWnd : m_overlayWnds)
                     {
-                        RECT prevrc{};
-                        GetWindowRect(*overlayWnd, &prevrc);
+                        RECT prevRc{};
+                        GetWindowRect(*overlayWnd, &prevRc);
                         switch (m_overlayPosition)
                         {
                             case OverlayPosition::BottomLeft:
                             case OverlayPosition::BottomRight:
-                                prevrc.top -= (height + 10);
-                                prevrc.bottom -= (height + 10);
+                                prevRc.top -= (height + 10);
+                                prevRc.bottom -= (height + 10);
                                 break;
                             case OverlayPosition::TopLeft:
                             case OverlayPosition::TopRight:
-                                prevrc.top += (height + 10);
-                                prevrc.bottom += (height + 10);
+                                prevRc.top += (height + 10);
+                                prevRc.bottom += (height + 10);
                                 break;
                         }
-                        m_wndPositions.emplace_back(*overlayWnd, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top);
+                        m_wndPositions.emplace_back(*overlayWnd, prevRc.left, prevRc.top, prevRc.right - prevRc.left, prevRc.bottom - prevRc.top);
                         //SetWindowPos(*overlayWnd, HWND_TOPMOST, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
                     }
                 }
@@ -424,9 +424,9 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                         }
                         text += buffer;
                         m_keySequence.push_back(buffer);
-                        auto       reqHeight = m_infoOverlay->GetRequiredHeight(text);
-                        const long width     = std::max(reqHeight.cx, static_cast<long>(CDPIAware::Instance().Scale(*m_infoOverlay, overlayWidth)));
-                        const long height    = std::max(reqHeight.cy, static_cast<long>(CDPIAware::Instance().Scale(*m_infoOverlay, overlayHeight)));
+                        auto [reqCx, reqCy] = m_infoOverlay->GetRequiredHeight(text);
+                        const long width    = std::max(reqCx, static_cast<long>(CDPIAware::Instance().Scale(*m_infoOverlay, overlayWidth)));
+                        const long height   = std::max(reqCy, static_cast<long>(CDPIAware::Instance().Scale(*m_infoOverlay, overlayHeight)));
                         m_wndPositions.clear();
                         ClearOutdatedPopupWindows();
                         if (!m_infoOverlay->HasWindowBeenShown())
@@ -434,22 +434,22 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                             // move previous windows upwards
                             for (auto& overlayWnd : m_overlayWnds)
                             {
-                                RECT prevrc{};
-                                GetWindowRect(*overlayWnd, &prevrc);
+                                RECT prevRc{};
+                                GetWindowRect(*overlayWnd, &prevRc);
                                 switch (m_overlayPosition)
                                 {
                                     case OverlayPosition::BottomLeft:
                                     case OverlayPosition::BottomRight:
-                                        prevrc.top -= (height + 10);
-                                        prevrc.bottom -= (height + 10);
+                                        prevRc.top -= (height + 10);
+                                        prevRc.bottom -= (height + 10);
                                         break;
                                     case OverlayPosition::TopLeft:
                                     case OverlayPosition::TopRight:
-                                        prevrc.top += (height + 10);
-                                        prevrc.bottom += (height + 10);
+                                        prevRc.top += (height + 10);
+                                        prevRc.bottom += (height + 10);
                                         break;
                                 }
-                                m_wndPositions.emplace_back(*overlayWnd, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top);
+                                m_wndPositions.emplace_back(*overlayWnd, prevRc.left, prevRc.top, prevRc.right - prevRc.left, prevRc.bottom - prevRc.top);
                                 //SetWindowPos(*overlayWnd, HWND_TOPMOST, prevrc.left, prevrc.top, prevrc.right - prevrc.left, prevrc.bottom - prevrc.top, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
                             }
                         }
@@ -508,8 +508,8 @@ bool CMainWindow::RegisterAndCreateWindow()
     wcx.cbWndExtra  = 0;
     wcx.hInstance   = hResource;
     //wcx.hCursor     = LoadCursor(nullptr, IDC_ARROW);
-    ResString clsname(hResource, IDS_APP_TITLE);
-    wcx.lpszClassName = clsname;
+    ResString clsName(hResource, IDS_APP_TITLE);
+    wcx.lpszClassName = clsName;
     wcx.hIcon         = LoadIcon(hResource, MAKEINTRESOURCE(IDI_DEMOHELPER));
     wcx.hbrBackground = nullptr;
     wcx.lpszMenuName  = nullptr;
@@ -652,9 +652,9 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
         {
             ProfileTimer profiler(L"WM_PAINT");
             PAINTSTRUCT  ps;
-            HDC          hdc = BeginPaint(*this, &ps);
+            HDC          hDc = BeginPaint(*this, &ps);
             {
-                CMemDC memDC(hdc, ps.rcPaint);
+                CMemDC memDC(hDc, ps.rcPaint);
                 if (m_bZooming)
                 {
                     // we're zooming,

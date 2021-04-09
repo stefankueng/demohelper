@@ -28,10 +28,10 @@
 HINSTANCE g_hInstance; // current instance
 HINSTANCE g_hResource; // the resource dll
 
-int APIENTRY _tWinMain(HINSTANCE hInstance,
-                       HINSTANCE hPrevInstance,
-                       LPTSTR    lpCmdLine,
-                       int       nCmdShow)
+int APIENTRY wWinMain(HINSTANCE hInstance,
+                      HINSTANCE hPrevInstance,
+                      LPTSTR    lpCmdLine,
+                      int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -42,8 +42,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
         ICC_STANDARD_CLASSES | ICC_BAR_CLASSES};
     InitCommonControlsEx(&used);
     SetDllDirectory(L"");
-    HRESULT hr = CoInitialize(nullptr);
-    if (FAILED(hr))
+    if (FAILED(CoInitialize(nullptr)))
         return -1;
     OnOutOfScope(CoUninitialize());
 
@@ -74,8 +73,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     int ret = 1;
     MSG msg;
     {
-        CMainWindow trayWindow(g_hResource);
-        if (trayWindow.RegisterAndCreateWindow())
+        if (CMainWindow trayWindow(g_hResource); trayWindow.RegisterAndCreateWindow())
         {
             HACCEL hAccelTable = LoadAccelerators(g_hResource, MAKEINTRESOURCE(IDR_DEMOHELPER));
             // Main message loop:
