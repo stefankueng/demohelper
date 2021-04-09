@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,7 +19,6 @@
 #include "stdafx.h"
 #include "RectSelectionWnd.h"
 #include "DPIAware.h"
-#include "MemDC.h"
 
 #pragma comment(lib, "Winmm.lib")
 
@@ -27,7 +26,7 @@ constexpr int FADE_TIMER = 101;
 
 CRectSelectionWnd::~CRectSelectionWnd()
 {
-    DiscardDeviceResources();
+    CRectSelectionWnd::DiscardDeviceResources();
 }
 
 bool CRectSelectionWnd::RegisterAndCreateWindow()
@@ -41,15 +40,15 @@ bool CRectSelectionWnd::RegisterAndCreateWindow()
     wcx.cbClsExtra    = 0;
     wcx.cbWndExtra    = 0;
     wcx.hInstance     = hResource;
-    wcx.hCursor       = LoadCursor(NULL, IDC_HAND);
+    wcx.hCursor       = LoadCursor(nullptr, IDC_HAND);
     wcx.lpszClassName = L"CRectSelectionWnd_{3FD2D1AD-D9BD-4F3B-99F7-1103C8AAE535}";
-    wcx.hIcon         = NULL;
-    wcx.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wcx.lpszMenuName  = NULL;
-    wcx.hIconSm       = NULL;
+    wcx.hIcon         = nullptr;
+    wcx.hbrBackground = reinterpret_cast<HBRUSH>((COLOR_WINDOW + 1));
+    wcx.lpszMenuName  = nullptr;
+    wcx.hIconSm       = nullptr;
     if (RegisterWindow(&wcx))
     {
-        auto ret = CreateEx(WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOPMOST, WS_POPUP, NULL);
+        auto ret = CreateEx(WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOPMOST, WS_POPUP, nullptr);
         return ret;
     }
     return false;
@@ -67,7 +66,7 @@ RECT CRectSelectionWnd::Show(HWND hWndParent, RECT wndRect, float aspectRatio)
     m_endPt   = {};
     // Main message loop:
     m_bRunning = true;
-    MSG  msg   = {0};
+    MSG  msg   = {nullptr};
     BOOL bRet  = TRUE;
     while (m_bRunning && ((bRet = GetMessage(&msg, nullptr, 0, 0)) != 0))
     {
@@ -87,7 +86,7 @@ RECT CRectSelectionWnd::Show(HWND hWndParent, RECT wndRect, float aspectRatio)
         ::EnableWindow(hWndParent, TRUE);
     ShowWindow(*this, SW_HIDE);
     if (msg.message == WM_QUIT)
-        PostQuitMessage((int)msg.wParam);
+        PostQuitMessage(static_cast<int>(msg.wParam));
     return m_selectedRect;
 }
 
@@ -153,9 +152,9 @@ LRESULT CRectSelectionWnd::WinMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 }
 HRESULT CRectSelectionWnd::OnRender(ID2D1DeviceContext* dc)
 {
-    HRESULT hr      = S_OK;
-    auto    size    = dc->GetSize();
-    auto    wndRect = D2D1::RectF(0, 0, size.width, size.height);
+    HRESULT hr           = S_OK;
+    auto [width, height] = dc->GetSize();
+    auto wndRect         = D2D1::RectF(0, 0, width, height);
 
     ComPtr<ID2D1SolidColorBrush> backgroundBrush;
     hr = m_dc->CreateSolidColorBrush(D2D1::ColorF(RGB(128, 128, 128), 0.5f), backgroundBrush.GetAddressOf());
@@ -163,14 +162,14 @@ HRESULT CRectSelectionWnd::OnRender(ID2D1DeviceContext* dc)
     hr = m_dc->CreateSolidColorBrush(D2D1::ColorF(RGB(120, 120, 255), 0.9f), textBrush.GetAddressOf());
 
     std::wstring text = L"select zoom area";
-    if (m_TextFormat)
-        dc->DrawText(text.c_str(), (UINT32)text.size(), m_TextFormat.Get(), wndRect, textBrush.Get());
+    if (m_textFormat)
+        dc->DrawText(text.c_str(), static_cast<UINT32>(text.size()), m_textFormat.Get(), wndRect, textBrush.Get());
     if (m_selectionInProgress)
     {
-        auto selRect = D2D1::RectF((float)std::min(m_startPt.x, m_endPt.x),
-                                   (float)std::min(m_startPt.y, m_endPt.y),
-                                   (float)std::max(m_startPt.x, m_endPt.x),
-                                   (float)std::max(m_startPt.y, m_endPt.y));
+        auto selRect = D2D1::RectF(static_cast<float>(std::min(m_startPt.x, m_endPt.x)),
+                                   static_cast<float>(std::min(m_startPt.y, m_endPt.y)),
+                                   static_cast<float>(std::max(m_startPt.x, m_endPt.x)),
+                                   static_cast<float>(std::max(m_startPt.y, m_endPt.y)));
         // rect above the selRect
         auto topRect = D2D1::RectF(0, 0, wndRect.right, selRect.top);
         // rect below the selRect
@@ -205,13 +204,13 @@ HRESULT CRectSelectionWnd::CreateDeviceResources()
     if (SUCCEEDED(hr))
         hr = m_writeFactory->CreateTextFormat(L"Arial", nullptr,
                                               DWRITE_FONT_WEIGHT_DEMI_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_CONDENSED,
-                                              float(CDPIAware::Instance().Scale(*this, 36)),
-                                              L"", m_TextFormat.GetAddressOf());
+                                              static_cast<float>(CDPIAware::Instance().Scale(*this, 36)),
+                                              L"", m_textFormat.GetAddressOf());
     if (SUCCEEDED(hr))
-        hr = m_TextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+        hr = m_textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 
     if (SUCCEEDED(hr))
-        hr = m_TextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+        hr = m_textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
     if (SUCCEEDED(hr))
         hr = m_dc->CreateEffect(CLSID_D2D1GaussianBlur, &m_gaussianBlurEffect);
@@ -220,7 +219,7 @@ HRESULT CRectSelectionWnd::CreateDeviceResources()
 }
 HRESULT CRectSelectionWnd::DiscardDeviceResources()
 {
-    m_TextFormat = nullptr;
+    m_textFormat = nullptr;
     return S_OK;
 }
 void CRectSelectionWnd::AdjustEndPoint()
@@ -233,10 +232,10 @@ void CRectSelectionWnd::AdjustEndPoint()
     auto yFactor = m_startPt.y > m_endPt.y ? -1.0f : 1.0f;
     if (width / m_aspectRatio > height)
     {
-        m_endPt.x = m_startPt.x + LONG(xFactor * (height * m_aspectRatio));
+        m_endPt.x = m_startPt.x + static_cast<LONG>(xFactor * (height * m_aspectRatio));
     }
     else
     {
-        m_endPt.y = m_startPt.y + LONG(yFactor * (width / m_aspectRatio));
+        m_endPt.y = m_startPt.y + static_cast<LONG>(yFactor * (width / m_aspectRatio));
     }
 };

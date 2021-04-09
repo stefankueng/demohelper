@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -30,12 +30,12 @@ public:
     ~CColorDlg();
 
 protected:
-    LRESULT CALLBACK        DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    LRESULT                 DoCommand(int id);
+    LRESULT CALLBACK DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    LRESULT          DoCommand(int id);
 
 private:
-    HWND                    m_hParent;
-    CColorButton            m_mvLColor;
-    CColorButton            m_mvMColor;
-    CColorButton            m_mvRColor;
+    HWND         m_hParent;
+    CColorButton m_mvLColor;
+    CColorButton m_mvMColor;
+    CColorButton m_mvRColor;
 };

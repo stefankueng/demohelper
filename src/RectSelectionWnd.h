@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,15 +18,11 @@
 //
 #pragma once
 #include "BaseWindowD2D.h"
-#include "DPIAware.h"
-#include "AnimationManager.h"
-#include <string>
-#include <vector>
 
 class CRectSelectionWnd : public CWindowD2D
 {
 public:
-    CRectSelectionWnd(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL)
+    explicit CRectSelectionWnd(HINSTANCE hInst, const WNDCLASSEX* wcx = nullptr)
         : CWindowD2D(hInst, wcx)
         , m_bRunning(false)
         , m_selectedRect{}
@@ -37,7 +33,7 @@ public:
     {
         RegisterAndCreateWindow();
     }
-    ~CRectSelectionWnd(void);
+    ~CRectSelectionWnd();
 
     RECT Show(HWND hWndParent, RECT wndRect, float aspectRatio);
 
@@ -50,13 +46,13 @@ protected:
 
 private:
     // Inherited via CWindowD2D
-    virtual LRESULT WinMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-    virtual HRESULT OnRender(ID2D1DeviceContext* dc) override;
-    virtual HRESULT CreateDeviceResources() override;
-    virtual HRESULT DiscardDeviceResources() override;
-    void            AdjustEndPoint();
+    LRESULT WinMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    HRESULT OnRender(ID2D1DeviceContext* dc) override;
+    HRESULT CreateDeviceResources() override;
+    HRESULT DiscardDeviceResources() override;
+    void    AdjustEndPoint();
 
-    ComPtr<IDWriteTextFormat> m_TextFormat;
+    ComPtr<IDWriteTextFormat> m_textFormat;
     ComPtr<ID2D1Effect>       m_gaussianBlurEffect;
     bool                      m_bRunning;
     RECT                      m_selectedRect;

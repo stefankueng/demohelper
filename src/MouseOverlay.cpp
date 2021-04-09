@@ -30,8 +30,8 @@ using namespace Microsoft::WRL;
 
 #pragma comment(lib, "Winmm.lib")
 
-#define winHalfWidth  long(CDPIAware::Instance().Scale(*this, 30))
-#define winHalfHeight long(CDPIAware::Instance().Scale(*this, 30))
+#define WIN_HALF_WIDTH  long(CDPIAware::Instance().Scale(*this, 30))
+#define WIN_HALF_HEIGHT long(CDPIAware::Instance().Scale(*this, 30))
 
 CMouseOverlayWnd::~CMouseOverlayWnd()
 {
@@ -48,15 +48,15 @@ bool CMouseOverlayWnd::RegisterAndCreateWindow()
     wcx.cbClsExtra    = 0;
     wcx.cbWndExtra    = 0;
     wcx.hInstance     = hResource;
-    wcx.hCursor       = LoadCursor(NULL, IDC_HAND);
+    wcx.hCursor       = LoadCursor(nullptr, IDC_HAND);
     wcx.lpszClassName = L"CMouseOverlayWnd_{eee30d59-743f-42e5-8414-6ef9f311c49a}";
-    wcx.hIcon         = NULL;
-    wcx.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wcx.lpszMenuName  = NULL;
-    wcx.hIconSm       = NULL;
+    wcx.hIcon         = nullptr;
+    wcx.hbrBackground = reinterpret_cast<HBRUSH>((COLOR_WINDOW + 1));
+    wcx.lpszMenuName  = nullptr;
+    wcx.hIconSm       = nullptr;
     if (RegisterWindow(&wcx))
     {
-        if (CreateEx(WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOPMOST, WS_POPUP | WS_DISABLED, NULL))
+        if (CreateEx(WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOPMOST, WS_POPUP | WS_DISABLED, nullptr))
         {
             // Make the window fully transparent.
             return SetLayeredWindowAttributes(*this, 0, 255, LWA_COLORKEY | LWA_ALPHA);
@@ -68,45 +68,45 @@ bool CMouseOverlayWnd::RegisterAndCreateWindow()
 void CMouseOverlayWnd::Show(POINT screenPos, COLORREF color, double fadeTo)
 {
     m_color = color;
-    SetWindowPos(*this, HWND_TOPMOST, screenPos.x - winHalfWidth, screenPos.y - winHalfHeight, 2 * winHalfWidth, 2 * winHalfHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+    SetWindowPos(*this, HWND_TOPMOST, screenPos.x - WIN_HALF_WIDTH, screenPos.y - WIN_HALF_HEIGHT, 2 * WIN_HALF_WIDTH, 2 * WIN_HALF_HEIGHT, SWP_NOACTIVATE | SWP_SHOWWINDOW);
     InvalidateRect(*this, nullptr, false);
-    m_AnimVar       = Animator::Instance().CreateAnimationVariable(255.0, fadeTo);
-    auto transFade  = Animator::Instance().CreateSmoothStopTransition(m_AnimVar, 1.0 * ((255.0 - fadeTo) / 255.0), fadeTo);
+    m_animVar       = Animator::Instance().CreateAnimationVariable(255.0, fadeTo);
+    auto transFade  = Animator::Instance().CreateSmoothStopTransition(m_animVar, 1.0 * ((255.0 - fadeTo) / 255.0), fadeTo);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
-    storyBoard->AddTransition(m_AnimVar.m_animVar, transFade);
+    storyBoard->AddTransition(m_animVar.m_animVar, transFade);
     Animator::Instance().RunStoryBoard(storyBoard, [this]() {
-        auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
+        auto animVar = static_cast<BYTE>(Animator::GetIntegerValue(m_animVar));
         SetLayeredWindowAttributes(*this, 0, animVar / 2, LWA_COLORKEY | LWA_ALPHA);
         InvalidateRect(*this, nullptr, false);
         if (animVar == 0)
             ShowWindow(*this, SW_HIDE);
     });
 
-    SetLayeredWindowAttributes(*this, 0, (BYTE)128, LWA_COLORKEY | LWA_ALPHA);
+    SetLayeredWindowAttributes(*this, 0, static_cast<BYTE>(128), LWA_COLORKEY | LWA_ALPHA);
 }
 
 void CMouseOverlayWnd::UpdatePos(POINT screenPos)
 {
-    if (m_AnimVar.m_animVar)
+    if (m_animVar.m_animVar)
     {
-        auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
+        auto animVar = static_cast<BYTE>(Animator::GetIntegerValue(m_animVar));
         if (animVar)
-            SetWindowPos(*this, HWND_TOPMOST, screenPos.x - winHalfWidth, screenPos.y - winHalfHeight, 2 * winHalfWidth, 2 * winHalfHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+            SetWindowPos(*this, HWND_TOPMOST, screenPos.x - WIN_HALF_WIDTH, screenPos.y - WIN_HALF_HEIGHT, 2 * WIN_HALF_WIDTH, 2 * WIN_HALF_HEIGHT, SWP_NOACTIVATE | SWP_SHOWWINDOW);
     }
 }
 
 void CMouseOverlayWnd::Fade()
 {
-    if (m_AnimVar.m_animVar)
+    if (m_animVar.m_animVar)
     {
-        auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
+        auto animVar = static_cast<BYTE>(Animator::GetIntegerValue(m_animVar));
         if (animVar)
         {
-            auto transFade  = Animator::Instance().CreateSmoothStopTransition(m_AnimVar, 1.0, 0.0);
+            auto transFade  = Animator::Instance().CreateSmoothStopTransition(m_animVar, 1.0, 0.0);
             auto storyBoard = Animator::Instance().CreateStoryBoard();
-            storyBoard->AddTransition(m_AnimVar.m_animVar, transFade);
+            storyBoard->AddTransition(m_animVar.m_animVar, transFade);
             Animator::Instance().RunStoryBoard(storyBoard, [this]() {
-                auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
+                auto animVar = static_cast<BYTE>(Animator::GetIntegerValue(m_animVar));
                 SetLayeredWindowAttributes(*this, 0, animVar / 2, LWA_COLORKEY | LWA_ALPHA);
                 InvalidateRect(*this, nullptr, false);
                 if (animVar == 0)
@@ -137,8 +137,8 @@ LRESULT CALLBACK CMouseOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wP
                 PAINTSTRUCT ps;
                 HDC         hdc = BeginPaint(hwnd, &ps);
                 {
-                    CMemDC memdc(hdc);
-                    OnPaint(memdc, &rect);
+                    CMemDC memDC(hdc);
+                    OnPaint(memDC, &rect);
                 }
                 EndPaint(hwnd, &ps);
             }
@@ -147,15 +147,15 @@ LRESULT CALLBACK CMouseOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wP
         case WM_SETFOCUS:
         {
             if (wParam)
-                SetFocus((HWND)wParam); // return the focus, we don't want it
+                SetFocus(reinterpret_cast<HWND>(wParam)); // return the focus, we don't want it
         }
         break;
         case WM_DESTROY:
         {
-            if (m_AnimVar.m_animVar && Animator::IsInstanceActive())
+            if (m_animVar.m_animVar && Animator::IsInstanceActive())
             {
                 ComPtr<IUIAnimationStoryboard> storyBoard;
-                if (SUCCEEDED(m_AnimVar.m_animVar->GetCurrentStoryboard(storyBoard.GetAddressOf())))
+                if (SUCCEEDED(m_animVar.m_animVar->GetCurrentStoryboard(storyBoard.GetAddressOf())))
                 {
                     if (storyBoard)
                     {
@@ -163,7 +163,7 @@ LRESULT CALLBACK CMouseOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wP
                     }
                 }
             }
-            m_AnimVar.m_animVar = nullptr;
+            m_animVar.m_animVar = nullptr;
         }
         break;
         default:
@@ -175,7 +175,7 @@ LRESULT CALLBACK CMouseOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wP
 
 void CMouseOverlayWnd::OnPaint(HDC hDC, LPRECT pRect)
 {
-    auto              animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
+    auto              animVar = static_cast<BYTE>(Animator::GetIntegerValue(m_animVar));
     Gdiplus::Rect     rect    = {pRect->left, pRect->top, pRect->right - pRect->left, pRect->bottom - pRect->top};
     Gdiplus::Graphics graphics(hDC);
     graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
@@ -190,14 +190,14 @@ void CMouseOverlayWnd::OnPaint(HDC hDC, LPRECT pRect)
                             2 * radius,
                             2 * radius};
 
-    Gdiplus::Color surroundColors[]   = {Gdiplus::Color::MakeARGB((BYTE)animVar, GetRValue(m_color), GetGValue(m_color), GetBValue(m_color))};
+    Gdiplus::Color surroundColors[]   = {Gdiplus::Color::MakeARGB(static_cast<BYTE>(animVar), GetRValue(m_color), GetGValue(m_color), GetBValue(m_color))};
     INT            surroundColorCount = _countof(surroundColors);
 
     Gdiplus::GraphicsPath gp;
     gp.AddEllipse(circle);
     Gdiplus::PathGradientBrush pgb(&gp);
     pgb.SetCenterPoint(Gdiplus::Point(circle.Width / 2, circle.Height / 2));
-    pgb.SetCenterColor(Gdiplus::Color::MakeARGB((BYTE)animVar, 255, 255, 255));
+    pgb.SetCenterColor(Gdiplus::Color::MakeARGB(static_cast<BYTE>(animVar), 255, 255, 255));
     pgb.SetSurroundColors(surroundColors, &surroundColorCount);
 
     graphics.FillPath(&pgb, &gp);

@@ -45,15 +45,15 @@ bool CKeyboardOverlayWnd::RegisterAndCreateWindow()
     wcx.cbClsExtra    = 0;
     wcx.cbWndExtra    = 0;
     wcx.hInstance     = hResource;
-    wcx.hCursor       = LoadCursor(NULL, IDC_HAND);
+    wcx.hCursor       = LoadCursor(nullptr, IDC_HAND);
     wcx.lpszClassName = L"CKeyboardOverlayWnd_{fda7e16a-f6b2-4be2-a3fc-ea929a07385d}";
-    wcx.hIcon         = NULL;
-    wcx.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wcx.lpszMenuName  = NULL;
-    wcx.hIconSm       = NULL;
+    wcx.hIcon         = nullptr;
+    wcx.hbrBackground = reinterpret_cast<HBRUSH>((COLOR_WINDOW + 1));
+    wcx.lpszMenuName  = nullptr;
+    wcx.hIconSm       = nullptr;
     if (RegisterWindow(&wcx))
     {
-        if (CreateEx(WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOPMOST, WS_POPUP | WS_DISABLED, NULL))
+        if (CreateEx(WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOPMOST, WS_POPUP | WS_DISABLED, nullptr))
         {
             // Make the window fully transparent.
             return SetLayeredWindowAttributes(*this, 0, 255, LWA_COLORKEY | LWA_ALPHA);
@@ -66,20 +66,20 @@ void CKeyboardOverlayWnd::Show(const std::wstring& text)
 {
     m_text = text;
     InvalidateRect(*this, nullptr, false);
-    m_AnimVar = Animator::Instance().CreateAnimationVariable(255.0, 255.0);
-    auto transKeep = Animator::Instance().CreateConstantTransition(2.0);
-    auto transFade = Animator::Instance().CreateSmoothStopTransition(m_AnimVar, 0.8, 0.0);
+    m_animVar       = Animator::Instance().CreateAnimationVariable(255.0, 255.0);
+    auto transKeep  = Animator::Instance().CreateConstantTransition(2.0);
+    auto transFade  = Animator::Instance().CreateSmoothStopTransition(m_animVar, 0.8, 0.0);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
-    storyBoard->AddTransition(m_AnimVar.m_animVar, transKeep);
-    storyBoard->AddTransition(m_AnimVar.m_animVar, transFade);
+    storyBoard->AddTransition(m_animVar.m_animVar, transKeep);
+    storyBoard->AddTransition(m_animVar.m_animVar, transFade);
     Animator::Instance().RunStoryBoard(storyBoard, [this]() {
-        auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
+        auto animVar = static_cast<BYTE>(Animator::GetIntegerValue(m_animVar));
         SetLayeredWindowAttributes(*this, 0, animVar, LWA_COLORKEY | LWA_ALPHA);
         InvalidateRect(*this, nullptr, false);
         if (animVar == 0)
             ShowWindow(*this, SW_HIDE);
-        });
-    SetLayeredWindowAttributes(*this, 0, (BYTE)255, LWA_COLORKEY | LWA_ALPHA);
+    });
+    SetLayeredWindowAttributes(*this, 0, static_cast<BYTE>(255), LWA_COLORKEY | LWA_ALPHA);
 }
 
 LRESULT CALLBACK CKeyboardOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -103,8 +103,8 @@ LRESULT CALLBACK CKeyboardOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM
                 PAINTSTRUCT ps;
                 HDC         hdc = BeginPaint(hwnd, &ps);
                 {
-                    CMemDC memdc(hdc);
-                    OnPaint(memdc, &rect);
+                    CMemDC memDc(hdc);
+                    OnPaint(memDc, &rect);
                 }
                 EndPaint(hwnd, &ps);
             }
@@ -113,7 +113,7 @@ LRESULT CALLBACK CKeyboardOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM
         case WM_SETFOCUS:
         {
             if (wParam)
-                SetFocus((HWND)wParam); // return the focus, we don't want it
+                SetFocus(reinterpret_cast<HWND>(wParam)); // return the focus, we don't want it
         }
         break;
         default:
@@ -125,19 +125,19 @@ LRESULT CALLBACK CKeyboardOverlayWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM
 
 void CKeyboardOverlayWnd::OnPaint(HDC hDC, LPRECT pRect)
 {
-    auto              animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
-    Gdiplus::Rect     rect  = {pRect->left, pRect->top, pRect->right - pRect->left, pRect->bottom - pRect->top};
-    Gdiplus::RectF    rectF = {(Gdiplus::REAL)pRect->left,
-                            (Gdiplus::REAL)pRect->top,
-                            Gdiplus::REAL(pRect->right - pRect->left),
-                            Gdiplus::REAL(pRect->bottom - pRect->top)};
+    auto              animVar = static_cast<BYTE>(Animator::GetIntegerValue(m_animVar));
+    Gdiplus::Rect     rect    = {pRect->left, pRect->top, pRect->right - pRect->left, pRect->bottom - pRect->top};
+    Gdiplus::RectF    rectF   = {static_cast<Gdiplus::REAL>(pRect->left),
+                            static_cast<Gdiplus::REAL>(pRect->top),
+                            static_cast<Gdiplus::REAL>(pRect->right - pRect->left),
+                            static_cast<Gdiplus::REAL>(pRect->bottom - pRect->top)};
     Gdiplus::Graphics graphics(hDC);
     graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
     graphics.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
 
     Gdiplus::SolidBrush transparentBrush(Gdiplus::Color::MakeARGB(255, 0, 0, 0));
-    Gdiplus::SolidBrush textBrush(Gdiplus::Color::MakeARGB((BYTE)animVar, 255, 255, 255));
-    Gdiplus::SolidBrush shadowBrush(Gdiplus::Color::MakeARGB((BYTE)animVar, 1, 1, 1));
+    Gdiplus::SolidBrush textBrush(Gdiplus::Color::MakeARGB(static_cast<BYTE>(animVar), 255, 255, 255));
+    Gdiplus::SolidBrush shadowBrush(Gdiplus::Color::MakeARGB(static_cast<BYTE>(animVar), 1, 1, 1));
     graphics.FillRectangle(&transparentBrush, rect);
 
     Gdiplus::StringFormat format;
@@ -146,13 +146,13 @@ void CKeyboardOverlayWnd::OnPaint(HDC hDC, LPRECT pRect)
 
     Gdiplus::FontFamily   fontFamily(L"Arial");
     Gdiplus::GraphicsPath path;
-    path.AddString(m_text.c_str(), (int)m_text.size(),
+    path.AddString(m_text.c_str(), static_cast<int>(m_text.size()),
                    &fontFamily, Gdiplus::FontStyleRegular,
-                   (Gdiplus::REAL)CDPIAware::Instance().PointsToPixels(*this, 20), rectF, &format);
+                   static_cast<Gdiplus::REAL>(CDPIAware::Instance().PointsToPixels(*this, 20)), rectF, &format);
 
     for (int i = 1; i < 8; ++i)
     {
-        Gdiplus::Pen pen(Gdiplus::Color((BYTE)animVar / 8, 192, 20, 20), (Gdiplus::REAL)i);
+        Gdiplus::Pen pen(Gdiplus::Color(static_cast<BYTE>(animVar) / 8, 192, 20, 20), static_cast<Gdiplus::REAL>(i));
         pen.SetLineJoin(Gdiplus::LineJoinRound);
         graphics.DrawPath(&pen, &path);
     }

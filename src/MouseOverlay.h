@@ -18,21 +18,18 @@
 //
 #pragma once
 #include "BaseWindow.h"
-#include "DPIAware.h"
 #include "AnimationManager.h"
-#include <string>
-#include <vector>
 
 class CMouseOverlayWnd : public CWindow
 {
 public:
-    CMouseOverlayWnd(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL)
+    explicit CMouseOverlayWnd(HINSTANCE hInst, const WNDCLASSEX* wcx = nullptr)
         : CWindow(hInst, wcx)
         , m_color(0)
     {
         RegisterAndCreateWindow();
     }
-    ~CMouseOverlayWnd(void);
+    ~CMouseOverlayWnd();
 
     void Show(POINT screenPos, COLORREF color, double fadeTo);
     void UpdatePos(POINT screenPos);
@@ -46,9 +43,9 @@ protected:
      */
     bool RegisterAndCreateWindow();
     /// the message handler for this window
-    LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 private:
-    AnimationVariable m_AnimVar;
+    AnimationVariable m_animVar;
     COLORREF          m_color;
 };

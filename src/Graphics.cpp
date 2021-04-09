@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008, 2020 - Stefan Kueng
+// Copyright (C) 2007-2008, 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,7 +20,6 @@
 #include "stdafx.h"
 #include "MainWindow.h"
 #include "DPIAware.h"
-#include <math.h>
 
 HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
 {
@@ -37,16 +36,16 @@ HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
 
     // Create the mask bitmaps
     auto hSourceBitmap  = ::CreateCompatibleBitmap(hDC, cursorSizeX, cursorSizeY); // original
-    auto hAndMaskBitmap = ::CreateBitmap(cursorSizeX, cursorSizeY, 1, 1, NULL);    // monochrome
+    auto hAndMaskBitmap = ::CreateBitmap(cursorSizeX, cursorSizeY, 1, 1, nullptr); // monochrome
     auto hXorMaskBitmap = ::CreateCompatibleBitmap(hDC, cursorSizeX, cursorSizeY); // color
 
     // Release the system display DC
     ::ReleaseDC(*this, hDC);
 
     // Select the bitmaps to helper DC
-    auto hOldMainBitmap    = (HBITMAP)::SelectObject(hMainDC, hSourceBitmap);
-    auto hOldAndMaskBitmap = (HBITMAP)::SelectObject(hAndMaskDC, hAndMaskBitmap);
-    auto hOldXorMaskBitmap = (HBITMAP)::SelectObject(hXorMaskDC, hXorMaskBitmap);
+    auto hOldMainBitmap    = static_cast<HBITMAP>(::SelectObject(hMainDC, hSourceBitmap));
+    auto hOldAndMaskBitmap = static_cast<HBITMAP>(::SelectObject(hAndMaskDC, hAndMaskBitmap));
+    auto hOldXorMaskBitmap = static_cast<HBITMAP>(::SelectObject(hXorMaskDC, hXorMaskBitmap));
 
     // fill our bitmap with the 'transparent' color RGB(1,1,1)
     RECT rc;
@@ -55,14 +54,12 @@ HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
     rc.right  = cursorSizeX;
     rc.bottom = cursorSizeY;
     SetBkColor(hMainDC, RGB(1, 1, 1));
-    ::ExtTextOut(hMainDC, 0, 0, ETO_OPAQUE, &rc, NULL, 0, NULL);
+    ::ExtTextOut(hMainDC, 0, 0, ETO_OPAQUE, &rc, nullptr, 0, nullptr);
     // set up the pen and brush to draw
-    HPEN   hPen      = CreatePen(PS_SOLID, 1, color);
-    HPEN   hOldPen   = NULL;
-    HBRUSH hOldBrush = NULL;
-    hOldPen          = (HPEN)SelectObject(hMainDC, hPen);
-    HBRUSH hBrush    = CreateSolidBrush(color);
-    hOldBrush        = (HBRUSH)SelectObject(hMainDC, hBrush);
+    auto hPen      = CreatePen(PS_SOLID, 1, color);
+    auto hOldPen   = static_cast<HPEN>(SelectObject(hMainDC, hPen));
+    auto hBrush    = CreateSolidBrush(color);
+    auto hOldBrush = static_cast<HBRUSH>(SelectObject(hMainDC, hBrush));
 
     // draw the real cursor
     HICON    hIcon = CopyIcon(LoadCursor(nullptr, IDC_ARROW));
@@ -102,12 +99,12 @@ HCURSOR CMainWindow::CreateDrawCursor(COLORREF color, int penwidth)
     ::DeleteDC(hAndMaskDC);
     ::DeleteDC(hMainDC);
 
-    ICONINFO iconinfo = {0};
-    iconinfo.fIcon    = FALSE;
-    iconinfo.xHotspot = cursorSizeX / 2;
-    iconinfo.yHotspot = cursorSizeY / 2;
-    iconinfo.hbmMask  = hAndMaskBitmap;
-    iconinfo.hbmColor = hXorMaskBitmap;
+    ICONINFO iconInfo = {0};
+    iconInfo.fIcon    = FALSE;
+    iconInfo.xHotspot = cursorSizeX / 2;
+    iconInfo.yHotspot = cursorSizeY / 2;
+    iconInfo.hbmMask  = hAndMaskBitmap;
+    iconInfo.hbmColor = hXorMaskBitmap;
 
-    return ::CreateIconIndirect(&iconinfo);
+    return ::CreateIconIndirect(&iconInfo);
 }

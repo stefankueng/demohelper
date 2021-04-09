@@ -18,15 +18,13 @@
 //
 #pragma once
 #include "BaseWindow.h"
-#include "DPIAware.h"
 #include "AnimationManager.h"
 #include <string>
-#include <vector>
 
 class CKeyboardOverlayWnd : public CWindow
 {
 public:
-    CKeyboardOverlayWnd(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL)
+    explicit CKeyboardOverlayWnd(HINSTANCE hInst, const WNDCLASSEX* wcx = nullptr)
         : CWindow(hInst, wcx)
     {
         RegisterAndCreateWindow();
@@ -43,9 +41,9 @@ protected:
      */
     bool RegisterAndCreateWindow();
     /// the message handler for this window
-    LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 private:
     std::wstring      m_text;
-    AnimationVariable m_AnimVar;
+    AnimationVariable m_animVar;
 };

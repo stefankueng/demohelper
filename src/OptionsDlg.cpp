@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008, 2012, 2015, 2020 - Stefan Kueng
+// Copyright (C) 2007-2008, 2012, 2015, 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -29,26 +29,26 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
     {
         case WM_INITDIALOG:
         {
-            auto zoom            = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231);
-            auto draw            = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232);
-            auto lens            = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"lens", 0x233);
+            auto zoom            = static_cast<WORD>(CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231));
+            auto draw            = static_cast<WORD>(CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232));
+            auto lens            = static_cast<WORD>(CIniSettings::Instance().GetInt64(L"HotKeys", L"lens", 0x233));
             auto allmonitors     = CIniSettings::Instance().GetInt64(L"Misc", L"allmonitors", 0);
             auto fadeseconds     = CIniSettings::Instance().GetInt64(L"Draw", L"fadeseconds", 0);
             auto keyhook         = CIniSettings::Instance().GetInt64(L"Hooks", L"keyboard", 1);
             auto mousehook       = CIniSettings::Instance().GetInt64(L"Hooks", L"mouse", 1);
             auto mousevisual     = CIniSettings::Instance().GetInt64(L"Misc", L"mousevisual", 1);
-            auto overlayPosition = (OverlayPosition)CIniSettings::Instance().GetInt64(L"Misc", L"OvlPosition", (int64_t)OverlayPosition::BottomRight);
-            SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_SETHOTKEY, (WPARAM)zoom, 0);
-            SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_SETHOTKEY, (WPARAM)draw, 0);
-            SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_LENSMODE), HKM_SETHOTKEY, (WPARAM)lens, 0);
+            auto overlayPosition = static_cast<OverlayPosition>(CIniSettings::Instance().GetInt64(L"Misc", L"OvlPosition", static_cast<int64_t>(OverlayPosition::BottomRight)));
+            SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_ZOOMMODE), HKM_SETHOTKEY, static_cast<WPARAM>(zoom), 0);
+            SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_DRAWMODE), HKM_SETHOTKEY, static_cast<WPARAM>(draw), 0);
+            SendMessage(GetDlgItem(hwndDlg, IDC_HOTKEY_LENSMODE), HKM_SETHOTKEY, static_cast<WPARAM>(lens), 0);
             CheckRadioButton(hwndDlg, IDC_CURRENTMONITOR, IDC_ALLMONITORS, allmonitors ? IDC_ALLMONITORS : IDC_CURRENTMONITOR);
             CheckDlgButton(hwndDlg, IDC_KEYHOOK, keyhook ? BST_CHECKED : BST_UNCHECKED);
             CheckDlgButton(hwndDlg, IDC_MOUSEHOOK, mousehook ? BST_CHECKED : BST_UNCHECKED);
             CheckDlgButton(hwndDlg, IDC_MOUSEVISUALS, mousevisual ? BST_CHECKED : BST_UNCHECKED);
-            CheckRadioButton(hwndDlg, IDC_POS_TOPLEFT, IDC_POS_BOTTOMRIGHT, (int)overlayPosition + IDC_POS_TOPLEFT);
+            CheckRadioButton(hwndDlg, IDC_POS_TOPLEFT, IDC_POS_BOTTOMRIGHT, static_cast<int>(overlayPosition) + IDC_POS_TOPLEFT);
             TCHAR buffer[128] = {0};
             LoadString(g_hInstance, IDS_WEBLINK, buffer, _countof(buffer));
-            _stprintf_s(buffer, _countof(buffer), _T("%ld"), (DWORD)fadeseconds);
+            _stprintf_s(buffer, _countof(buffer), _T("%ld"), static_cast<DWORD>(fadeseconds));
             SetWindowText(GetDlgItem(hwndDlg, IDC_FADESECONDS), buffer);
 
             // position the dialog box on the screen
@@ -87,15 +87,15 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
                     CIniSettings::Instance().SetInt64(L"Hooks", L"mouse", IsDlgButtonChecked(hwndDlg, IDC_MOUSEHOOK) ? 1 : 0);
                     CIniSettings::Instance().SetInt64(L"Misc", L"mousevisual", IsDlgButtonChecked(hwndDlg, IDC_MOUSEVISUALS) ? 1 : 0);
                     if (IsDlgButtonChecked(hwndDlg, IDC_POS_TOPLEFT))
-                        CIniSettings::Instance().SetInt64(L"Misc", L"OvlPosition", (int64_t)OverlayPosition::TopLeft);
+                        CIniSettings::Instance().SetInt64(L"Misc", L"OvlPosition", static_cast<int64_t>(OverlayPosition::TopLeft));
                     if (IsDlgButtonChecked(hwndDlg, IDC_POS_TOPRIGHT))
-                        CIniSettings::Instance().SetInt64(L"Misc", L"OvlPosition", (int64_t)OverlayPosition::TopRight);
+                        CIniSettings::Instance().SetInt64(L"Misc", L"OvlPosition", static_cast<int64_t>(OverlayPosition::TopRight));
                     if (IsDlgButtonChecked(hwndDlg, IDC_POS_BOTTOMLEFT))
-                        CIniSettings::Instance().SetInt64(L"Misc", L"OvlPosition", (int64_t)OverlayPosition::BottomLeft);
+                        CIniSettings::Instance().SetInt64(L"Misc", L"OvlPosition", static_cast<int64_t>(OverlayPosition::BottomLeft));
                     if (IsDlgButtonChecked(hwndDlg, IDC_POS_BOTTOMRIGHT))
-                        CIniSettings::Instance().SetInt64(L"Misc", L"OvlPosition", (int64_t)OverlayPosition::BottomRight);
+                        CIniSettings::Instance().SetInt64(L"Misc", L"OvlPosition", static_cast<int64_t>(OverlayPosition::BottomRight));
                 }
-                    // Fall through.
+                    [[fallthrough]];
                 case IDCANCEL:
                     EndDialog(hwndDlg, wParam);
                     return TRUE;
@@ -109,17 +109,17 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
             break;
         case WM_NOTIFY:
 
-            switch (((LPNMHDR)lParam)->code)
+            switch (reinterpret_cast<LPNMHDR>(lParam)->code)
             {
                 case NM_CLICK: // Fall through to the next case.
                 case NM_RETURN:
                 {
-                    PNMLINK pNMLink = (PNMLINK)lParam;
+                    PNMLINK pNMLink = reinterpret_cast<PNMLINK>(lParam);
                     LITEM   item    = pNMLink->item;
 
-                    if ((((LPNMHDR)lParam)->hwndFrom == GetDlgItem(hwndDlg, IDC_SYSLINK1)) && (item.iLink == 0))
+                    if ((reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == GetDlgItem(hwndDlg, IDC_SYSLINK1)) && (item.iLink == 0))
                     {
-                        ShellExecute(NULL, L"open", item.szUrl, NULL, NULL, SW_SHOW);
+                        ShellExecute(nullptr, L"open", item.szUrl, nullptr, nullptr, SW_SHOW);
                     }
 
                     break;

@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008, 2015, 2020 - Stefan Kueng
+// Copyright (C) 2007-2008, 2015, 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -66,20 +66,20 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     }
     CIniSettings::Instance().SetIniPath(iniFilePath);
     OnOutOfScope(CIniSettings::Instance().Save());
-    ULONG_PTR                    gdiplusToken;
-    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
+    ULONG_PTR                    gdiPlusToken;
+    Gdiplus::GdiplusStartupInput gdiPlusStartupInput;
+    Gdiplus::GdiplusStartup(&gdiPlusToken, &gdiPlusStartupInput, nullptr);
 
-    OnOutOfScope(Gdiplus::GdiplusShutdown(gdiplusToken));
-    MSG msg;
+    OnOutOfScope(Gdiplus::GdiplusShutdown(gdiPlusToken));
     int ret = 1;
+    MSG msg;
     {
         CMainWindow trayWindow(g_hResource);
         if (trayWindow.RegisterAndCreateWindow())
         {
             HACCEL hAccelTable = LoadAccelerators(g_hResource, MAKEINTRESOURCE(IDR_DEMOHELPER));
             // Main message loop:
-            while (GetMessage(&msg, NULL, 0, 0))
+            while (GetMessage(&msg, nullptr, 0, 0))
             {
                 if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
                 {
@@ -87,8 +87,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                     DispatchMessage(&msg);
                 }
             }
-            ret = (int)msg.wParam;
+            ret = static_cast<int>(msg.wParam);
         }
     }
-    return 1;
+    return ret;
 }

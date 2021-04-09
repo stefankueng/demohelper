@@ -24,14 +24,10 @@
 #include "hyperlink.h"
 #include "ResString.h"
 #include "AnimationManager.h"
-#include "KeyboardOverlay.h"
 #include "KeyboardOverlayD2D.h"
 #include "MouseOverlay.h"
 #include "MagnifierWindow.h"
-#include "ColorButton.h"
 #include <shellapi.h>
-#include <shlwapi.h>
-#include <commctrl.h>
 #include <vector>
 #include <deque>
 
@@ -49,11 +45,11 @@
 
 enum class LineType
 {
-    hand,
-    straight,
-    arrow,
-    rectangle,
-    ellipse
+    Hand,
+    Straight,
+    Arrow,
+    Rectangle,
+    Ellipse
 };
 
 enum class OverlayPosition
@@ -89,7 +85,7 @@ public:
     {
     }
 
-    LineType                    lineType  = LineType::hand;
+    LineType                    lineType  = LineType::Hand;
     int                         lineIndex = 0;
     std::vector<Gdiplus::Point> points;
     BYTE                        alpha = 100;
@@ -104,32 +100,32 @@ public:
 class CMainWindow : public CWindow
 {
 public:
-    CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL)
+    explicit CMainWindow(HINSTANCE hInst, const WNDCLASSEX* wcx = nullptr)
         : CWindow(hInst, wcx)
+        , niData({0})
+        , hDesktopCompatibleDC(nullptr)
+        , hDesktopCompatibleBitmap(nullptr)
+        , hOldBmp(nullptr)
         , m_bDrawing(false)
+        , m_zoomFactor(1.2f)
         , m_bZooming(false)
-        , m_zoomfactor(1.2f)
-        , hDesktopCompatibleDC(NULL)
-        , hDesktopCompatibleBitmap(NULL)
-        , hOldBmp(NULL)
-        , m_colorindex(1)
-        , m_currentpenwidth(6)
-        , m_hCursor(NULL)
-        , m_currentalpha(LINE_ALPHA)
-        , m_bMarker(false)
-        , m_bInlineZoom(false)
-        , m_fadeseconds(0)
-        , m_hPreviousCursor(nullptr)
+        , m_colorIndex(1)
+        , m_currentPenWidth(6)
+        , m_currentAlpha(LINE_ALPHA)
+        , m_fadeSeconds(0)
         , m_lineStartShiftPoint({})
+        , m_hCursor(nullptr)
+        , m_hPreviousCursor(nullptr)
+        , m_bMarker(false)
+        , m_oldPenWidth(6)
+        , m_oldColorIndex(0)
+        , m_oldAlpha(0)
+        , m_bInlineZoom(false)
         , m_ptInlineZoomStartPoint({})
         , m_ptInlineZoomEndPoint({})
-        , m_oldalpha(0)
-        , m_oldcolorindex(0)
-        , m_oldpenwidth(6)
-        , niData({0})
         , m_rcScreen({0})
     {
-        SetWindowTitle((LPCTSTR)ResString(hResource, IDS_APP_TITLE));
+        SetWindowTitle(static_cast<LPCTSTR>(ResString(hResource, IDS_APP_TITLE)));
         m_colors[0]   = RGB(255, 255, 0);
         m_colors[1]   = RGB(255, 0, 0);
         m_colors[2]   = RGB(150, 0, 0);
@@ -140,15 +136,15 @@ public:
         m_colors[7]   = RGB(0, 0, 0);
         m_colors[8]   = RGB(150, 150, 150);
         m_colors[9]   = RGB(0, 255, 255);
-        m_AnimVarZoom = Animator::Instance().CreateAnimationVariable(1.2, 1.2);
+        m_animVarZoom = Animator::Instance().CreateAnimationVariable(1.2, 1.2);
     };
-    ~CMainWindow(void){};
+    ~CMainWindow(){};
 
     bool RegisterAndCreateWindow();
 
 protected:
     /// the message handler for this window
-    LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
     /// Handles all the WM_COMMAND window messages (e.g. menu commands)
     LRESULT DoCommand(int id);
@@ -179,13 +175,13 @@ protected:
     HBITMAP        hOldBmp;
 
     bool  m_bDrawing;
-    float m_zoomfactor;
+    float m_zoomFactor;
     bool  m_bZooming;
 
-    int  m_colorindex;
-    int  m_currentpenwidth;
-    BYTE m_currentalpha;
-    int  m_fadeseconds;
+    int  m_colorIndex;
+    int  m_currentPenWidth;
+    BYTE m_currentAlpha;
+    int  m_fadeSeconds;
 
     POINT m_lineStartShiftPoint;
 
@@ -195,16 +191,16 @@ protected:
     HCURSOR m_hPreviousCursor;
 
     bool m_bMarker;
-    int  m_oldpenwidth;
-    int  m_oldcolorindex;
-    BYTE m_oldalpha;
+    int  m_oldPenWidth;
+    int  m_oldColorIndex;
+    BYTE m_oldAlpha;
 
     bool  m_bInlineZoom;
     POINT m_ptInlineZoomStartPoint;
     POINT m_ptInlineZoomEndPoint;
 
     RECT                 m_rcScreen;
-    AnimationVariable    m_AnimVarZoom;
+    AnimationVariable    m_animVarZoom;
     std::deque<DrawLine> m_drawLines;
 
     static HHOOK  m_hKeyboardHook;

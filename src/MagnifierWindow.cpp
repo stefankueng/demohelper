@@ -1,4 +1,22 @@
-﻿#include "stdafx.h"
+﻿// demoHelper - screen drawing and presentation tool
+
+// Copyright (C) 2021 - Stefan Kueng
+
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software Foundation,
+// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+//
+#include "stdafx.h"
 #include "MagnifierWindow.h"
 
 BOOL CMagnifierWindow::Create(HINSTANCE hInst, HWND hwndHost, BOOL visible)
@@ -38,31 +56,31 @@ BOOL CMagnifierWindow::SetMagnification(POINT mousePt, float magnification)
     if (magnification == 0.0f)
         magnification = m_magFactor;
 
-    m_sourceRect.left   = LONG(mousePt.x - ((clientWidth / magnification) / 2.0f));
-    m_sourceRect.right  = LONG(mousePt.x + ((clientWidth / magnification) / 2.0f));
-    m_sourceRect.top    = LONG(mousePt.y - ((clientHeight / magnification) / 2.0f));
-    m_sourceRect.bottom = LONG(mousePt.y + ((clientHeight / magnification) / 2.0f));
+    m_sourceRect.left   = static_cast<LONG>(mousePt.x - ((clientWidth / magnification) / 2.0f));
+    m_sourceRect.right  = static_cast<LONG>(mousePt.x + ((clientWidth / magnification) / 2.0f));
+    m_sourceRect.top    = static_cast<LONG>(mousePt.y - ((clientHeight / magnification) / 2.0f));
+    m_sourceRect.bottom = static_cast<LONG>(mousePt.y + ((clientHeight / magnification) / 2.0f));
 
     if (m_sourceRect.left < client.left)
     {
         m_sourceRect.left  = client.left;
-        m_sourceRect.right = LONG(m_sourceRect.left + (clientWidth / magnification));
+        m_sourceRect.right = static_cast<LONG>(m_sourceRect.left + (clientWidth / magnification));
     }
     if (m_sourceRect.top < client.top)
     {
         m_sourceRect.top    = client.top;
-        m_sourceRect.bottom = LONG(m_sourceRect.top + (clientHeight / magnification));
+        m_sourceRect.bottom = static_cast<LONG>(m_sourceRect.top + (clientHeight / magnification));
     }
 
     if (m_sourceRect.right > client.right)
     {
         m_sourceRect.right = client.right;
-        m_sourceRect.left  = LONG(client.right - (clientWidth / magnification));
+        m_sourceRect.left  = static_cast<LONG>(client.right - (clientWidth / magnification));
     }
     if (m_sourceRect.bottom > client.bottom)
     {
         m_sourceRect.bottom = client.bottom;
-        m_sourceRect.top    = LONG(client.bottom - (clientHeight / magnification));
+        m_sourceRect.top    = static_cast<LONG>(client.bottom - (clientHeight / magnification));
     }
 
     MAGTRANSFORM matrix;
@@ -84,7 +102,7 @@ BOOL CMagnifierWindow::SetSourceRect(RECT rc)
 
     RECT client = {0};
     GetClientRect(*this, &client);
-    auto         magFactor = float(client.right - client.left) / float(m_sourceRect.right - m_sourceRect.left);
+    auto         magFactor = static_cast<float>(client.right - client.left) / static_cast<float>(m_sourceRect.right - m_sourceRect.left);
     MAGTRANSFORM matrix;
     memset(&matrix, 0, sizeof(matrix));
     matrix.v[0][0] = magFactor;
@@ -98,7 +116,7 @@ BOOL CMagnifierWindow::SetSourceRect(RECT rc)
     return MagSetWindowSource(m_hWnd, m_sourceRect);
 }
 
-BOOL CMagnifierWindow::UpdateMagnifier()
+BOOL CMagnifierWindow::UpdateMagnifier() const
 {
     return MagSetWindowSource(m_hWnd, m_sourceRect);
 }

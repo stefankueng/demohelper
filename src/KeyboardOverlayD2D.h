@@ -18,18 +18,16 @@
 //
 #pragma once
 #include "BaseWindowD2D.h"
-#include "DPIAware.h"
 #include "AnimationManager.h"
 #include <string>
-#include <vector>
 
 class CKeyboardOverlayWndD2D : public CWindowD2D
 {
 public:
-    CKeyboardOverlayWndD2D(HINSTANCE hInst, const WNDCLASSEX* wcx = NULL)
+    explicit CKeyboardOverlayWndD2D(HINSTANCE hInst, const WNDCLASSEX* wcx = nullptr)
         : CWindowD2D(hInst, wcx)
+        , m_animVar(nullptr)
         , m_bShown(false)
-        , m_AnimVar(nullptr)
     {
         RegisterAndCreateWindow();
     }
@@ -49,7 +47,7 @@ protected:
 
 private:
     std::wstring            m_text;
-    AnimationVariable       m_AnimVar;
+    AnimationVariable       m_animVar;
 
     // Inherited via CWindowD2D
     virtual LRESULT WinMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
@@ -57,7 +55,7 @@ private:
     virtual HRESULT CreateDeviceResources() override;
     virtual HRESULT DiscardDeviceResources() override;
 
-    ComPtr<IDWriteTextFormat> m_TextFormat;
+    ComPtr<IDWriteTextFormat> m_textFormat;
     ComPtr<ID2D1Effect>       m_gaussianBlurEffect;
     bool                      m_bShown;
 };

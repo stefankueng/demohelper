@@ -36,8 +36,8 @@ extern HINSTANCE g_hResource; // the resource dll
 constexpr int overlayWidth  = 220;
 constexpr int overlayHeight = 140;
 
-HHOOK  CMainWindow::m_hKeyboardHook = 0;
-HHOOK  CMainWindow::m_hMouseHook    = 0;
+HHOOK  CMainWindow::m_hKeyboardHook = nullptr;
+HHOOK  CMainWindow::m_hMouseHook    = nullptr;
 DWORD  CMainWindow::m_lastHookTime  = 0;
 POINT  CMainWindow::m_lastHookPoint = {0};
 WPARAM CMainWindow::m_lastHookMsg   = 0;
@@ -62,7 +62,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
     if (nCode == 0)
     {
         std::wstring    text;
-        MSLLHOOKSTRUCT* phs      = (MSLLHOOKSTRUCT*)lParam;
+        MSLLHOOKSTRUCT* phs      = reinterpret_cast<MSLLHOOKSTRUCT*>(lParam);
         auto            bControl = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
         auto            bAlt     = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
         auto            bShift   = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
@@ -214,8 +214,8 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
             if (m_bMouseClicks && !text.empty() && hasClick)
             {
                 auto       reqHeight = m_infoOverlay->GetRequiredHeight(text);
-                const long width     = std::max(reqHeight.cx, (long)CDPIAware::Instance().Scale(*m_infoOverlay, overlayWidth));
-                const long height    = std::max(reqHeight.cy, (long)CDPIAware::Instance().Scale(*m_infoOverlay, overlayHeight));
+                const long width     = std::max(reqHeight.cx, static_cast<long>(CDPIAware::Instance().Scale(*m_infoOverlay, overlayWidth)));
+                const long height    = std::max(reqHeight.cy, static_cast<long>(CDPIAware::Instance().Scale(*m_infoOverlay, overlayHeight)));
                 if (!dbl && IsWindowVisible(*m_infoOverlay))
                 {
                     m_overlayWnds.push_back(std::move(m_infoOverlay));
@@ -296,7 +296,7 @@ LRESULT CMainWindow::LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     // lParam is cast as KBDLLHOOKSTRUCT
-    KBDLLHOOKSTRUCT keyInfo = *((KBDLLHOOKSTRUCT*)lParam);
+    KBDLLHOOKSTRUCT keyInfo = *reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam);
     // wParam is the The identifier of the keyboard message.
     // This parameter can be one of the following messages: WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, or WM_SYSKEYUP.
     switch (wParam)
@@ -414,7 +414,7 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                 case VK_LWIN:
                     break;
                 default:
-                    GetKeyNameText((LONG)dwMsg, buffer, sizeof(buffer));
+                    GetKeyNameText(static_cast<LONG>(dwMsg), buffer, sizeof(buffer));
                     if ((wcslen(buffer) > 1) || bControl || bAlt || bWindows)
                     {
                         for (const auto& key : m_keySequence)
@@ -425,8 +425,8 @@ LRESULT CMainWindow::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lPara
                         text += buffer;
                         m_keySequence.push_back(buffer);
                         auto       reqHeight = m_infoOverlay->GetRequiredHeight(text);
-                        const long width     = std::max(reqHeight.cx, (long)CDPIAware::Instance().Scale(*m_infoOverlay, overlayWidth));
-                        const long height    = std::max(reqHeight.cy, (long)CDPIAware::Instance().Scale(*m_infoOverlay, overlayHeight));
+                        const long width     = std::max(reqHeight.cx, static_cast<long>(CDPIAware::Instance().Scale(*m_infoOverlay, overlayWidth)));
+                        const long height    = std::max(reqHeight.cy, static_cast<long>(CDPIAware::Instance().Scale(*m_infoOverlay, overlayHeight)));
                         m_wndPositions.clear();
                         ClearOutdatedPopupWindows();
                         if (!m_infoOverlay->HasWindowBeenShown())
@@ -511,12 +511,12 @@ bool CMainWindow::RegisterAndCreateWindow()
     ResString clsname(hResource, IDS_APP_TITLE);
     wcx.lpszClassName = clsname;
     wcx.hIcon         = LoadIcon(hResource, MAKEINTRESOURCE(IDI_DEMOHELPER));
-    wcx.hbrBackground = NULL;
-    wcx.lpszMenuName  = NULL;
+    wcx.hbrBackground = nullptr;
+    wcx.lpszMenuName  = nullptr;
     wcx.hIconSm       = LoadIcon(wcx.hInstance, MAKEINTRESOURCE(IDI_DEMOHELPER));
     if (RegisterWindow(&wcx))
     {
-        if (CreateEx(NULL, WS_POPUP, NULL))
+        if (CreateEx(NULL, WS_POPUP, nullptr))
         {
             // since our main window is hidden most of the time
             // we have to add an auxiliary window to the system tray
@@ -528,8 +528,8 @@ bool CMainWindow::RegisterAndCreateWindow()
             niData.uID    = IDI_DEMOHELPER;
             niData.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP | NIF_INFO;
 
-            niData.hIcon            = (HICON)LoadImage(hResource, MAKEINTRESOURCE(IDI_DEMOHELPER),
-                                            IMAGE_ICON, iconSizeX, iconSizeY, LR_DEFAULTCOLOR);
+            niData.hIcon            = static_cast<HICON>(LoadImage(hResource, MAKEINTRESOURCE(IDI_DEMOHELPER),
+                                                        IMAGE_ICON, iconSizeX, iconSizeY, LR_DEFAULTCOLOR));
             niData.hWnd             = *this;
             niData.uCallbackMessage = TRAY_WM_MESSAGE;
 
@@ -556,24 +556,23 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                 m_hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, g_hInstance, 0);
             m_bMouseVisuals   = CIniSettings::Instance().GetInt64(L"Misc", L"mousevisual", 1) != 0;
             m_bMouseClicks    = CIniSettings::Instance().GetInt64(L"Hooks", L"mouse", 1) != 0;
-            m_mvLColor        = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualLcolor", RGB(255, 0, 0));
-            m_mvMColor        = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualMcolor", RGB(0, 0, 255));
-            m_mvRColor        = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualRcolor", RGB(0, 255, 0));
-            m_overlayPosition = (OverlayPosition)CIniSettings::Instance().GetInt64(L"Misc", L"OvlPosition", (int64_t)OverlayPosition::BottomRight);
-            m_colorindex      = (int)CIniSettings::Instance().GetInt64(L"Draw", L"colorindex", 1);
-            m_currentpenwidth = (int)CIniSettings::Instance().GetInt64(L"Draw", L"currentpenwidth", 6);
+            m_mvLColor        = static_cast<COLORREF>(CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualLcolor", RGB(255, 0, 0)));
+            m_mvMColor        = static_cast<COLORREF>(CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualMcolor", RGB(0, 0, 255)));
+            m_mvRColor        = static_cast<COLORREF>(CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualRcolor", RGB(0, 255, 0)));
+            m_overlayPosition = static_cast<OverlayPosition>(CIniSettings::Instance().GetInt64(L"Misc", L"OvlPosition", static_cast<int64_t>(OverlayPosition::BottomRight)));
+            m_colorIndex      = static_cast<int>(CIniSettings::Instance().GetInt64(L"Draw", L"colorindex", 1));
+            m_currentPenWidth = static_cast<int>(CIniSettings::Instance().GetInt64(L"Draw", L"currentpenwidth", 6));
         }
         break;
         case WM_COMMAND:
             return DoCommand(LOWORD(wParam));
-            break;
         case WM_HOTKEY:
         {
             WORD key  = MAKEWORD(HIWORD(lParam), LOWORD(lParam));
             key       = HotKey2HotKeyControl(key);
-            WORD zoom = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231);
-            WORD draw = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232);
-            WORD lens = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"lens", 0x233);
+            WORD zoom = static_cast<WORD>(CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231));
+            WORD draw = static_cast<WORD>(CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232));
+            WORD lens = static_cast<WORD>(CIniSettings::Instance().GetInt64(L"HotKeys", L"lens", 0x233));
             if (key == zoom)
             {
                 m_bZooming = true;
@@ -620,7 +619,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     }
 
                     CRectSelectionWnd selWnd(g_hInstance);
-                    auto              zoomRect = selWnd.Show(*this, m_rcScreen, float(m_rcScreen.right - m_rcScreen.left) / float(m_rcScreen.bottom - m_rcScreen.top));
+                    auto              zoomRect = selWnd.Show(*this, m_rcScreen, static_cast<float>(m_rcScreen.right - m_rcScreen.left) / static_cast<float>(m_rcScreen.bottom - m_rcScreen.top));
                     CloseWindow(selWnd);
                     DestroyWindow(selWnd);
                     if (!IsRectEmpty(&zoomRect))
@@ -632,7 +631,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         SetWindowPos(m_magnifierWindow, HWND_TOP, m_rcScreen.left, m_rcScreen.top, m_rcScreen.right - m_rcScreen.left, m_rcScreen.bottom - m_rcScreen.top,
                                      SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE);
                         m_magnifierWindow.SetSourceRect(zoomRect);
-                        ::SetTimer(*this, TIMER_ID_LENS, 20, NULL);
+                        ::SetTimer(*this, TIMER_ID_LENS, 20, nullptr);
                         SetWindowPos(*this, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
                     }
                     else
@@ -655,7 +654,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             PAINTSTRUCT  ps;
             HDC          hdc = BeginPaint(*this, &ps);
             {
-                CMemDC memdc(hdc, ps.rcPaint);
+                CMemDC memDC(hdc, ps.rcPaint);
                 if (m_bZooming)
                 {
                     // we're zooming,
@@ -664,11 +663,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     auto  msgPos = GetMessagePos();
                     pt.x         = GET_X_LPARAM(msgPos);
                     pt.y         = GET_Y_LPARAM(msgPos);
-                    DrawZoom(memdc, pt);
+                    DrawZoom(memDC, pt);
                 }
                 else
                 {
-                    BitBlt(memdc,
+                    BitBlt(memDC,
                            ps.rcPaint.left,
                            ps.rcPaint.top,
                            ps.rcPaint.right - ps.rcPaint.left,
@@ -677,17 +676,17 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                            ps.rcPaint.left,
                            ps.rcPaint.top,
                            SRCCOPY);
-                    Gdiplus::Graphics graphics(memdc);
+                    Gdiplus::Graphics graphics(memDC);
                     graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
 
                     for (const auto& line : m_drawLines)
                     {
                         Gdiplus::Color color;
                         color.SetValue(Gdiplus::Color::MakeARGB(line.alpha, GetRValue(m_colors[line.colorIndex]), GetGValue(m_colors[line.colorIndex]), GetBValue(m_colors[line.colorIndex])));
-                        Gdiplus::Pen pen(color, (Gdiplus::REAL)line.penWidth);
+                        Gdiplus::Pen pen(color, static_cast<Gdiplus::REAL>(line.penWidth));
                         pen.SetLineCap(Gdiplus::LineCap::LineCapRound, Gdiplus::LineCap::LineCapRound, Gdiplus::DashCap::DashCapRound);
 
-                        if (line.lineType == LineType::hand)
+                        if (line.lineType == LineType::Hand)
                         {
                             if (line.points.size() == 1)
                             {
@@ -696,23 +695,23 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                 graphics.FillEllipse(&brush, line.points[0].X - halfPenWidth, line.points[0].Y - halfPenWidth, line.penWidth, line.penWidth);
                             }
                             else
-                                graphics.DrawLines(&pen, line.points.data(), (int)line.points.size());
+                                graphics.DrawLines(&pen, line.points.data(), static_cast<int>(line.points.size()));
                         }
                         else
                         {
                             switch (line.lineType)
                             {
-                                case LineType::arrow:
+                                case LineType::Arrow:
                                     pen.SetEndCap(Gdiplus::LineCap::LineCapArrowAnchor);
                                     [[fallthrough]];
-                                case LineType::hand:
-                                case LineType::straight:
+                                case LineType::Hand:
+                                case LineType::Straight:
                                     if ((line.lineStartPoint.X >= 0) && (line.lineStartPoint.Y >= 0) && (line.lineEndPoint.X >= 0) && (line.lineEndPoint.Y >= 0))
                                     {
                                         graphics.DrawLine(&pen, line.lineStartPoint, line.lineEndPoint);
                                     }
                                     break;
-                                case LineType::rectangle:
+                                case LineType::Rectangle:
                                     if ((line.lineStartPoint.X >= 0) && (line.lineStartPoint.Y >= 0) && (line.lineEndPoint.X >= 0) && (line.lineEndPoint.Y >= 0))
                                     {
                                         Gdiplus::Point startPt;
@@ -723,7 +722,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                         graphics.DrawRectangle(&pen, startPt.X, startPt.Y, width, height);
                                     }
                                     break;
-                                case LineType::ellipse:
+                                case LineType::Ellipse:
                                     if ((line.lineStartPoint.X >= 0) && (line.lineStartPoint.Y >= 0) && (line.lineEndPoint.X >= 0) && (line.lineEndPoint.Y >= 0))
                                     {
                                         Gdiplus::Point startPt;
@@ -776,14 +775,14 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             DrawLine drawLine;
             drawLine.lineStartPoint.X = GET_X_LPARAM(lParam);
             drawLine.lineStartPoint.Y = GET_Y_LPARAM(lParam);
-            drawLine.alpha            = m_currentalpha;
+            drawLine.alpha            = m_currentAlpha;
             drawLine.points.push_back(drawLine.lineStartPoint);
-            drawLine.colorIndex = m_colorindex;
-            drawLine.penWidth   = m_currentpenwidth;
+            drawLine.colorIndex = m_colorIndex;
+            drawLine.penWidth   = m_currentPenWidth;
             m_drawLines.push_back(std::move(drawLine));
 
             RECT invalidRect = {drawLine.lineStartPoint.X, drawLine.lineStartPoint.Y, drawLine.lineStartPoint.X, drawLine.lineStartPoint.Y};
-            InflateRect(&invalidRect, 2 * m_currentpenwidth, 2 * m_currentpenwidth);
+            InflateRect(&invalidRect, 2 * m_currentPenWidth, 2 * m_currentPenWidth);
             InvalidateRect(*this, &invalidRect, FALSE);
         }
         break;
@@ -847,12 +846,12 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         if (wParam & MK_SHIFT)
                         {
                             if (wParam & MK_CONTROL)
-                                line.lineType = LineType::ellipse;
+                                line.lineType = LineType::Ellipse;
                             else
-                                line.lineType = LineType::rectangle;
+                                line.lineType = LineType::Rectangle;
                         }
                         else
-                            line.lineType = LineType::straight;
+                            line.lineType = LineType::Straight;
 
                         RECT invalidRect;
                         invalidRect.left   = std::min(line.lineStartPoint.X, xPos);
@@ -865,7 +864,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         invalidRect.right  = std::max(line.lineStartPoint.X, line.lineEndPoint.X);
                         invalidRect.bottom = std::max(line.lineStartPoint.Y, line.lineEndPoint.Y);
 
-                        InflateRect(&invalidRect, 10 * m_currentpenwidth, 10 * m_currentpenwidth);
+                        InflateRect(&invalidRect, 10 * m_currentPenWidth, 10 * m_currentPenWidth);
                         invalidRect.left = std::max(0L, invalidRect.left);
                         invalidRect.top  = std::max(0L, invalidRect.top);
                         InvalidateRect(*this, &invalidRect, FALSE);
@@ -882,7 +881,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                         if (sqrt((pt.X - prevPt.X) * (pt.X - prevPt.X) + (pt.Y - prevPt.Y) * (pt.Y - prevPt.Y)) > 1)
                         {
                             line.points.push_back(pt);
-                            line.lineType = LineType::hand;
+                            line.lineType = LineType::Hand;
                             InvalidateRect(*this, &invalidRect, FALSE);
                         }
                     }
@@ -907,11 +906,11 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     if (wParam & MK_CONTROL)
                     {
                         // control pressed means normal lines, not arrows
-                        line.lineType = LineType::straight;
+                        line.lineType = LineType::Straight;
                     }
                     else
                     {
-                        line.lineType = LineType::arrow;
+                        line.lineType = LineType::Arrow;
                     }
                     RECT invalidRect;
                     invalidRect.left   = std::min(line.lineStartPoint.X, xPos);
@@ -924,7 +923,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     invalidRect.right  = std::max(line.lineStartPoint.X, line.lineEndPoint.X);
                     invalidRect.bottom = std::max(line.lineStartPoint.Y, line.lineEndPoint.Y);
 
-                    InflateRect(&invalidRect, 10 * m_currentpenwidth, 10 * m_currentpenwidth);
+                    InflateRect(&invalidRect, 10 * m_currentPenWidth, 10 * m_currentPenWidth);
                     invalidRect.left = std::max(0L, invalidRect.left);
                     invalidRect.top  = std::max(0L, invalidRect.top);
                     InvalidateRect(*this, &invalidRect, FALSE);
@@ -948,7 +947,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                     GetCursorPos(&pt);
                     HMENU hMenu    = LoadMenu(hResource, MAKEINTRESOURCE(IDC_DEMOHELPER));
                     HMENU hPopMenu = GetSubMenu(hMenu, 0);
-                    TrackPopupMenu(hPopMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, 0, *this, NULL);
+                    TrackPopupMenu(hPopMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, 0, *this, nullptr);
                     DestroyMenu(hMenu);
                 }
                 break;
@@ -967,19 +966,19 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             {
                 if (zDelta > 0)
                 {
-                    m_zoomfactor += 0.2f;
-                    if (m_zoomfactor > 4.0f)
-                        m_zoomfactor = 4.0f;
+                    m_zoomFactor += 0.2f;
+                    if (m_zoomFactor > 4.0f)
+                        m_zoomFactor = 4.0f;
                 }
                 else
                 {
-                    m_zoomfactor -= 0.2f;
-                    if (m_zoomfactor < 1.0f)
-                        m_zoomfactor = 1.0f;
+                    m_zoomFactor -= 0.2f;
+                    if (m_zoomFactor < 1.0f)
+                        m_zoomFactor = 1.0f;
                 }
-                auto transZoom  = Animator::Instance().CreateLinearTransition(m_AnimVarZoom, 0.3, m_zoomfactor);
+                auto transZoom  = Animator::Instance().CreateLinearTransition(m_animVarZoom, 0.3, m_zoomFactor);
                 auto storyBoard = Animator::Instance().CreateStoryBoard();
-                storyBoard->AddTransition(m_AnimVarZoom.m_animVar, transZoom);
+                storyBoard->AddTransition(m_animVarZoom.m_animVar, transZoom);
                 Animator::Instance().RunStoryBoard(storyBoard, [this]() {
                     InvalidateRect(*this, nullptr, false);
                 });
@@ -1018,7 +1017,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
             else if (wParam == TIMER_ID_FADE)
             {
                 // go through all lines and reduce the fade-count value
-                auto dec = std::max(BYTE(LINE_ALPHA / (m_fadeseconds * 10)), (BYTE)1);
+                auto dec = std::max(static_cast<BYTE>(LINE_ALPHA / (m_fadeSeconds * 10)), static_cast<BYTE>(1));
                 for (auto& line : m_drawLines)
                 {
                     if (line.alpha > dec)
@@ -1132,7 +1131,7 @@ bool CMainWindow::StartPresentationMode()
         hDesktopDC = CreateDC(nullptr, devName.c_str(), nullptr, nullptr);
     hDesktopCompatibleDC     = CreateCompatibleDC(hDesktopDC);
     hDesktopCompatibleBitmap = CreateCompatibleBitmap(hDesktopDC, nScreenWidth, nScreenHeight);
-    hOldBmp                  = (HBITMAP)SelectObject(hDesktopCompatibleDC, hDesktopCompatibleBitmap);
+    hOldBmp                  = static_cast<HBITMAP>(SelectObject(hDesktopCompatibleDC, hDesktopCompatibleBitmap));
     BitBlt(hDesktopCompatibleDC, 0, 0, nScreenWidth, nScreenHeight,
            hDesktopDC, allMonitors ? m_rcScreen.left : 0, allMonitors ? m_rcScreen.top : 0,
            SRCCOPY | CAPTUREBLT);
@@ -1159,7 +1158,7 @@ bool CMainWindow::StartPresentationMode()
     {
         if (m_hCursor)
             DestroyCursor(m_hCursor);
-        m_hCursor         = CreateDrawCursor(m_colors[m_colorindex], std::max(2, m_currentpenwidth));
+        m_hCursor         = CreateDrawCursor(m_colors[m_colorIndex], std::max(2, m_currentPenWidth));
         m_hPreviousCursor = SetCursor(m_hCursor);
     }
     else
@@ -1168,10 +1167,10 @@ bool CMainWindow::StartPresentationMode()
     }
     m_bInlineZoom = false;
 
-    m_fadeseconds = (int)CIniSettings::Instance().GetInt64(L"Draw", L"fadeseconds", 0);
-    if (m_fadeseconds > 0)
+    m_fadeSeconds = static_cast<int>(CIniSettings::Instance().GetInt64(L"Draw", L"fadeseconds", 0));
+    if (m_fadeSeconds > 0)
     {
-        ::SetTimer(*this, TIMER_ID_FADE, 100, NULL);
+        ::SetTimer(*this, TIMER_ID_FADE, 100, nullptr);
     }
 
     return true;
@@ -1190,20 +1189,20 @@ bool CMainWindow::EndPresentationMode()
     if (m_hCursor)
     {
         DestroyCursor(m_hCursor);
-        m_hCursor = NULL;
+        m_hCursor = nullptr;
     }
     m_bInlineZoom = false;
-    m_zoomfactor  = 1.2f;
-    CIniSettings::Instance().SetInt64(L"Draw", L"colorindex", m_colorindex);
-    CIniSettings::Instance().SetInt64(L"Draw", L"currentpenwidth", m_currentpenwidth);
+    m_zoomFactor  = 1.2f;
+    CIniSettings::Instance().SetInt64(L"Draw", L"colorindex", m_colorIndex);
+    CIniSettings::Instance().SetInt64(L"Draw", L"currentpenwidth", m_currentPenWidth);
     return true;
 }
 
 void CMainWindow::RegisterHotKeys()
 {
-    WORD zoom = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231);
-    WORD draw = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232);
-    WORD lens = (WORD)CIniSettings::Instance().GetInt64(L"HotKeys", L"lens", 0x233);
+    WORD zoom = static_cast<WORD>(CIniSettings::Instance().GetInt64(L"HotKeys", L"zoom", 0x231));
+    WORD draw = static_cast<WORD>(CIniSettings::Instance().GetInt64(L"HotKeys", L"draw", 0x232));
+    WORD lens = static_cast<WORD>(CIniSettings::Instance().GetInt64(L"HotKeys", L"lens", 0x233));
     zoom      = HotKeyControl2HotKey(zoom);
     draw      = HotKeyControl2HotKey(draw);
     lens      = HotKeyControl2HotKey(lens);
@@ -1216,10 +1215,10 @@ void CMainWindow::RegisterHotKeys()
 bool CMainWindow::StartZoomingMode()
 {
     m_bZooming      = true;
-    m_zoomfactor    = 1.2f;
-    auto transZoom  = Animator::Instance().CreateLinearTransition(m_AnimVarZoom, 0.5, m_zoomfactor);
+    m_zoomFactor    = 1.2f;
+    auto transZoom  = Animator::Instance().CreateLinearTransition(m_animVarZoom, 0.5, m_zoomFactor);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
-    storyBoard->AddTransition(m_AnimVarZoom.m_animVar, transZoom);
+    storyBoard->AddTransition(m_animVarZoom.m_animVar, transZoom);
     Animator::Instance().RunStoryBoard(storyBoard, [this]() {
         InvalidateRect(*this, nullptr, false);
     });
@@ -1242,17 +1241,17 @@ bool CMainWindow::DrawZoom(HDC hdc, POINT pt)
     // zoomfactor 2 = quarter screen to fullscreen
     auto cx          = m_rcScreen.right - m_rcScreen.left;
     auto cy          = m_rcScreen.bottom - m_rcScreen.top;
-    auto zoomfactor  = Animator::GetValue(m_AnimVarZoom);
-    auto zoomwindowx = long(double(cx) / zoomfactor);
-    auto zoomwindowy = long(double(cy) / zoomfactor);
+    auto zoomFactor  = Animator::GetValue(m_animVarZoom);
+    auto zoomWindowX = static_cast<long>(static_cast<double>(cx) / zoomFactor);
+    auto zoomWindowY = static_cast<long>(static_cast<double>(cy) / zoomFactor);
 
     // adjust the cursor position to the zoom factor
     ScreenToClient(*this, &pt);
     POINT resPt;
-    resPt.x = pt.x * (cx - zoomwindowx) / cx;
-    resPt.y = pt.y * (cy - zoomwindowy) / cy;
+    resPt.x = pt.x * (cx - zoomWindowX) / cx;
+    resPt.y = pt.y * (cy - zoomWindowY) / cy;
 
-    return !!StretchBlt(hdc, 0, 0, cx, cy, hDesktopCompatibleDC, resPt.x, resPt.y, zoomwindowx, zoomwindowy, SRCCOPY);
+    return !!StretchBlt(hdc, 0, 0, cx, cy, hDesktopCompatibleDC, resPt.x, resPt.y, zoomWindowX, zoomWindowY, SRCCOPY);
 }
 
 bool CMainWindow::UpdateCursor()
@@ -1262,7 +1261,7 @@ bool CMainWindow::UpdateCursor()
         SetCursor(LoadCursor(nullptr, IDC_ARROW));
     }
     DestroyCursor(m_hCursor);
-    m_hCursor = CreateDrawCursor(m_colors[m_colorindex], std::max(2, m_currentpenwidth));
+    m_hCursor = CreateDrawCursor(m_colors[m_colorIndex], std::max(2, m_currentPenWidth));
     if (m_hCursor)
     {
         SetCursor(m_hCursor);
@@ -1290,7 +1289,7 @@ void CMainWindow::ClearOutdatedPopupWindows()
 bool CMainWindow::StartInlineZoom()
 {
     m_bInlineZoom = true;
-    HCURSOR hCur  = LoadCursor(NULL, IDC_CROSS);
+    HCURSOR hCur  = LoadCursor(nullptr, IDC_CROSS);
     SetCursor(hCur);
     m_ptInlineZoomStartPoint.x = -1;
     m_ptInlineZoomStartPoint.y = -1;

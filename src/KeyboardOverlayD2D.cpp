@@ -19,7 +19,6 @@
 #include "stdafx.h"
 #include "KeyboardOverlayD2D.h"
 #include "DPIAware.h"
-#include "MemDC.h"
 
 #pragma comment(lib, "Winmm.lib")
 
@@ -27,11 +26,11 @@ constexpr int FADE_TIMER = 101;
 
 CKeyboardOverlayWndD2D::~CKeyboardOverlayWndD2D()
 {
-    DiscardDeviceResources();
-    if (m_AnimVar.m_animVar && Animator::IsInstanceActive())
+    CKeyboardOverlayWndD2D::DiscardDeviceResources();
+    if (m_animVar.m_animVar && Animator::IsInstanceActive())
     {
         ComPtr<IUIAnimationStoryboard> storyBoard;
-        if (SUCCEEDED(m_AnimVar.m_animVar->GetCurrentStoryboard(storyBoard.GetAddressOf())))
+        if (SUCCEEDED(m_animVar.m_animVar->GetCurrentStoryboard(storyBoard.GetAddressOf())))
         {
             if (storyBoard)
             {
@@ -52,15 +51,15 @@ bool CKeyboardOverlayWndD2D::RegisterAndCreateWindow()
     wcx.cbClsExtra    = 0;
     wcx.cbWndExtra    = 0;
     wcx.hInstance     = hResource;
-    wcx.hCursor       = LoadCursor(NULL, IDC_HAND);
+    wcx.hCursor       = LoadCursor(nullptr, IDC_HAND);
     wcx.lpszClassName = L"CKeyboardOverlayWndD2D_{3c0b3390-375e-4553-a1ce-04dc03764e4b}";
-    wcx.hIcon         = NULL;
-    wcx.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wcx.lpszMenuName  = NULL;
-    wcx.hIconSm       = NULL;
+    wcx.hIcon         = nullptr;
+    wcx.hbrBackground = reinterpret_cast<HBRUSH>((COLOR_WINDOW + 1));
+    wcx.lpszMenuName  = nullptr;
+    wcx.hIconSm       = nullptr;
     if (RegisterWindow(&wcx))
     {
-        auto ret = CreateEx(WS_EX_NOREDIRECTIONBITMAP | WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_NOACTIVATE | WS_EX_TOPMOST, WS_POPUP | WS_DISABLED, NULL);
+        auto ret = CreateEx(WS_EX_NOREDIRECTIONBITMAP | WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_NOACTIVATE | WS_EX_TOPMOST, WS_POPUP | WS_DISABLED, nullptr);
         return ret;
     }
     return false;
@@ -70,16 +69,16 @@ SIZE CKeyboardOverlayWndD2D::GetRequiredHeight(const std::wstring& text)
 {
     RECT rc;
     GetClientRect(*this, &rc);
-    auto                      textOffset = (float)CDPIAware::Instance().Scale(*this, 3);
+    auto                      textOffset = static_cast<float>(CDPIAware::Instance().Scale(*this, 3));
     ComPtr<IDWriteTextLayout> textLayout;
     if (SUCCEEDED(m_writeFactory->CreateTextLayout(text.c_str(),
-                                                   (UINT32)text.length(), m_TextFormat.Get(),
-                                                   (float)rc.right - textOffset - textOffset, (float)rc.bottom,
+                                                   static_cast<UINT32>(text.length()), m_textFormat.Get(),
+                                                   static_cast<float>(rc.right) - textOffset - textOffset, static_cast<float>(rc.bottom),
                                                    textLayout.GetAddressOf())))
     {
         DWRITE_TEXT_METRICS textMetrics = {};
         if (SUCCEEDED(textLayout->GetMetrics(&textMetrics)))
-            return SIZE{(int)textMetrics.width, (int)textMetrics.height};
+            return SIZE{static_cast<int>(textMetrics.width), static_cast<int>(textMetrics.height)};
     }
     return SIZE{};
 }
@@ -88,14 +87,14 @@ void CKeyboardOverlayWndD2D::Show(const std::wstring& text)
 {
     m_text = text;
     InvalidateRect(*this, nullptr, false);
-    m_AnimVar       = Animator::Instance().CreateAnimationVariable(255.0, 255.0);
+    m_animVar       = Animator::Instance().CreateAnimationVariable(255.0, 255.0);
     auto transKeep  = Animator::Instance().CreateConstantTransition(2.0);
-    auto transFade  = Animator::Instance().CreateSmoothStopTransition(m_AnimVar, 0.8, 0.0);
+    auto transFade  = Animator::Instance().CreateSmoothStopTransition(m_animVar, 0.8, 0.0);
     auto storyBoard = Animator::Instance().CreateStoryBoard();
-    storyBoard->AddTransition(m_AnimVar.m_animVar, transKeep);
-    storyBoard->AddTransition(m_AnimVar.m_animVar, transFade);
+    storyBoard->AddTransition(m_animVar.m_animVar, transKeep);
+    storyBoard->AddTransition(m_animVar.m_animVar, transFade);
     Animator::Instance().RunStoryBoard(storyBoard, [this]() {
-        auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
+        auto animVar = static_cast<BYTE>(Animator::GetIntegerValue(m_animVar));
         InvalidateRect(*this, nullptr, false);
         if (animVar == 0)
             ShowWindow(*this, SW_HIDE);
@@ -105,7 +104,7 @@ void CKeyboardOverlayWndD2D::Show(const std::wstring& text)
 
 bool CKeyboardOverlayWndD2D::IsAnimationFinished()
 {
-    auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
+    auto animVar = static_cast<BYTE>(Animator::GetIntegerValue(m_animVar));
     return (animVar == 0);
 }
 
@@ -127,7 +126,7 @@ LRESULT CKeyboardOverlayWndD2D::WinMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
         case WM_SETFOCUS:
         {
             if (wParam)
-                SetFocus((HWND)wParam); // return the focus, we don't want it
+                SetFocus(reinterpret_cast<HWND>(wParam)); // return the focus, we don't want it
         }
         break;
         case WM_NCHITTEST:
@@ -142,14 +141,14 @@ HRESULT CKeyboardOverlayWndD2D::OnRender(ID2D1DeviceContext* dc)
 {
     HRESULT hr          = S_OK;
     auto    size        = dc->GetSize();
-    auto    roundRadius = (float)CDPIAware::Instance().Scale(*this, 15);
-    auto    textOffset  = (float)CDPIAware::Instance().Scale(*this, 3);
+    auto    roundRadius = static_cast<float>(CDPIAware::Instance().Scale(*this, 15));
+    auto    textOffset  = static_cast<float>(CDPIAware::Instance().Scale(*this, 3));
     auto    roundedRect = D2D1::RoundedRect(D2D1::RectF(0, 0, size.width, size.height), roundRadius, roundRadius);
 
-    auto animVar = (BYTE)Animator::GetIntegerValue(m_AnimVar);
+    auto animVar = static_cast<BYTE>(Animator::GetIntegerValue(m_animVar));
 
     ComPtr<ID2D1Bitmap1>    bmp;
-    D2D1_SIZE_U             sizeU      = {(UINT32)size.width, (UINT32)size.height};
+    D2D1_SIZE_U             sizeU      = {static_cast<UINT32>(size.width), static_cast<UINT32>(size.height)};
     D2D1_BITMAP_PROPERTIES1 properties = {};
     properties.pixelFormat.alphaMode   = D2D1_ALPHA_MODE_PREMULTIPLIED;
     properties.pixelFormat.format      = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -161,8 +160,8 @@ HRESULT CKeyboardOverlayWndD2D::OnRender(ID2D1DeviceContext* dc)
     auto                         textRect = D2D1::RectF(textOffset, textOffset, size.width - textOffset - textOffset, size.height - textOffset - textOffset);
     ComPtr<ID2D1SolidColorBrush> shadowBrush;
     hr = m_dc->CreateSolidColorBrush(D2D1::ColorF(RGB(10, 10, 10), animVar / 255.0f), shadowBrush.GetAddressOf());
-    if (m_TextFormat)
-        dc->DrawText(m_text.c_str(), (UINT32)m_text.size(), m_TextFormat.Get(), textRect, shadowBrush.Get());
+    if (m_textFormat)
+        dc->DrawText(m_text.c_str(), static_cast<UINT32>(m_text.size()), m_textFormat.Get(), textRect, shadowBrush.Get());
 
     m_gaussianBlurEffect->SetInput(0, bmp.Get());
     m_gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 5.0f);
@@ -181,8 +180,8 @@ HRESULT CKeyboardOverlayWndD2D::OnRender(ID2D1DeviceContext* dc)
 
     ComPtr<ID2D1SolidColorBrush> textBrush;
     hr = m_dc->CreateSolidColorBrush(D2D1::ColorF(RGB(120, 120, 255), animVar / 255.0f / 1.1f), textBrush.GetAddressOf());
-    if (m_TextFormat)
-        dc->DrawText(m_text.c_str(), (UINT32)m_text.size(), m_TextFormat.Get(), textRect, textBrush.Get());
+    if (m_textFormat)
+        dc->DrawText(m_text.c_str(), static_cast<UINT32>(m_text.size()), m_textFormat.Get(), textRect, textBrush.Get());
     return hr;
 }
 
@@ -192,13 +191,13 @@ HRESULT CKeyboardOverlayWndD2D::CreateDeviceResources()
     if (SUCCEEDED(hr))
         hr = m_writeFactory->CreateTextFormat(L"Arial", nullptr,
                                               DWRITE_FONT_WEIGHT_DEMI_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_CONDENSED,
-                                              float(CDPIAware::Instance().Scale(*this, 36)),
-                                              L"", m_TextFormat.GetAddressOf());
+                                              static_cast<float>(CDPIAware::Instance().Scale(*this, 36)),
+                                              L"", m_textFormat.GetAddressOf());
     if (SUCCEEDED(hr))
-        hr = m_TextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+        hr = m_textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 
     if (SUCCEEDED(hr))
-        hr = m_TextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+        hr = m_textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     if (SUCCEEDED(hr))
         hr = m_dc->CreateEffect(CLSID_D2D1GaussianBlur, &m_gaussianBlurEffect);
@@ -207,6 +206,6 @@ HRESULT CKeyboardOverlayWndD2D::CreateDeviceResources()
 }
 HRESULT CKeyboardOverlayWndD2D::DiscardDeviceResources()
 {
-    m_TextFormat = nullptr;
+    m_textFormat = nullptr;
     return S_OK;
 };

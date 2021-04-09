@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2020 - Stefan Kueng
+// Copyright (C) 2020-2021 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,7 +20,6 @@
 #include "ColorDlg.h"
 #include "IniSettings.h"
 #include "resource.h"
-#include <string>
 #include <Commdlg.h>
 
 CColorDlg::CColorDlg(HWND hParent)
@@ -43,9 +42,9 @@ LRESULT CColorDlg::DlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam
             m_mvLColor.ConvertToColorButton(hwndDlg, IDC_MOUSEVISUAL_LEFT);
             m_mvMColor.ConvertToColorButton(hwndDlg, IDC_MOUSEVISUAL_MIDDLE);
             m_mvRColor.ConvertToColorButton(hwndDlg, IDC_MOUSEVISUAL_RIGHT);
-            auto mvLClr = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualLcolor", RGB(255, 0, 0));
-            auto mvMClr = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualMcolor", RGB(0, 0, 255));
-            auto mvRClr = (COLORREF)CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualRcolor", RGB(0, 255, 0));
+            auto mvLClr = static_cast<COLORREF>(CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualLcolor", RGB(255, 0, 0)));
+            auto mvMClr = static_cast<COLORREF>(CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualMcolor", RGB(0, 0, 255)));
+            auto mvRClr = static_cast<COLORREF>(CIniSettings::Instance().GetInt64(L"Misc", L"mousevisualRcolor", RGB(0, 255, 0)));
             m_mvLColor.SetColor(mvLClr);
             m_mvMColor.SetColor(mvMClr);
             m_mvRColor.SetColor(mvRClr);
@@ -66,7 +65,7 @@ LRESULT CColorDlg::DoCommand(int id)
             CIniSettings::Instance().SetInt64(L"Misc", L"mousevisualLcolor", m_mvLColor.GetColor());
             CIniSettings::Instance().SetInt64(L"Misc", L"mousevisualMcolor", m_mvMColor.GetColor());
             CIniSettings::Instance().SetInt64(L"Misc", L"mousevisualRcolor", m_mvRColor.GetColor());
-            // fall through
+            [[fallthrough]];
         case IDCANCEL:
             EndDialog(*this, id);
             break;
