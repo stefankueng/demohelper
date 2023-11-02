@@ -1,6 +1,6 @@
 ﻿// demoHelper - screen drawing and presentation tool
 
-// Copyright (C) 2007-2008, 2012, 2015, 2020-2021 - Stefan Kueng
+// Copyright (C) 2007-2008, 2012, 2015, 2020-2021, 2023 - Stefan Kueng
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -94,6 +94,7 @@ BOOL CALLBACK CMainWindow::OptionsDlgProc(HWND hwndDlg, UINT message, WPARAM wPa
                         CIniSettings::Instance().SetInt64(L"Misc", L"OvlPosition", static_cast<int64_t>(OverlayPosition::BottomLeft));
                     if (IsDlgButtonChecked(hwndDlg, IDC_POS_BOTTOMRIGHT))
                         CIniSettings::Instance().SetInt64(L"Misc", L"OvlPosition", static_cast<int64_t>(OverlayPosition::BottomRight));
+                    CIniSettings::Instance().Save();
                 }
                     [[fallthrough]];
                 case IDCANCEL:
