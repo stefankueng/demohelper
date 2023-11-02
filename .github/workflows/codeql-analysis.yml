@@ -38,7 +38,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3.2.0
       with:
         fetch-depth: 2
         submodules: recursive
@@ -74,7 +74,7 @@ jobs:
     #    uses a compiled language
 
     - name: setup-msbuild
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v1.1.3
       
     - name: Build Solution
       run: MSBuild.exe DemoHelper.sln /p:Configuration=Release /p:Platform=x64 -nologo
